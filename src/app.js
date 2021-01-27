@@ -12,7 +12,7 @@ class App extends React.Component{
 
     handleClick(){
         this.setState((state) => ({
-            list: [...state.list, <Area key={"area" + this.state.count}/>],
+            list: [...state.list, <Area key={"area" + this.state.count} filling={<Filling />}/>],
             count: state.count + 1
         }));
     };
@@ -22,80 +22,72 @@ class App extends React.Component{
             <div id="mainDiv">
                 <button id="centerBtn" onClick={this.handleClick}>Add Area</button>
                 {this.state.list}
-                <Area />
             </div>
         )
-    }
-
-    componentDidMount(){
-        let test = document.getElementsByName("drag")
-        console.log(test.length);
-        for(let item of test){
-            dragElement(item);
-        }
-    }
-
-    componentDidUpdate(){
-        let test = document.getElementsByName("drag")
-        console.log(test.length);
-        for(let item of test){
-            dragElement(item);
-        }
     }
 }
 
 class Area extends React.Component{
     constructor(props){
         super(props);
+        this.state = {
+            top: '2%',
+            left: '2%'
+        }
+        this.handleDrag=this.handleDrag.bind(this);
     }
 
-    render(){
-        return(
-            <div name="drag" className="drag dragDiv"></div>
-        )
-    }
-}
-
-
-function dragElement(elmnt) {
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    if (document.getElementById(elmnt.id + "header")) {
-    // if present, the header is where you move the DIV from:
-    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
-    } else {
-    // otherwise, move the DIV from anywhere inside the DIV: 
-    elmnt.onmousedown = dragMouseDown;
-    }
-
-    function dragMouseDown(e) {
-        e = e || window.event;
+    handleDrag(e) {
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
         e.preventDefault();
-        // get the mouse cursor position at startup:
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        // call a function whenever the cursor moves:
-        document.onmousemove = elementDrag;
-    }
-
-    function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
-        // calculate the new cursor position:
+        e.persist();
         pos1 = pos3 - e.clientX;
         pos2 = pos4 - e.clientY;
         pos3 = e.clientX;
         pos4 = e.clientY;
         // set the element's new position:
-        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        this.setState({
+            top: (this.offsetTop - pos2) + "px",
+            left:(this.offsetLeft - pos1) + "px"
+        });
     }
 
-    function closeDragElement() {
-        // stop moving when mouse button is released:
-        document.onmouseup = null;
-        document.onmousemove = null;
+    render(){
+        return(
+            <div 
+                draggable="true"
+                name="drag" 
+                className="drag dragDiv"
+                onDrag={this.handleDrag}
+                style={{left: this.state.left}, {top: this.state.top}}
+                >
+                {this.props.filling}
+            </div>
+        )
+    }
+}
+
+class Filling extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.handleMove=this.handleMove.bind(this);
+    }
+
+    handleMove(e){
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("Moved");
+    }
+
+    render(){
+        return(
+            <div id="fillingDiv">
+                <input type="range" min='-1' max='1' step='.1' onClickCapture={this.handleMove}/>
+            </div>
+        )
     }
 }
 
 ReactDOM.render(<App />, document.getElementById("App"));
+
