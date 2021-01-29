@@ -1,0 +1,131 @@
+html,body
+{
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    overflow-x: hidden; 
+}
+
+.interactive{
+    cursor:pointer;
+}
+
+.moduleDiv{
+    position: absolute;
+    top: 2vh;
+    left: 2vh;
+    background-color:#ddd;
+    filter: drop-shadow(0 0 10px #555);
+    text-align: center;
+
+    &:hover{
+        .fa-times{
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+    
+    .fa-times{
+        text-align: center;
+        background-color: #333;
+        visibility:hidden;
+        opacity: 0;
+        color: #ccc;
+        position: absolute;
+        width: 2vh;
+        height: 2vh;
+        top: -10%;
+        left: -3%;
+        margin: 0px;
+        padding: 0px;
+        border-radius: 50%;
+        transition: transform .6s, filter .6s, visibility .3s, opacity .3s;
+        &:hover{
+            transform: rotate(180deg);
+            filter: drop-shadow(0 0 3px #444);
+        }
+    }
+    p{
+        width: 100%;
+        background-color: #999;
+        margin: 0px;
+        margin-bottom: 5%;
+        padding-top: 4%;
+        padding-bottom: 4%;
+        cursor: move;
+    }
+}
+
+#fillingDiv{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#mainDiv{
+    height: 100vh;
+    width: 100vw;
+    display: grid;
+    grid-template-columns: 4vmax auto;
+    grid-template-rows: 4vmax auto;
+    background-color: #ddd;
+    padding: 0px;
+    margin: 0;
+}
+
+#logo{
+    height: 100%;
+    width: 100%;
+    background-color: #ddd;
+    padding: 0px;
+    margin: 0px;
+    background: #999;
+    filter: drop-shadow(0 0 20px #555);
+}
+
+#header{
+    height: 100%;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+}
+
+#sidebar{
+    position: relative;
+    height: 100%;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+    flex-direction: column;
+
+    #sideButtons{
+        height: 100%;
+        width: 100%;
+    }
+
+    .addBtn{
+        width: 100%;
+        height: 10%;
+        background-color: #ddd;
+        text-align: center;
+        overflow:hidden;
+    }
+}
+
+#playSpace{
+    position: relative;
+    background-image: url('./media/bedge-grunge.png');
+    background-color: #440440;
+    filter: drop-shadow(0 0 10px #555);
+}
+
+
+
+#returnSpace{
+    height: 100%;
+    width: 100%;
+}
