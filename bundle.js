@@ -32,7 +32,7 @@ var App = function (_React$Component) {
 
     _createClass(App, [{
         key: "handleClick",
-        value: function handleClick(childKey, childJSX, childCords) {
+        value: function handleClick(childKey, childJSX) {
             var _this2 = this;
 
             this.setState(function (state) {
@@ -41,7 +41,6 @@ var App = function (_React$Component) {
                         key: childKey,
                         myKey: childKey,
                         filling: childJSX,
-                        cords: childCords,
                         name: childKey.split(" ")[0],
                         handleClose: _this2.handleClose
                     })))
@@ -142,9 +141,7 @@ var Area = function (_React$Component2) {
                         "div",
                         { id: "innerModDiv" },
                         this.props.filling
-                    ),
-                    this.props.cords[0] ? React.createElement(CordDock, { type: "input" }) : React.createElement("div", { className: "hideMe" }),
-                    this.props.cords[1] ? React.createElement(CordDock, { type: "output" }) : React.createElement("div", { className: "hideMe" })
+                    )
                 )
             );
         }
@@ -168,9 +165,10 @@ var SideButtons = function (_React$Component3) {
             return React.createElement(
                 "div",
                 { id: this.props.id },
-                React.createElement(MyButton, { name: "TestButton", cords: [true, false], handleClick: this.props.handleClick }),
-                React.createElement(MyButton, { name: "AnotherTest", cords: [true, true], handleClick: this.props.handleClick }),
-                React.createElement(MyButton, { name: "Poopoop", cords: [false, false], handleClick: this.props.handleClick })
+                React.createElement(MyButton, { name: "TestButton", handleClick: this.props.handleClick }),
+                React.createElement(MyButton, { name: "AnotherTest", handleClick: this.props.handleClick }),
+                React.createElement(MyButton, { name: "Poopoop", handleClick: this.props.handleClick }),
+                React.createElement(MyButton, { name: "PeePee", handleClick: this.props.handleClick })
             );
         }
     }]);
@@ -200,7 +198,7 @@ var MyButton = function (_React$Component4) {
     _createClass(MyButton, [{
         key: "handleClick",
         value: function handleClick() {
-            this.props.handleClick(this.props.name + " " + this.state.count, React.createElement(Filling, { name: this.props.name }), this.props.cords);
+            this.props.handleClick(this.props.name + " " + this.state.count, React.createElement(Filling, { name: this.props.name }));
             this.setState(function (state) {
                 return {
                     count: state.count + 1
@@ -244,7 +242,9 @@ var Filling = function (_React$Component5) {
                     "button",
                     null,
                     "On"
-                )
+                ),
+                React.createElement(InputCord, null),
+                React.createElement(OutputCord, null)
             );
         }
     }]);
@@ -252,30 +252,50 @@ var Filling = function (_React$Component5) {
     return Filling;
 }(React.Component);
 
-var CordDock = function (_React$Component6) {
-    _inherits(CordDock, _React$Component6);
+var InputCord = function (_React$Component6) {
+    _inherits(InputCord, _React$Component6);
 
-    function CordDock(props) {
-        _classCallCheck(this, CordDock);
+    function InputCord(props) {
+        _classCallCheck(this, InputCord);
 
-        return _possibleConstructorReturn(this, (CordDock.__proto__ || Object.getPrototypeOf(CordDock)).call(this, props));
+        return _possibleConstructorReturn(this, (InputCord.__proto__ || Object.getPrototypeOf(InputCord)).call(this, props));
     }
 
-    _createClass(CordDock, [{
+    _createClass(InputCord, [{
         key: "render",
         value: function render() {
-            var color = this.props.type == "input" ? { backgroundColor: '#ddd' } : { backgroundColor: '#555' };
-            var pos = this.props.type == 'input' ? { right: '75%' } : { right: '25%' };
-            console.log(color);
             return React.createElement(
                 "div",
-                { id: "cordOuter", style: pos },
-                React.createElement("div", { id: "cordInner", style: color })
+                { className: "cordOuter", id: "inputOuter" },
+                React.createElement("div", { className: "cordInner", id: "inputInner" })
             );
         }
     }]);
 
-    return CordDock;
+    return InputCord;
+}(React.Component);
+
+var OutputCord = function (_React$Component7) {
+    _inherits(OutputCord, _React$Component7);
+
+    function OutputCord(props) {
+        _classCallCheck(this, OutputCord);
+
+        return _possibleConstructorReturn(this, (OutputCord.__proto__ || Object.getPrototypeOf(OutputCord)).call(this, props));
+    }
+
+    _createClass(OutputCord, [{
+        key: "render",
+        value: function render() {
+            return React.createElement(
+                "div",
+                { className: "cordOuter", id: "outputOuter" },
+                React.createElement("div", { className: "cordInner", id: "outputInner" })
+            );
+        }
+    }]);
+
+    return OutputCord;
 }(React.Component);
 
 ReactDOM.render(React.createElement(App, null), document.getElementById("App"));

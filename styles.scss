@@ -76,7 +76,6 @@ html,body
         &:hover{
             background-color: $dark;
             color: #ddd;
-            filter:drop-shadow(0 0 10px $light);
         }
     }
 }
@@ -98,7 +97,7 @@ html,body
         height: 10.5vh;
     
         &:hover{
-            .fa-times, #cordOuter{
+            .fa-times, .cordOuter{
                 visibility: visible;
                 opacity: 1;
             }
@@ -109,14 +108,14 @@ html,body
             text-align: center;
             background-color: $dark;
             color: $light;
-            font-size: 2vh;
+            font-size: 1.8vh;
             visibility:hidden;
             opacity: 0;
             position: absolute;
-            width: 2vh;
-            height: 2vh;
+            width: 1.8vh;
+            height: 1.8vh;
             top: -10%;
-            left: -3%;
+            left: -4%;
             margin: 0px;
             padding: 0px;
             border-radius: 50%;
@@ -153,16 +152,15 @@ html,body
             margin-bottom: 10%;
         }
 
-        #cordOuter{
+        .cordOuter{
             visibility: 0;
             opacity: 0;
             position: absolute;
             width: 2vh;
             height: 2vh;
-            bottom: -10%;
             background-color: lighten($dark, 20%);
             border-radius: 50%;
-            transition: transform .6s, filter .6s, visibility .3s, opacity .3s;
+            transition: transform .6s, filter .3s, visibility .3s, opacity .3s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -173,13 +171,30 @@ html,body
                 filter:drop-shadow(0 0 5px $dark);
             }
 
-            #cordInner{
+            .cordInner{
                 width: 65%;
                 height: 65%;
                 border-radius: 50%;
                 padding: 0px;
                 margin: 0px;
             }
+
+            #inputInner{
+                background-color: $light;
+            }
+
+            #outputInner{
+                background-color: $dark;
+            }
+        }
+        #inputOuter{
+            bottom: -1vh;
+            right: 75%;
+        }
+
+        #outputOuter{
+            bottom: -1vh;
+            right: 25%;
         }
     }
 }

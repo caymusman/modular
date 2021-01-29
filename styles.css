@@ -82,8 +82,6 @@ html, body {
 #sidebar .addBtn:hover {
   background-color: #555;
   color: #ddd;
-  -webkit-filter: drop-shadow(0 0 10px #ddd);
-          filter: drop-shadow(0 0 10px #ddd);
 }
 
 #playSpace {
@@ -105,7 +103,7 @@ html, body {
   height: 10.5vh;
 }
 
-#playSpace .moduleDiv:hover .fa-times, #playSpace .moduleDiv:hover #cordOuter {
+#playSpace .moduleDiv:hover .fa-times, #playSpace .moduleDiv:hover .cordOuter {
   visibility: visible;
   opacity: 1;
 }
@@ -114,14 +112,14 @@ html, body {
   text-align: center;
   background-color: #555;
   color: #ddd;
-  font-size: 2vh;
+  font-size: 1.8vh;
   visibility: hidden;
   opacity: 0;
   position: absolute;
-  width: 2vh;
-  height: 2vh;
+  width: 1.8vh;
+  height: 1.8vh;
   top: -10%;
-  left: -3%;
+  left: -4%;
   margin: 0px;
   padding: 0px;
   border-radius: 50%;
@@ -173,19 +171,18 @@ html, body {
   margin-bottom: 10%;
 }
 
-#playSpace .moduleDiv #cordOuter {
+#playSpace .moduleDiv .cordOuter {
   visibility: 0;
   opacity: 0;
   position: absolute;
   width: 2vh;
   height: 2vh;
-  bottom: -10%;
   background-color: #888888;
   border-radius: 50%;
-  -webkit-transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
-  transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
-  transition: transform .6s, filter .6s, visibility .3s, opacity .3s;
-  transition: transform .6s, filter .6s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
+  -webkit-transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .3s;
+  transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .3s;
+  transition: transform .6s, filter .3s, visibility .3s, opacity .3s;
+  transition: transform .6s, filter .3s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .3s;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -200,17 +197,35 @@ html, body {
           transform: translate(50%);
 }
 
-#playSpace .moduleDiv #cordOuter:hover {
+#playSpace .moduleDiv .cordOuter:hover {
   -webkit-filter: drop-shadow(0 0 5px #555);
           filter: drop-shadow(0 0 5px #555);
 }
 
-#playSpace .moduleDiv #cordOuter #cordInner {
+#playSpace .moduleDiv .cordOuter .cordInner {
   width: 65%;
   height: 65%;
   border-radius: 50%;
   padding: 0px;
   margin: 0px;
+}
+
+#playSpace .moduleDiv .cordOuter #inputInner {
+  background-color: #ddd;
+}
+
+#playSpace .moduleDiv .cordOuter #outputInner {
+  background-color: #555;
+}
+
+#playSpace .moduleDiv #inputOuter {
+  bottom: -1vh;
+  right: 75%;
+}
+
+#playSpace .moduleDiv #outputOuter {
+  bottom: -1vh;
+  right: 25%;
 }
 
 #returnSpace {
