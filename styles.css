@@ -10,72 +10,6 @@ html, body {
   cursor: pointer;
 }
 
-.moduleDiv {
-  position: absolute;
-  top: 2vh;
-  left: 2vh;
-  background-color: #ddd;
-  -webkit-filter: drop-shadow(0 0 10px #555);
-          filter: drop-shadow(0 0 10px #555);
-  text-align: center;
-}
-
-.moduleDiv:hover .fa-times {
-  visibility: visible;
-  opacity: 1;
-}
-
-.moduleDiv .fa-times {
-  text-align: center;
-  background-color: #333;
-  visibility: hidden;
-  opacity: 0;
-  color: #ccc;
-  position: absolute;
-  width: 2vh;
-  height: 2vh;
-  top: -10%;
-  left: -3%;
-  margin: 0px;
-  padding: 0px;
-  border-radius: 50%;
-  -webkit-transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
-  transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
-  transition: transform .6s, filter .6s, visibility .3s, opacity .3s;
-  transition: transform .6s, filter .6s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
-}
-
-.moduleDiv .fa-times:hover {
-  -webkit-transform: rotate(180deg);
-          transform: rotate(180deg);
-  -webkit-filter: drop-shadow(0 0 3px #444);
-          filter: drop-shadow(0 0 3px #444);
-}
-
-.moduleDiv p {
-  width: 100%;
-  background-color: #999;
-  margin: 0px;
-  margin-bottom: 5%;
-  padding-top: 4%;
-  padding-bottom: 4%;
-  cursor: move;
-}
-
-#fillingDiv {
-  height: 100%;
-  width: 100%;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-}
-
 #mainDiv {
   height: 100vh;
   width: 100vw;
@@ -93,12 +27,10 @@ html, body {
 #logo {
   height: 100%;
   width: 100%;
-  background-color: #ddd;
   padding: 0px;
   margin: 0px;
   background: #999;
-  -webkit-filter: drop-shadow(0 0 20px #555);
-          filter: drop-shadow(0 0 20px #555);
+  z-index: 3;
 }
 
 #header {
@@ -106,6 +38,10 @@ html, body {
   width: 100%;
   padding: 0px;
   margin: 0px;
+  background-color: #555;
+  -webkit-filter: drop-shadow(0 0 20px #555);
+          filter: drop-shadow(0 0 20px #555);
+  z-index: 2;
 }
 
 #sidebar {
@@ -121,6 +57,9 @@ html, body {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
+  z-index: 2;
+  -webkit-filter: drop-shadow(0 0 10px #555);
+          filter: drop-shadow(0 0 10px #555);
 }
 
 #sidebar #sideButtons {
@@ -129,19 +68,149 @@ html, body {
 }
 
 #sidebar .addBtn {
+  font-size: .6vmax;
   width: 100%;
   height: 10%;
   background-color: #ddd;
+  color: #555;
   text-align: center;
-  overflow: hidden;
+  margin: auto;
+  padding: 0px;
+  border: none;
+}
+
+#sidebar .addBtn:hover {
+  background-color: #555;
+  color: #ddd;
+  -webkit-filter: drop-shadow(0 0 10px #ddd);
+          filter: drop-shadow(0 0 10px #ddd);
 }
 
 #playSpace {
+  z-index: 1;
   position: relative;
-  background-image: url("./media/bedge-grunge.png");
-  background-color: #440440;
+  background-color: #b6a8b5;
+  background-image: url("/media/bedge-grunge.png");
+}
+
+#playSpace .moduleDiv {
+  position: absolute;
+  top: 2vh;
+  left: 2vh;
+  background-color: #ddd;
   -webkit-filter: drop-shadow(0 0 10px #555);
           filter: drop-shadow(0 0 10px #555);
+  text-align: center;
+  width: 12.5vw;
+  height: 10.5vh;
+}
+
+#playSpace .moduleDiv:hover .fa-times, #playSpace .moduleDiv:hover #cordOuter {
+  visibility: visible;
+  opacity: 1;
+}
+
+#playSpace .moduleDiv .fa-times {
+  text-align: center;
+  background-color: #555;
+  color: #ddd;
+  font-size: 2vh;
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  width: 2vh;
+  height: 2vh;
+  top: -10%;
+  left: -3%;
+  margin: 0px;
+  padding: 0px;
+  border-radius: 50%;
+  -webkit-transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
+  transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
+  transition: transform .6s, filter .6s, visibility .3s, opacity .3s;
+  transition: transform .6s, filter .6s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
+  cursor: pointer;
+}
+
+#playSpace .moduleDiv .fa-times:hover {
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+  -webkit-filter: drop-shadow(0 0 3px #555);
+          filter: drop-shadow(0 0 3px #555);
+}
+
+#playSpace .moduleDiv p {
+  width: 100%;
+  height: 25%;
+  background-color: #555;
+  color: #ddd;
+  margin: 0px;
+  margin-bottom: 5%;
+  padding-top: 4%;
+  padding-bottom: 4%;
+  cursor: move;
+  -webkit-transition: background-color .3s, color .3s;
+  transition: background-color .3s, color .3s;
+}
+
+#playSpace .moduleDiv p:hover {
+  background-color: #6f6f6f;
+  color: #f7f7f7;
+}
+
+#playSpace .moduleDiv #fillingDiv {
+  height: 100%;
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin-bottom: 10%;
+}
+
+#playSpace .moduleDiv #cordOuter {
+  visibility: 0;
+  opacity: 0;
+  position: absolute;
+  width: 2vh;
+  height: 2vh;
+  bottom: -10%;
+  background-color: #888888;
+  border-radius: 50%;
+  -webkit-transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
+  transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
+  transition: transform .6s, filter .6s, visibility .3s, opacity .3s;
+  transition: transform .6s, filter .6s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  padding: 0px;
+  -webkit-transform: translate(50%);
+          transform: translate(50%);
+}
+
+#playSpace .moduleDiv #cordOuter:hover {
+  -webkit-filter: drop-shadow(0 0 5px #555);
+          filter: drop-shadow(0 0 5px #555);
+}
+
+#playSpace .moduleDiv #cordOuter #cordInner {
+  width: 65%;
+  height: 65%;
+  border-radius: 50%;
+  padding: 0px;
+  margin: 0px;
 }
 
 #returnSpace {

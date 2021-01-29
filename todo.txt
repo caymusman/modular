@@ -1,0 +1,3 @@
+Make audio out module and final gain module.
+patch cords
+audio

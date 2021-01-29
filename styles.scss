@@ -1,3 +1,6 @@
+$dark: #555;
+$light: #ddd;
+
 html,body
 {
     width: 100%;
@@ -11,59 +14,6 @@ html,body
     cursor:pointer;
 }
 
-.moduleDiv{
-    position: absolute;
-    top: 2vh;
-    left: 2vh;
-    background-color:#ddd;
-    filter: drop-shadow(0 0 10px #555);
-    text-align: center;
-
-    &:hover{
-        .fa-times{
-            visibility: visible;
-            opacity: 1;
-        }
-    }
-    
-    .fa-times{
-        text-align: center;
-        background-color: #333;
-        visibility:hidden;
-        opacity: 0;
-        color: #ccc;
-        position: absolute;
-        width: 2vh;
-        height: 2vh;
-        top: -10%;
-        left: -3%;
-        margin: 0px;
-        padding: 0px;
-        border-radius: 50%;
-        transition: transform .6s, filter .6s, visibility .3s, opacity .3s;
-        &:hover{
-            transform: rotate(180deg);
-            filter: drop-shadow(0 0 3px #444);
-        }
-    }
-    p{
-        width: 100%;
-        background-color: #999;
-        margin: 0px;
-        margin-bottom: 5%;
-        padding-top: 4%;
-        padding-bottom: 4%;
-        cursor: move;
-    }
-}
-
-#fillingDiv{
-    height: 100%;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 
 #mainDiv{
     height: 100vh;
@@ -71,7 +21,7 @@ html,body
     display: grid;
     grid-template-columns: 4vmax auto;
     grid-template-rows: 4vmax auto;
-    background-color: #ddd;
+    background-color: $light;
     padding: 0px;
     margin: 0;
 }
@@ -79,11 +29,11 @@ html,body
 #logo{
     height: 100%;
     width: 100%;
-    background-color: #ddd;
     padding: 0px;
     margin: 0px;
     background: #999;
-    filter: drop-shadow(0 0 20px #555);
+    z-index: 3;
+    
 }
 
 #header{
@@ -91,6 +41,9 @@ html,body
     width: 100%;
     padding: 0px;
     margin: 0px;
+    background-color: $dark;
+    filter: drop-shadow(0 0 20px $dark);
+    z-index: 2;
 }
 
 #sidebar{
@@ -101,6 +54,8 @@ html,body
     margin: 0px;
     display: flex;
     flex-direction: column;
+    z-index: 2;
+    filter:drop-shadow(0 0 10px $dark);
 
     #sideButtons{
         height: 100%;
@@ -108,22 +63,126 @@ html,body
     }
 
     .addBtn{
+        font-size: .6vmax;
         width: 100%;
         height: 10%;
-        background-color: #ddd;
+        background-color: $light;
+        color: #555;
         text-align: center;
-        overflow:hidden;
+        margin: auto;
+        padding: 0px;
+        border: none;
+
+        &:hover{
+            background-color: $dark;
+            color: #ddd;
+            filter:drop-shadow(0 0 10px $light);
+        }
     }
 }
 
 #playSpace{
+    z-index: 1;
     position: relative;
-    background-image: url('./media/bedge-grunge.png');
-    background-color: #440440;
-    filter: drop-shadow(0 0 10px #555);
+    background-color: #b6a8b5;
+    background-image: url('/media/bedge-grunge.png');
+
+    .moduleDiv{
+        position: absolute;
+        top: 2vh;
+        left: 2vh;
+        background-color:$light;
+        filter: drop-shadow(0 0 10px $dark);
+        text-align: center;
+        width: 12.5vw;
+        height: 10.5vh;
+    
+        &:hover{
+            .fa-times, #cordOuter{
+                visibility: visible;
+                opacity: 1;
+            }
+
+        }
+        
+        .fa-times{
+            text-align: center;
+            background-color: $dark;
+            color: $light;
+            font-size: 2vh;
+            visibility:hidden;
+            opacity: 0;
+            position: absolute;
+            width: 2vh;
+            height: 2vh;
+            top: -10%;
+            left: -3%;
+            margin: 0px;
+            padding: 0px;
+            border-radius: 50%;
+            transition: transform .6s, filter .6s, visibility .3s, opacity .3s;
+            cursor: pointer;
+            &:hover{
+                transform: rotate(180deg);
+                filter: drop-shadow(0 0 3px $dark);
+            }
+        }
+        p{
+            width: 100%;
+            height: 25%;
+            background-color: $dark;
+            color: $light;
+            margin: 0px;
+            margin-bottom: 5%;
+            padding-top: 4%;
+            padding-bottom: 4%;
+            cursor: move;
+            transition: background-color .3s, color .3s;
+            &:hover{
+                background-color: lighten($dark, 10%);
+                color: lighten($light, 10%);
+            }
+        }
+
+        #fillingDiv{
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10%;
+        }
+
+        #cordOuter{
+            visibility: 0;
+            opacity: 0;
+            position: absolute;
+            width: 2vh;
+            height: 2vh;
+            bottom: -10%;
+            background-color: lighten($dark, 20%);
+            border-radius: 50%;
+            transition: transform .6s, filter .6s, visibility .3s, opacity .3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0px;
+            transform: translate(50%);
+
+            &:hover{
+                filter:drop-shadow(0 0 5px $dark);
+            }
+
+            #cordInner{
+                width: 65%;
+                height: 65%;
+                border-radius: 50%;
+                padding: 0px;
+                margin: 0px;
+            }
+        }
+    }
 }
-
-
 
 #returnSpace{
     height: 100%;

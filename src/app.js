@@ -12,12 +12,13 @@ class App extends React.Component{
     }
 
     //Passed to SideButtons to control which buttons are added to PlaySpace
-    handleClick(childKey, childJSX){
+    handleClick(childKey, childJSX, childCords){
         this.setState((state) => ({
             list: new Map(state.list.set(childKey, <Area 
                                                         key={childKey} 
                                                         myKey={childKey}
                                                         filling={childJSX} 
+                                                        cords={childCords}
                                                         name={childKey.split(" ")[0]}
                                                         handleClose={this.handleClose}
                                                         />)) ,
@@ -82,6 +83,8 @@ class Area extends React.Component{
                     <div id="innerModDiv">
                         {this.props.filling}
                     </div>
+                    {this.props.cords[0] ? <CordDock type="input" /> : <div className="hideMe"/>}
+                    {this.props.cords[1] ? <CordDock type="output"/> : <div className="hideMe"/>}
                         
                 </div>
             </Draggable>
@@ -97,9 +100,9 @@ class SideButtons extends React.Component{
     render(){
         return(
             <div id={this.props.id}>
-                <MyButton name="TestButton" handleClick={this.props.handleClick}/>
-                <MyButton name="AnotherTest" handleClick={this.props.handleClick}/>
-                <MyButton name="Poopoop" handleClick={this.props.handleClick}/>
+                <MyButton name="TestButton" cords={[true, false]} handleClick={this.props.handleClick}/>
+                <MyButton name="AnotherTest" cords={[true, true]} handleClick={this.props.handleClick}/>
+                <MyButton name="Poopoop" cords={[false, false]} handleClick={this.props.handleClick}/>
             </div>
         )
         
@@ -119,7 +122,7 @@ class MyButton extends React.Component{
 
     //Return up to App a new module to be added to the play area.
     handleClick(){
-        this.props.handleClick(this.props.name + " " + this.state.count, <Filling name={this.props.name}/>)
+        this.props.handleClick(this.props.name + " " + this.state.count, <Filling name={this.props.name}/>, this.props.cords)
         this.setState((state) => ({
             count: state.count + 1
         }))
@@ -143,6 +146,24 @@ class Filling extends React.Component{
             <div id="fillingDiv">
                 <input type="range" min='-1' max='1' step='.1'/>
                 <button>On</button>
+            </div>
+        )
+    }
+}
+
+class CordDock extends React.Component{
+    constructor(props){
+        super(props);
+    }
+
+    render(){
+        let color = this.props.type == "input" ? {backgroundColor: '#ddd'} : {backgroundColor: '#555'}
+        let pos = this.props.type == 'input' ? {right: '75%'} : {right: '25%'};
+        console.log(color);
+        return(
+            <div id="cordOuter" style={pos}>
+                <div id="cordInner" style={color}>
+                </div>
             </div>
         )
     }
