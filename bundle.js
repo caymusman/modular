@@ -64,9 +64,11 @@ var App = function (_React$Component) {
     }, {
         key: "render",
         value: function render() {
+            var dragHandlers = { onStart: this.onStart, onStop: this.onStop };
             return React.createElement(
                 "div",
                 { id: "mainDiv" },
+                React.createElement("svg", { id: "patchCords" }),
                 React.createElement("div", { id: "logo" }),
                 React.createElement("div", { id: "header" }),
                 React.createElement(
@@ -83,9 +85,13 @@ var App = function (_React$Component) {
                         var key = entry[0];
                         var value = entry[1];
                         return React.createElement(
-                            "div",
-                            { id: "returnSpace", key: key },
-                            value
+                            Draggable,
+                            Object.assign({ key: key, handle: "p" }, dragHandlers, { bounds: "parent" }),
+                            React.createElement(
+                                "div",
+                                { className: "dragDiv" },
+                                value
+                            )
                         );
                     })
                 )
@@ -122,26 +128,21 @@ var Area = function (_React$Component2) {
     }, {
         key: "render",
         value: function render() {
-            var dragHandlers = { onStart: this.onStart, onStop: this.onStop };
+
             return React.createElement(
-                Draggable,
-                Object.assign({ handle: "p" }, dragHandlers, { bounds: "parent" }),
+                "div",
+                { className: "moduleDiv"
+                },
+                React.createElement("i", { className: "fa fa-times", "aria-hidden": "true", onClick: this.handleClose }),
+                React.createElement(
+                    "p",
+                    { id: "modTitle" },
+                    this.props.name
+                ),
                 React.createElement(
                     "div",
-                    {
-                        className: "moduleDiv"
-                    },
-                    React.createElement("i", { className: "fa fa-times", "aria-hidden": "true", onClick: this.handleClose }),
-                    React.createElement(
-                        "p",
-                        { id: "modTitle" },
-                        this.props.name
-                    ),
-                    React.createElement(
-                        "div",
-                        { id: "innerModDiv" },
-                        this.props.filling
-                    )
+                    { id: "innerModDiv" },
+                    this.props.filling
                 )
             );
         }

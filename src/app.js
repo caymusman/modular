@@ -34,8 +34,10 @@ class App extends React.Component{
     }
 
     render(){
+        const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
         return(
             <div id="mainDiv">
+                <svg id="patchCords"></svg>
                 <div id="logo"></div>
                 <div id="header"></div>
                 <div id="sidebar">
@@ -47,7 +49,7 @@ class App extends React.Component{
                 {[...this.state.list].map((entry) => {
                         let key = entry[0];
                         let value = entry[1];
-                        return <div id="returnSpace" key = {key}>{value}</div>
+                        return <Draggable key={key} handle="p" {...dragHandlers} bounds="parent"><div className="dragDiv">{value}</div></Draggable>
                     })}
                 </div>
             </div>
@@ -71,11 +73,9 @@ class Area extends React.Component{
 
 
     render(){
-        const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
+        
         return(
-            <Draggable handle="p" {...dragHandlers} bounds="parent">
-                <div 
-                    className="moduleDiv"
+                <div className="moduleDiv"
                     >
                     <i className="fa fa-times" aria-hidden="true" onClick={this.handleClose}></i>
                     <p id="modTitle">{this.props.name}</p>
@@ -84,7 +84,6 @@ class Area extends React.Component{
                     </div>
                         
                 </div>
-            </Draggable>
         )
     }
 }

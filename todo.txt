@@ -1,3 +1,5 @@
-Make audio out module and final gain module.
-patch cords
-audio
+Make modules fixed sizes to ameliorate resizing issues with patch cables.
+Make side menu change when size is too small.
+port over patch cable designs including update when modules move.
+work on patch cord click options and design.
+have "input selected" lifecycle in App component.

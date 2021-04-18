@@ -11,6 +11,7 @@ html, body {
 }
 
 #mainDiv {
+  position: absolute;
   height: 100vh;
   width: 100vw;
   display: -ms-grid;
@@ -89,6 +90,12 @@ html, body {
   position: relative;
   background-color: #b6a8b5;
   background-image: url("/media/bedge-grunge.png");
+  width: 100%;
+}
+
+#playSpace .dragDiv {
+  width: 12.5vw;
+  height: 10.5vh;
 }
 
 #playSpace .moduleDiv {
@@ -123,18 +130,28 @@ html, body {
   margin: 0px;
   padding: 0px;
   border-radius: 50%;
-  -webkit-transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
-  transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
-  transition: transform .6s, filter .6s, visibility .3s, opacity .3s;
-  transition: transform .6s, filter .6s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
+  -webkit-transition: background-color .6s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
+  transition: background-color .6s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
+  transition: background-color .6s, transform .6s, filter .6s, visibility .3s, opacity .3s;
+  transition: background-color .6s, transform .6s, filter .6s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
   cursor: pointer;
 }
 
 #playSpace .moduleDiv .fa-times:hover {
+  background-color: #6f6f6f;
   -webkit-transform: rotate(180deg);
           transform: rotate(180deg);
-  -webkit-filter: drop-shadow(0 0 3px #555);
-          filter: drop-shadow(0 0 3px #555);
+  -webkit-filter: drop-shadow(0 0 2px #555);
+          filter: drop-shadow(0 0 2px #555);
+}
+
+#playSpace .moduleDiv #patchCords {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  stroke-linecap: round;
+  z-index: 100;
 }
 
 #playSpace .moduleDiv p {
@@ -169,6 +186,15 @@ html, body {
       -ms-flex-align: center;
           align-items: center;
   margin-bottom: 10%;
+}
+
+#playSpace .moduleDiv #fillingDiv input {
+  width: 60%;
+}
+
+#playSpace .moduleDiv #fillingDiv button {
+  width: 20%;
+  height: 20%;
 }
 
 #playSpace .moduleDiv .cordOuter {
@@ -231,5 +257,13 @@ html, body {
 #returnSpace {
   height: 100%;
   width: 100%;
+}
+
+svg {
+  position: absolute;
+  width: calc(100% - 4vmax);
+  height: calc(100% - 4vmax);
+  top: 4vmax;
+  left: 4vmax;
 }
 /*# sourceMappingURL=styles.css.map */
