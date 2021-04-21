@@ -3,3 +3,7 @@ Make side menu change when size is too small.
 port over patch cable designs including update when modules move.
 work on patch cord click options and design.
 have "input selected" lifecycle in App component.
+
+
+
+:handle exit output mode

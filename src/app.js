@@ -6,9 +6,17 @@ class App extends React.Component{
 
         this.state = {
             list: new Map(),
+            patchCords: [],
+            cordCount: 0,
+            outputMode: false
         }
         this.handleClick=this.handleClick.bind(this);
         this.handleClose=this.handleClose.bind(this);
+
+        this.addCord=this.addCord.bind(this);
+        this.handlePatchExit=this.handlePatchExit.bind(this);
+        this.handleOutput=this.handleOutput.bind(this);
+        this.deleteCord=this.deleteCord.bind(this);
     }
 
     //Passed to SideButtons to control which buttons are added to PlaySpace
@@ -20,6 +28,9 @@ class App extends React.Component{
                                                         filling={childJSX} 
                                                         name={childKey.split(" ")[0]}
                                                         handleClose={this.handleClose}
+                                                        outputMode={this.state.outputMode} 
+                                                        addPatch={this.addCord} 
+                                                        handleOutput={this.handleOutput}
                                                         />)) ,
         }));
     };
@@ -33,11 +44,58 @@ class App extends React.Component{
         }))
     }
 
+    handlePatchExit(){
+        this.setState({
+            outputMode: false
+        })
+    }
+
+    addCord(info){
+        this.setState((state) => ({
+            patchCords: [...state.patchCords, {id: "cord" + this.state.cordCount, inputData: info, outputData: null}],
+            cordCount: state.cordCount + 1,
+            outputMode: true
+        }))
+    }
+
+    handleOutput(info){
+        if(this.state.outputMode){
+            let newCords = [...this.state.patchCords];
+            let outData = "outputData";
+            newCords[this.state.cordCount - 1][outData]=info;
+            this.setState((state) => ({
+                patchCords: newCords
+            }));
+
+            this.setState({
+                outputMode: false
+            })
+        }
+    }
+
+    deleteCord(cordID){
+        let newArr = [...this.state.patchCords];
+        this.setState(state => ({
+            patchCords: newArr.filter(el => {
+                return el.id !== cordID;
+            }),
+            cordCount: state.cordCount - 1
+        }))
+    }
+
+
     render(){
         const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
+        let cords = []; //loop through the cords in the state, add line version to this array
+        let tempArr = [...this.state.patchCords];
+        tempArr.forEach(el => {
+            if(el['outputData']){
+                cords.push(<Cord deleteCord={this.deleteCord} key={el.id} id={el.id} x1={el.inputData.fromLocation.x} y1={el.inputData.fromLocation.y} x2={el.outputData.toLocation.x} y2={el.outputData.toLocation.y}></Cord>)
+            }
+        })
         return(
             <div id="mainDiv">
-                <svg id="patchCords"></svg>
+                <svg id="patchCords">{cords}</svg>
                 <div id="logo"></div>
                 <div id="header"></div>
                 <div id="sidebar">
@@ -64,12 +122,46 @@ class Area extends React.Component{
         super(props);
 
         this.handleClose=this.handleClose.bind(this);
+        this.handleCreatePatch=this.handleCreatePatch.bind(this);
+        this.handleOutput=this.handleOutput.bind(this);
+
+        this.state={
+            clicked: false
+        }
     }
 
     handleClose(){
         this.props.handleClose(this.props.myKey);
     }
     //Close on press of X icon. Pass key up to App and remove from state.list
+
+    handleCreatePatch(){
+        if(!this.state.clicked){
+            let el = document.getElementById(this.props.myKey + "inputInner").getBoundingClientRect();
+            let x = el.x;
+            let y = el.y;
+            let bottom = el.bottom;
+            let right = el.right;
+            let xCenter = (right - x) / 2 + x;
+            let yCenter = (bottom - y) / 2 + y;
+            this.props.addPatch({fromModID: this.props.myKey,
+                             fromLocation: {x: xCenter, y: yCenter}});
+            }
+        this.setState((state) => ({clicked: !state.clicked}));
+    }
+
+    handleOutput(){
+        let el = document.getElementById(this.props.myKey + "outputInner").getBoundingClientRect();
+        let x = el.x;
+        let y = el.y;
+        let bottom = el.bottom;
+        let right = el.right;
+        let xCenter = (right - x) / 2 + x;
+        let yCenter = (bottom - y) / 2 + y;
+        
+        this.props.handleOutput({tomyKey: this.props.myKey,
+                                 toLocation: {x: xCenter, y: yCenter}});
+        }
 
 
     render(){
@@ -82,11 +174,57 @@ class Area extends React.Component{
                     <div id="innerModDiv">
                         {this.props.filling}
                     </div>
-                        
+                    <div className="cordOuter" id="inputOuter" onClick={this.handleCreatePatch}>
+                        <div className="cordInner" id={this.props.myKey + "inputInner"}>
+                        </div>
+                    </div>
+                    <div className="cordOuter" id="outputOuter" onClick={this.handleOutput}>
+                        <div className="cordInner" id={this.props.myKey + "outputInner"}>
+                        </div>
+                    </div>       
                 </div>
         )
     }
 }
+
+//Filling belongs to SideButtons to render the inner part of each Area
+class Filling extends React.Component{
+    constructor(props){
+        super(props);
+    }
+    render(){
+        return(
+            <div id="fillingDiv">
+                <input type="range" min='-1' max='1' step='.1'/>
+                <button>On</button>
+            </div>
+        )
+    }
+}
+
+class Cord extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.handleClick=this.handleClick.bind(this);
+    }
+
+    handleClick(){
+        this.props.deleteCord(this.props.id);
+    }
+
+    render(){
+        return(
+            <line 
+                x1={this.props.x1} 
+                y1={this.props.y1} 
+                x2={this.props.x2} 
+                y2={this.props.y2}
+                onClick={this.handleClick}></line>
+        )
+    }
+}
+
 
 class SideButtons extends React.Component{
     constructor(props){
@@ -129,51 +267,6 @@ class MyButton extends React.Component{
     render(){
         return(
             <button className="addBtn" onClick={this.handleClick}>{this.props.name}</button>
-        )
-    }
-}
-
-//Filling belongs to SideButtons to render the inner part of each Area
-class Filling extends React.Component{
-    constructor(props){
-        super(props);
-    }
-    render(){
-        return(
-            <div id="fillingDiv">
-                <input type="range" min='-1' max='1' step='.1'/>
-                <button>On</button>
-                <InputCord />
-                <OutputCord />
-            </div>
-        )
-    }
-}
-
-class InputCord extends React.Component{
-    constructor(props){
-        super(props);
-    }
-    render(){
-        return(
-            <div className="cordOuter" id="inputOuter">
-                <div className="cordInner" id="inputInner">
-                </div>
-            </div>
-        )
-    }
-}
-
-class OutputCord extends React.Component{
-    constructor(props){
-        super(props);
-    }
-    render(){
-        return(
-            <div className="cordOuter" id="outputOuter">
-                <div className="cordInner" id="outputInner">
-                </div>
-            </div>
         )
     }
 }

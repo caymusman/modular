@@ -19,10 +19,18 @@ var App = function (_React$Component) {
         var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
         _this.state = {
-            list: new Map()
+            list: new Map(),
+            patchCords: [],
+            cordCount: 0,
+            outputMode: false
         };
         _this.handleClick = _this.handleClick.bind(_this);
         _this.handleClose = _this.handleClose.bind(_this);
+
+        _this.addCord = _this.addCord.bind(_this);
+        _this.handlePatchExit = _this.handlePatchExit.bind(_this);
+        _this.handleOutput = _this.handleOutput.bind(_this);
+        _this.deleteCord = _this.deleteCord.bind(_this);
         return _this;
     }
 
@@ -41,7 +49,10 @@ var App = function (_React$Component) {
                         myKey: childKey,
                         filling: childJSX,
                         name: childKey.split(" ")[0],
-                        handleClose: _this2.handleClose
+                        handleClose: _this2.handleClose,
+                        outputMode: _this2.state.outputMode,
+                        addPatch: _this2.addCord,
+                        handleOutput: _this2.handleOutput
                     })))
                 };
             });
@@ -61,13 +72,77 @@ var App = function (_React$Component) {
             });
         }
     }, {
+        key: "handlePatchExit",
+        value: function handlePatchExit() {
+            this.setState({
+                outputMode: false
+            });
+        }
+    }, {
+        key: "addCord",
+        value: function addCord(info) {
+            var _this3 = this;
+
+            this.setState(function (state) {
+                return {
+                    patchCords: [].concat(_toConsumableArray(state.patchCords), [{ id: "cord" + _this3.state.cordCount, inputData: info, outputData: null }]),
+                    cordCount: state.cordCount + 1,
+                    outputMode: true
+                };
+            });
+        }
+    }, {
+        key: "handleOutput",
+        value: function handleOutput(info) {
+            if (this.state.outputMode) {
+                var newCords = [].concat(_toConsumableArray(this.state.patchCords));
+                var outData = "outputData";
+                newCords[this.state.cordCount - 1][outData] = info;
+                this.setState(function (state) {
+                    return {
+                        patchCords: newCords
+                    };
+                });
+
+                this.setState({
+                    outputMode: false
+                });
+            }
+        }
+    }, {
+        key: "deleteCord",
+        value: function deleteCord(cordID) {
+            var newArr = [].concat(_toConsumableArray(this.state.patchCords));
+            this.setState(function (state) {
+                return {
+                    patchCords: newArr.filter(function (el) {
+                        return el.id !== cordID;
+                    }),
+                    cordCount: state.cordCount - 1
+                };
+            });
+        }
+    }, {
         key: "render",
         value: function render() {
+            var _this4 = this;
+
             var dragHandlers = { onStart: this.onStart, onStop: this.onStop };
+            var cords = []; //loop through the cords in the state, add line version to this array
+            var tempArr = [].concat(_toConsumableArray(this.state.patchCords));
+            tempArr.forEach(function (el) {
+                if (el['outputData']) {
+                    cords.push(React.createElement(Cord, { deleteCord: _this4.deleteCord, key: el.id, id: el.id, x1: el.inputData.fromLocation.x, y1: el.inputData.fromLocation.y, x2: el.outputData.toLocation.x, y2: el.outputData.toLocation.y }));
+                }
+            });
             return React.createElement(
                 "div",
                 { id: "mainDiv" },
-                React.createElement("svg", { id: "patchCords" }),
+                React.createElement(
+                    "svg",
+                    { id: "patchCords" },
+                    cords
+                ),
                 React.createElement("div", { id: "logo" }),
                 React.createElement("div", { id: "header" }),
                 React.createElement(
@@ -110,10 +185,16 @@ var Area = function (_React$Component2) {
     function Area(props) {
         _classCallCheck(this, Area);
 
-        var _this3 = _possibleConstructorReturn(this, (Area.__proto__ || Object.getPrototypeOf(Area)).call(this, props));
+        var _this5 = _possibleConstructorReturn(this, (Area.__proto__ || Object.getPrototypeOf(Area)).call(this, props));
 
-        _this3.handleClose = _this3.handleClose.bind(_this3);
-        return _this3;
+        _this5.handleClose = _this5.handleClose.bind(_this5);
+        _this5.handleCreatePatch = _this5.handleCreatePatch.bind(_this5);
+        _this5.handleOutput = _this5.handleOutput.bind(_this5);
+
+        _this5.state = {
+            clicked: false
+        };
+        return _this5;
     }
 
     _createClass(Area, [{
@@ -123,7 +204,38 @@ var Area = function (_React$Component2) {
         }
         //Close on press of X icon. Pass key up to App and remove from state.list
 
+    }, {
+        key: "handleCreatePatch",
+        value: function handleCreatePatch() {
+            if (!this.state.clicked) {
+                var el = document.getElementById(this.props.myKey + "inputInner").getBoundingClientRect();
+                var x = el.x;
+                var y = el.y;
+                var bottom = el.bottom;
+                var right = el.right;
+                var xCenter = (right - x) / 2 + x;
+                var yCenter = (bottom - y) / 2 + y;
+                this.props.addPatch({ fromModID: this.props.myKey,
+                    fromLocation: { x: xCenter, y: yCenter } });
+            }
+            this.setState(function (state) {
+                return { clicked: !state.clicked };
+            });
+        }
+    }, {
+        key: "handleOutput",
+        value: function handleOutput() {
+            var el = document.getElementById(this.props.myKey + "outputInner").getBoundingClientRect();
+            var x = el.x;
+            var y = el.y;
+            var bottom = el.bottom;
+            var right = el.right;
+            var xCenter = (right - x) / 2 + x;
+            var yCenter = (bottom - y) / 2 + y;
 
+            this.props.handleOutput({ tomyKey: this.props.myKey,
+                toLocation: { x: xCenter, y: yCenter } });
+        }
     }, {
         key: "render",
         value: function render() {
@@ -142,6 +254,16 @@ var Area = function (_React$Component2) {
                     "div",
                     { id: "innerModDiv" },
                     this.props.filling
+                ),
+                React.createElement(
+                    "div",
+                    { className: "cordOuter", id: "inputOuter", onClick: this.handleCreatePatch },
+                    React.createElement("div", { className: "cordInner", id: this.props.myKey + "inputInner" })
+                ),
+                React.createElement(
+                    "div",
+                    { className: "cordOuter", id: "outputOuter", onClick: this.handleOutput },
+                    React.createElement("div", { className: "cordInner", id: this.props.myKey + "outputInner" })
                 )
             );
         }
@@ -150,8 +272,71 @@ var Area = function (_React$Component2) {
     return Area;
 }(React.Component);
 
-var SideButtons = function (_React$Component3) {
-    _inherits(SideButtons, _React$Component3);
+//Filling belongs to SideButtons to render the inner part of each Area
+
+
+var Filling = function (_React$Component3) {
+    _inherits(Filling, _React$Component3);
+
+    function Filling(props) {
+        _classCallCheck(this, Filling);
+
+        return _possibleConstructorReturn(this, (Filling.__proto__ || Object.getPrototypeOf(Filling)).call(this, props));
+    }
+
+    _createClass(Filling, [{
+        key: "render",
+        value: function render() {
+            return React.createElement(
+                "div",
+                { id: "fillingDiv" },
+                React.createElement("input", { type: "range", min: "-1", max: "1", step: ".1" }),
+                React.createElement(
+                    "button",
+                    null,
+                    "On"
+                )
+            );
+        }
+    }]);
+
+    return Filling;
+}(React.Component);
+
+var Cord = function (_React$Component4) {
+    _inherits(Cord, _React$Component4);
+
+    function Cord(props) {
+        _classCallCheck(this, Cord);
+
+        var _this7 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
+
+        _this7.handleClick = _this7.handleClick.bind(_this7);
+        return _this7;
+    }
+
+    _createClass(Cord, [{
+        key: "handleClick",
+        value: function handleClick() {
+            this.props.deleteCord(this.props.id);
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            return React.createElement("line", {
+                x1: this.props.x1,
+                y1: this.props.y1,
+                x2: this.props.x2,
+                y2: this.props.y2,
+                onClick: this.handleClick });
+        }
+    }]);
+
+    return Cord;
+}(React.Component);
+
+var SideButtons = function (_React$Component5) {
+    _inherits(SideButtons, _React$Component5);
 
     function SideButtons(props) {
         _classCallCheck(this, SideButtons);
@@ -176,20 +361,20 @@ var SideButtons = function (_React$Component3) {
     return SideButtons;
 }(React.Component);
 
-var MyButton = function (_React$Component4) {
-    _inherits(MyButton, _React$Component4);
+var MyButton = function (_React$Component6) {
+    _inherits(MyButton, _React$Component6);
 
     function MyButton(props) {
         _classCallCheck(this, MyButton);
 
-        var _this5 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
+        var _this9 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
 
-        _this5.state = {
+        _this9.state = {
             count: 0
         };
 
-        _this5.handleClick = _this5.handleClick.bind(_this5);
-        return _this5;
+        _this9.handleClick = _this9.handleClick.bind(_this9);
+        return _this9;
     }
 
     //Return up to App a new module to be added to the play area.
@@ -217,85 +402,6 @@ var MyButton = function (_React$Component4) {
     }]);
 
     return MyButton;
-}(React.Component);
-
-//Filling belongs to SideButtons to render the inner part of each Area
-
-
-var Filling = function (_React$Component5) {
-    _inherits(Filling, _React$Component5);
-
-    function Filling(props) {
-        _classCallCheck(this, Filling);
-
-        return _possibleConstructorReturn(this, (Filling.__proto__ || Object.getPrototypeOf(Filling)).call(this, props));
-    }
-
-    _createClass(Filling, [{
-        key: "render",
-        value: function render() {
-            return React.createElement(
-                "div",
-                { id: "fillingDiv" },
-                React.createElement("input", { type: "range", min: "-1", max: "1", step: ".1" }),
-                React.createElement(
-                    "button",
-                    null,
-                    "On"
-                ),
-                React.createElement(InputCord, null),
-                React.createElement(OutputCord, null)
-            );
-        }
-    }]);
-
-    return Filling;
-}(React.Component);
-
-var InputCord = function (_React$Component6) {
-    _inherits(InputCord, _React$Component6);
-
-    function InputCord(props) {
-        _classCallCheck(this, InputCord);
-
-        return _possibleConstructorReturn(this, (InputCord.__proto__ || Object.getPrototypeOf(InputCord)).call(this, props));
-    }
-
-    _createClass(InputCord, [{
-        key: "render",
-        value: function render() {
-            return React.createElement(
-                "div",
-                { className: "cordOuter", id: "inputOuter" },
-                React.createElement("div", { className: "cordInner", id: "inputInner" })
-            );
-        }
-    }]);
-
-    return InputCord;
-}(React.Component);
-
-var OutputCord = function (_React$Component7) {
-    _inherits(OutputCord, _React$Component7);
-
-    function OutputCord(props) {
-        _classCallCheck(this, OutputCord);
-
-        return _possibleConstructorReturn(this, (OutputCord.__proto__ || Object.getPrototypeOf(OutputCord)).call(this, props));
-    }
-
-    _createClass(OutputCord, [{
-        key: "render",
-        value: function render() {
-            return React.createElement(
-                "div",
-                { className: "cordOuter", id: "outputOuter" },
-                React.createElement("div", { className: "cordInner", id: "outputInner" })
-            );
-        }
-    }]);
-
-    return OutputCord;
 }(React.Component);
 
 ReactDOM.render(React.createElement(App, null), document.getElementById("App"));

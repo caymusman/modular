@@ -234,14 +234,7 @@ html, body {
   border-radius: 50%;
   padding: 0px;
   margin: 0px;
-}
-
-#playSpace .moduleDiv .cordOuter #inputInner {
   background-color: #ddd;
-}
-
-#playSpace .moduleDiv .cordOuter #outputInner {
-  background-color: #555;
 }
 
 #playSpace .moduleDiv #inputOuter {
@@ -254,6 +247,10 @@ html, body {
   right: 25%;
 }
 
+#playSpace .moduleDiv #outputOuter .cordInner {
+  background-color: #555;
+}
+
 #returnSpace {
   height: 100%;
   width: 100%;
@@ -261,9 +258,14 @@ html, body {
 
 svg {
   position: absolute;
-  width: calc(100% - 4vmax);
-  height: calc(100% - 4vmax);
-  top: 4vmax;
-  left: 4vmax;
+  width: 100%;
+  height: 100%;
+}
+
+svg line {
+  position: absolute;
+  stroke: #555;
+  stroke-width: 2;
+  z-index: 10000;
 }
 /*# sourceMappingURL=styles.css.map */
