@@ -6,8 +6,6 @@ have "input selected" lifecycle in App component.
 
 
 
-:handle exit output mode
 make sure you cant connect more than once
-if delete a module delete the patch cables and connections
 
-when a connection is made, reset exit output mode
+delete cords when delete module

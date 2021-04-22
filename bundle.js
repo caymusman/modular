@@ -65,8 +65,6 @@ var App = function (_React$Component) {
 
         //Passed to Area to control which modules are removed from PlaySpace
         value: function handleClose(childKey) {
-            var _this3 = this;
-
             var newMap = new Map(this.state.list);
             newMap.delete(childKey);
             this.setState(function (state) {
@@ -77,10 +75,20 @@ var App = function (_React$Component) {
 
             //need to delete all patchcords attached to it, and disconnect all audio streams.
             var newCords = [].concat(_toConsumableArray(this.state.patchCords));
+            var finCords = [].concat(_toConsumableArray(this.state.patchCords));
+            var minCount = 0;
             newCords.forEach(function (el) {
                 if (el.inputData.fromModID == childKey || el.outputData.tomyKey == childKey) {
-                    _this3.deleteCord(el.id);
+                    var val = finCords.indexOf(el);
+                    finCords.splice(val, 1);
+                    minCount++;
                 }
+            });
+            this.setState(function (state) {
+                return {
+                    patchCords: finCords,
+                    cordCount: state.cordCount - minCount
+                };
             });
         }
     }, {
@@ -99,11 +107,11 @@ var App = function (_React$Component) {
     }, {
         key: "addCord",
         value: function addCord(info) {
-            var _this4 = this;
+            var _this3 = this;
 
             this.setState(function (state) {
                 return {
-                    patchCords: [].concat(_toConsumableArray(state.patchCords), [{ id: "cord" + _this4.state.cordCount, inputData: info, outputData: null }]),
+                    patchCords: [].concat(_toConsumableArray(state.patchCords), [{ id: "cord" + _this3.state.cordCount, inputData: info, outputData: null }]),
                     cordCount: state.cordCount + 1,
                     outputMode: true
                 };
@@ -176,14 +184,14 @@ var App = function (_React$Component) {
     }, {
         key: "render",
         value: function render() {
-            var _this5 = this;
+            var _this4 = this;
 
             var dragHandlers = { onStart: this.onStart, onStop: this.onStop };
             var cords = []; //loop through the cords in the state, add line version to this array
             var tempArr = [].concat(_toConsumableArray(this.state.patchCords));
             tempArr.forEach(function (el) {
                 if (el['outputData']) {
-                    cords.push(React.createElement(Cord, { deleteCord: _this5.deleteCord, key: el.id, id: el.id, x1: el.inputData.fromLocation.x, y1: el.inputData.fromLocation.y, x2: el.outputData.toLocation.x, y2: el.outputData.toLocation.y }));
+                    cords.push(React.createElement(Cord, { deleteCord: _this4.deleteCord, key: el.id, id: el.id, x1: el.inputData.fromLocation.x, y1: el.inputData.fromLocation.y, x2: el.outputData.toLocation.x, y2: el.outputData.toLocation.y }));
                 }
             });
             return React.createElement(
@@ -217,7 +225,7 @@ var App = function (_React$Component) {
                         return React.createElement(
                             Draggable,
                             Object.assign({ onDrag: function onDrag() {
-                                    _this5.handleDrag(key);
+                                    _this4.handleDrag(key);
                                 }, key: key, handle: "p" }, dragHandlers, { bounds: "parent" }),
                             React.createElement(
                                 "div",
@@ -243,12 +251,12 @@ var Area = function (_React$Component2) {
     function Area(props) {
         _classCallCheck(this, Area);
 
-        var _this6 = _possibleConstructorReturn(this, (Area.__proto__ || Object.getPrototypeOf(Area)).call(this, props));
+        var _this5 = _possibleConstructorReturn(this, (Area.__proto__ || Object.getPrototypeOf(Area)).call(this, props));
 
-        _this6.handleClose = _this6.handleClose.bind(_this6);
-        _this6.handleCreatePatch = _this6.handleCreatePatch.bind(_this6);
-        _this6.handleOutput = _this6.handleOutput.bind(_this6);
-        return _this6;
+        _this5.handleClose = _this5.handleClose.bind(_this5);
+        _this5.handleCreatePatch = _this5.handleCreatePatch.bind(_this5);
+        _this5.handleOutput = _this5.handleOutput.bind(_this5);
+        return _this5;
     }
 
     _createClass(Area, [{
@@ -362,10 +370,10 @@ var Cord = function (_React$Component4) {
     function Cord(props) {
         _classCallCheck(this, Cord);
 
-        var _this8 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
+        var _this7 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
 
-        _this8.handleClick = _this8.handleClick.bind(_this8);
-        return _this8;
+        _this7.handleClick = _this7.handleClick.bind(_this7);
+        return _this7;
     }
 
     _createClass(Cord, [{
@@ -420,14 +428,14 @@ var MyButton = function (_React$Component6) {
     function MyButton(props) {
         _classCallCheck(this, MyButton);
 
-        var _this10 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
+        var _this9 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
 
-        _this10.state = {
+        _this9.state = {
             count: 0
         };
 
-        _this10.handleClick = _this10.handleClick.bind(_this10);
-        return _this10;
+        _this9.handleClick = _this9.handleClick.bind(_this9);
+        return _this9;
     }
 
     //Return up to App a new module to be added to the play area.

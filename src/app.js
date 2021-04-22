@@ -46,11 +46,19 @@ class App extends React.Component{
 
         //need to delete all patchcords attached to it, and disconnect all audio streams.
         let newCords = [...this.state.patchCords];
+        let finCords = [...this.state.patchCords];
+        let minCount = 0;
         newCords.forEach(el => {
             if(el.inputData.fromModID == childKey || el.outputData.tomyKey == childKey){
-                this.deleteCord(el.id);
-            }
-        })
+                let val = finCords.indexOf(el);
+                finCords.splice(val, 1);
+                minCount++;
+                }
+            })
+        this.setState(state => ({
+            patchCords: finCords,
+            cordCount: state.cordCount - minCount
+        }))
     }
 
     handlePatchExit(){
