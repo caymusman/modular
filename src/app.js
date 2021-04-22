@@ -17,6 +17,7 @@ class App extends React.Component{
         this.handlePatchExit=this.handlePatchExit.bind(this);
         this.handleOutput=this.handleOutput.bind(this);
         this.deleteCord=this.deleteCord.bind(this);
+        this.handleDrag=this.handleDrag.bind(this);
     }
 
     //Passed to SideButtons to control which buttons are added to PlaySpace
@@ -42,12 +43,24 @@ class App extends React.Component{
         this.setState((state) => ({
             list: newMap
         }))
+
+        //need to delete all patchcords attached to it, and disconnect all audio streams.
+        let newCords = [...this.state.patchCords];
+        newCords.forEach(el => {
+            if(el.inputData.fromModID == childKey || el.outputData.tomyKey == childKey){
+                this.deleteCord(el.id);
+            }
+        })
     }
 
     handlePatchExit(){
-        this.setState({
-            outputMode: false
-        })
+        let newCords = [...this.state.patchCords];
+        let popped = newCords.pop();
+        this.setState(state => ({
+            cordCount: state.cordCount - 1,
+            outputMode: false,
+            patchCords: newCords
+        }))
     }
 
     addCord(info){
@@ -83,6 +96,36 @@ class App extends React.Component{
         }))
     }
 
+    handleDrag(modID){
+        let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
+        let newCords = [...this.state.patchCords];
+        newCords.forEach(el => {
+            if(el.inputData.fromModID == modID){ 
+                let in_el = document.getElementById(modID + "inputInner").getBoundingClientRect();
+                let in_x = in_el.x;
+                let in_y = in_el.y;
+                let in_bottom = in_el.bottom;
+                let in_right = in_el.right;
+                let in_xCenter = ((in_right - in_x) / 2 + in_x) - (largerDim * .04);
+                let in_yCenter = ((in_bottom - in_y) / 2 + in_y) - (largerDim * .04);
+                el.inputData.fromLocation = {x: in_xCenter, y: in_yCenter}
+            }else if(el.outputData.tomyKey == modID){
+                let out_el = document.getElementById(modID + "outputInner").getBoundingClientRect();
+                let out_x = out_el.x;
+                let out_y = out_el.y;
+                let out_bottom = out_el.bottom;
+                let out_right = out_el.right;
+                let out_xCenter = ((out_right - out_x) / 2 + out_x) - (largerDim * .04);
+                let out_yCenter = ((out_bottom - out_y) / 2 + out_y) - (largerDim * .04);
+                el.outputData.toLocation = {x: out_xCenter, y: out_yCenter}
+            }
+        });
+
+        this.setState(state => ({
+            patchCords: newCords
+        }))
+    }
+
 
     render(){
         const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
@@ -95,7 +138,6 @@ class App extends React.Component{
         })
         return(
             <div id="mainDiv">
-                <svg id="patchCords">{cords}</svg>
                 <div id="logo"></div>
                 <div id="header"></div>
                 <div id="sidebar">
@@ -104,10 +146,18 @@ class App extends React.Component{
                                 handleClick={this.handleClick}/> 
                 </div>
                 <div id="playSpace">
+                    <svg id="patchCords">{cords}</svg>
+
+                    <i 
+                        id="patchExit" 
+                        onClick={this.handlePatchExit}
+                        className={this.state.outputMode ? "show fa fa-times-circle" : "hide fa fa-times-circle"} 
+                        aria-hidden="true"></i>
+
                 {[...this.state.list].map((entry) => {
                         let key = entry[0];
                         let value = entry[1];
-                        return <Draggable key={key} handle="p" {...dragHandlers} bounds="parent"><div className="dragDiv">{value}</div></Draggable>
+                        return <Draggable onDrag={() => {this.handleDrag(key)}} key={key} handle="p" {...dragHandlers} bounds="parent"><div className="dragDiv">{value}</div></Draggable>
                     })}
                 </div>
             </div>
@@ -124,10 +174,6 @@ class Area extends React.Component{
         this.handleClose=this.handleClose.bind(this);
         this.handleCreatePatch=this.handleCreatePatch.bind(this);
         this.handleOutput=this.handleOutput.bind(this);
-
-        this.state={
-            clicked: false
-        }
     }
 
     handleClose(){
@@ -136,28 +182,29 @@ class Area extends React.Component{
     //Close on press of X icon. Pass key up to App and remove from state.list
 
     handleCreatePatch(){
-        if(!this.state.clicked){
+        if(!this.props.outputMode){
+            let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
             let el = document.getElementById(this.props.myKey + "inputInner").getBoundingClientRect();
             let x = el.x;
             let y = el.y;
             let bottom = el.bottom;
             let right = el.right;
-            let xCenter = (right - x) / 2 + x;
-            let yCenter = (bottom - y) / 2 + y;
+            let xCenter = ((right - x) / 2 + x) - (largerDim * .04);
+            let yCenter = ((bottom - y) / 2 + y) - (largerDim * .04);
             this.props.addPatch({fromModID: this.props.myKey,
                              fromLocation: {x: xCenter, y: yCenter}});
             }
-        this.setState((state) => ({clicked: !state.clicked}));
     }
 
     handleOutput(){
+        let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
         let el = document.getElementById(this.props.myKey + "outputInner").getBoundingClientRect();
         let x = el.x;
         let y = el.y;
         let bottom = el.bottom;
         let right = el.right;
-        let xCenter = (right - x) / 2 + x;
-        let yCenter = (bottom - y) / 2 + y;
+        let xCenter = ((right - x) / 2 + x) - (largerDim * .04);
+        let yCenter = ((bottom - y) / 2 + y) - (largerDim * .04);
         
         this.props.handleOutput({tomyKey: this.props.myKey,
                                  toLocation: {x: xCenter, y: yCenter}});
@@ -174,11 +221,11 @@ class Area extends React.Component{
                     <div id="innerModDiv">
                         {this.props.filling}
                     </div>
-                    <div className="cordOuter" id="inputOuter" onClick={this.handleCreatePatch}>
+                    <div className={this.props.outputMode ? "cordOuter hide" : "cordOuter show"} id="inputOuter" onClick={this.handleCreatePatch}>
                         <div className="cordInner" id={this.props.myKey + "inputInner"}>
                         </div>
                     </div>
-                    <div className="cordOuter" id="outputOuter" onClick={this.handleOutput}>
+                    <div className={this.props.outputMode ? "cordOuter raise" : "cordOuter"} id="outputOuter" onClick={this.handleOutput}>
                         <div className="cordInner" id={this.props.myKey + "outputInner"}>
                         </div>
                     </div>       

@@ -65,6 +65,7 @@ html,body
 
     .addBtn{
         font-size: .6vmax;
+        text-shadow: .1vmax .1vmax .05vmax #b6a8b5;
         width: 100%;
         height: 10%;
         background-color: $light;
@@ -87,6 +88,18 @@ html,body
     background-color: #b6a8b5;
     background-image: url('/media/bedge-grunge.png');
     width: 100%;
+
+    #patchExit{
+        position: absolute;
+        right: 3%;
+        top: 3%;
+        font-size: 6vh;
+        color: $dark;
+    
+        &:hover{
+            color: darken(red, 30%);
+        }
+    }
 
     .dragDiv{
         width: 12.5vw;
@@ -237,7 +250,20 @@ svg{
     line{
         position: absolute;
         stroke: $dark;
-        stroke-width: 2;
+        stroke-width: 3;
         z-index: 10000;
     }
+}
+
+.show{
+    visibility: visible;
+}
+
+.hide{
+    visibility: hidden;
+
+}
+
+.raise{
+    filter:drop-shadow(0 0 5px $light);
 }

@@ -70,6 +70,7 @@ html, body {
 
 #sidebar .addBtn {
   font-size: .6vmax;
+  text-shadow: .1vmax .1vmax .05vmax #b6a8b5;
   width: 100%;
   height: 10%;
   background-color: #ddd;
@@ -91,6 +92,18 @@ html, body {
   background-color: #b6a8b5;
   background-image: url("/media/bedge-grunge.png");
   width: 100%;
+}
+
+#playSpace #patchExit {
+  position: absolute;
+  right: 3%;
+  top: 3%;
+  font-size: 6vh;
+  color: #555;
+}
+
+#playSpace #patchExit:hover {
+  color: #660000;
 }
 
 #playSpace .dragDiv {
@@ -265,7 +278,20 @@ svg {
 svg line {
   position: absolute;
   stroke: #555;
-  stroke-width: 2;
+  stroke-width: 3;
   z-index: 10000;
+}
+
+.show {
+  visibility: visible;
+}
+
+.hide {
+  visibility: hidden;
+}
+
+.raise {
+  -webkit-filter: drop-shadow(0 0 5px #ddd);
+          filter: drop-shadow(0 0 5px #ddd);
 }
 /*# sourceMappingURL=styles.css.map */
