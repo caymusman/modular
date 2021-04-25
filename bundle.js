@@ -1,7 +1,11 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -22,8 +26,10 @@ var App = function (_React$Component) {
         _this.state = {
             list: new Map(),
             patchCords: [],
-            cordCount: 0,
-            outputMode: false
+            currentCordCount: 0,
+            cumulativeCordCount: 0,
+            outputMode: false,
+            cordCombos: {}
         };
         _this.handleClick = _this.handleClick.bind(_this);
         _this.handleClose = _this.handleClose.bind(_this);
@@ -33,6 +39,7 @@ var App = function (_React$Component) {
         _this.handleOutput = _this.handleOutput.bind(_this);
         _this.deleteCord = _this.deleteCord.bind(_this);
         _this.handleDrag = _this.handleDrag.bind(_this);
+        _this.handleComboDelete = _this.handleComboDelete.bind(_this);
         return _this;
     }
 
@@ -42,20 +49,16 @@ var App = function (_React$Component) {
     _createClass(App, [{
         key: "handleClick",
         value: function handleClick(childKey, childJSX) {
-            var _this2 = this;
-
+            if (this.state.outputMode) {
+                this.handlePatchExit();
+            }
+            var newCombos = Object.assign({}, this.state.cordCombos, _defineProperty({}, childKey, []));
             this.setState(function (state) {
                 return {
-                    list: new Map(state.list.set(childKey, React.createElement(Area, {
-                        key: childKey,
-                        myKey: childKey,
+                    list: new Map([].concat(_toConsumableArray(state.list), [[childKey, { myKey: childKey,
                         filling: childJSX,
-                        name: childKey.split(" ")[0],
-                        handleClose: _this2.handleClose,
-                        outputMode: _this2.state.outputMode,
-                        addPatch: _this2.addCord,
-                        handleOutput: _this2.handleOutput
-                    })))
+                        name: childKey.split(" ")[0] }]])),
+                    cordCombos: newCombos
                 };
             });
         }
@@ -67,11 +70,6 @@ var App = function (_React$Component) {
         value: function handleClose(childKey) {
             var newMap = new Map(this.state.list);
             newMap.delete(childKey);
-            this.setState(function (state) {
-                return {
-                    list: newMap
-                };
-            });
 
             //need to delete all patchcords attached to it, and disconnect all audio streams.
             var newCords = [].concat(_toConsumableArray(this.state.patchCords));
@@ -84,13 +82,23 @@ var App = function (_React$Component) {
                     minCount++;
                 }
             });
+
+            //delete property from cordCombos object    
+            var newCombos = Object.assign({}, this.state.cordCombos);
+            delete newCombos[childKey];
+
             this.setState(function (state) {
                 return {
+                    list: newMap,
                     patchCords: finCords,
-                    cordCount: state.cordCount - minCount
+                    currentCordCount: state.currentCordCount - minCount,
+                    cordCombos: newCombos
                 };
             });
         }
+
+        //click X to not make patch cord after input click
+
     }, {
         key: "handlePatchExit",
         value: function handlePatchExit() {
@@ -98,41 +106,64 @@ var App = function (_React$Component) {
             var popped = newCords.pop();
             this.setState(function (state) {
                 return {
-                    cordCount: state.cordCount - 1,
+                    currentCordCount: state.currentCordCount - 1,
+                    cumulativeCordCount: state.cumulativeCordCount - 1,
                     outputMode: false,
                     patchCords: newCords
                 };
             });
         }
+
+        //add initial patch cord data upon input click
+
     }, {
         key: "addCord",
         value: function addCord(info) {
-            var _this3 = this;
+            var _this2 = this;
 
             this.setState(function (state) {
                 return {
-                    patchCords: [].concat(_toConsumableArray(state.patchCords), [{ id: "cord" + _this3.state.cordCount, inputData: info, outputData: null }]),
-                    cordCount: state.cordCount + 1,
+                    patchCords: [].concat(_toConsumableArray(state.patchCords), [{ id: "cord" + _this2.state.cumulativeCordCount, inputData: info, outputData: null }]),
+                    currentCordCount: state.currentCordCount + 1,
+                    cumulativeCordCount: state.cumulativeCordCount + 1,
                     outputMode: true
                 };
             });
         }
+
+        //add output data to fully formed patch cords
+
     }, {
         key: "handleOutput",
         value: function handleOutput(info) {
             if (this.state.outputMode) {
                 var newCords = [].concat(_toConsumableArray(this.state.patchCords));
                 var outData = "outputData";
-                newCords[this.state.cordCount - 1][outData] = info;
-                this.setState(function (state) {
-                    return {
-                        patchCords: newCords
-                    };
-                });
+                var lastEl = newCords[this.state.currentCordCount - 1];
+                var fromMod = lastEl.inputData.fromModID;
+                console.log(fromMod);
+                console.log(this.state.cordCombos[fromMod]);
+                if (fromMod == info.tomyKey) {
+                    alert("You can't plug a module into itself!");
+                    this.handlePatchExit();
+                } else if (this.state.cordCombos[fromMod].includes(info.tomyKey)) {
+                    alert("You've already patched this cord!");
+                    this.handlePatchExit();
+                } else {
+                    lastEl[outData] = info;
+                    var newCombo = Object.assign({}, this.state.cordCombos);
+                    newCombo[fromMod].push(info.tomyKey);
+                    this.setState(function (state) {
+                        return {
+                            patchCords: newCords,
+                            cordCombos: newCombo
+                        };
+                    });
 
-                this.setState({
-                    outputMode: false
-                });
+                    this.setState({
+                        outputMode: false
+                    });
+                }
             }
         }
     }, {
@@ -144,10 +175,26 @@ var App = function (_React$Component) {
                     patchCords: newArr.filter(function (el) {
                         return el.id !== cordID;
                     }),
-                    cordCount: state.cordCount - 1
+                    currentCordCount: state.currentCordCount - 1
                 };
             });
         }
+    }, {
+        key: "handleComboDelete",
+        value: function handleComboDelete(cordID) {
+            var cordVal = this.state.patchCords.find(function (val) {
+                return val.id == cordID;
+            });
+            var fromCombo = cordVal.inputData.fromModID;
+            var newCombo = Object.assign({}, this.state.cordCombos);
+            newCombo[fromCombo].splice(newCombo[fromCombo].indexOf(cordVal.outputData.tomyKey), 1);
+            this.setState({
+                cordCombos: newCombo
+            });
+        }
+
+        //redraw cords when module is dragged
+
     }, {
         key: "handleDrag",
         value: function handleDrag(modID) {
@@ -184,14 +231,14 @@ var App = function (_React$Component) {
     }, {
         key: "render",
         value: function render() {
-            var _this4 = this;
+            var _this3 = this;
 
             var dragHandlers = { onStart: this.onStart, onStop: this.onStop };
             var cords = []; //loop through the cords in the state, add line version to this array
             var tempArr = [].concat(_toConsumableArray(this.state.patchCords));
             tempArr.forEach(function (el) {
                 if (el['outputData']) {
-                    cords.push(React.createElement(Cord, { deleteCord: _this4.deleteCord, key: el.id, id: el.id, x1: el.inputData.fromLocation.x, y1: el.inputData.fromLocation.y, x2: el.outputData.toLocation.x, y2: el.outputData.toLocation.y }));
+                    cords.push(React.createElement(Cord, { deleteCord: _this3.deleteCord, key: el.id, id: el.id, x1: el.inputData.fromLocation.x, y1: el.inputData.fromLocation.y, x2: el.outputData.toLocation.x, y2: el.outputData.toLocation.y }));
                 }
             });
             return React.createElement(
@@ -219,18 +266,32 @@ var App = function (_React$Component) {
                         onClick: this.handlePatchExit,
                         className: this.state.outputMode ? "show fa fa-times-circle" : "hide fa fa-times-circle",
                         "aria-hidden": "true" }),
-                    [].concat(_toConsumableArray(this.state.list)).map(function (entry) {
-                        var key = entry[0];
-                        var value = entry[1];
+                    [].concat(_toConsumableArray(this.state.list)).map(function (_ref) {
+                        var _ref2 = _slicedToArray(_ref, 2),
+                            key = _ref2[0],
+                            _ref2$ = _ref2[1],
+                            myKey = _ref2$.myKey,
+                            filling = _ref2$.filling,
+                            name = _ref2$.name;
+
                         return React.createElement(
                             Draggable,
                             Object.assign({ onDrag: function onDrag() {
-                                    _this4.handleDrag(key);
+                                    _this3.handleDrag(key);
                                 }, key: key, handle: "p" }, dragHandlers, { bounds: "parent" }),
                             React.createElement(
                                 "div",
                                 { className: "dragDiv" },
-                                value
+                                React.createElement(Area, {
+                                    key: myKey,
+                                    myKey: myKey,
+                                    filling: filling,
+                                    name: name,
+                                    handleClose: _this3.handleClose,
+                                    outputMode: _this3.state.outputMode,
+                                    addPatch: _this3.addCord,
+                                    handleOutput: _this3.handleOutput
+                                })
                             )
                         );
                     })
@@ -251,20 +312,24 @@ var Area = function (_React$Component2) {
     function Area(props) {
         _classCallCheck(this, Area);
 
-        var _this5 = _possibleConstructorReturn(this, (Area.__proto__ || Object.getPrototypeOf(Area)).call(this, props));
+        var _this4 = _possibleConstructorReturn(this, (Area.__proto__ || Object.getPrototypeOf(Area)).call(this, props));
 
-        _this5.handleClose = _this5.handleClose.bind(_this5);
-        _this5.handleCreatePatch = _this5.handleCreatePatch.bind(_this5);
-        _this5.handleOutput = _this5.handleOutput.bind(_this5);
-        return _this5;
+        _this4.handleClose = _this4.handleClose.bind(_this4);
+        _this4.handleCreatePatch = _this4.handleCreatePatch.bind(_this4);
+        _this4.handleOutput = _this4.handleOutput.bind(_this4);
+        return _this4;
     }
+
+    //Close on press of X icon. Pass key up to App and remove from state.list
+
 
     _createClass(Area, [{
         key: "handleClose",
         value: function handleClose() {
             this.props.handleClose(this.props.myKey);
         }
-        //Close on press of X icon. Pass key up to App and remove from state.list
+
+        //handle first click in input area
 
     }, {
         key: "handleCreatePatch",
@@ -282,6 +347,9 @@ var Area = function (_React$Component2) {
                     fromLocation: { x: xCenter, y: yCenter } });
             }
         }
+
+        //handle patchcord click in output area
+
     }, {
         key: "handleOutput",
         value: function handleOutput() {
@@ -300,15 +368,14 @@ var Area = function (_React$Component2) {
     }, {
         key: "render",
         value: function render() {
-
             return React.createElement(
                 "div",
                 { className: "moduleDiv"
                 },
-                React.createElement("i", { className: "fa fa-times", "aria-hidden": "true", onClick: this.handleClose }),
                 React.createElement(
                     "p",
                     { id: "modTitle" },
+                    React.createElement("i", { className: "fa fa-times", "aria-hidden": "true", onClick: this.handleClose }),
                     this.props.name
                 ),
                 React.createElement(
@@ -318,12 +385,14 @@ var Area = function (_React$Component2) {
                 ),
                 React.createElement(
                     "div",
-                    { className: this.props.outputMode ? "cordOuter hide" : "cordOuter show", id: "inputOuter", onClick: this.handleCreatePatch },
+                    { className: this.props.outputMode ? "cordOuter hide" : "cordOuter show interactive",
+                        id: "inputOuter", onClick: this.handleCreatePatch },
                     React.createElement("div", { className: "cordInner", id: this.props.myKey + "inputInner" })
                 ),
                 React.createElement(
                     "div",
-                    { className: this.props.outputMode ? "cordOuter raise" : "cordOuter", id: "outputOuter", onClick: this.handleOutput },
+                    { className: this.props.outputMode ? "cordOuter show raise interactive" : "cordOuter show",
+                        id: "outputOuter", onClick: this.handleOutput },
                     React.createElement("div", { className: "cordInner", id: this.props.myKey + "outputInner" })
                 )
             );
@@ -364,16 +433,19 @@ var Filling = function (_React$Component3) {
     return Filling;
 }(React.Component);
 
+//patchcords with delete capability
+
+
 var Cord = function (_React$Component4) {
     _inherits(Cord, _React$Component4);
 
     function Cord(props) {
         _classCallCheck(this, Cord);
 
-        var _this7 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
+        var _this6 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
 
-        _this7.handleClick = _this7.handleClick.bind(_this7);
-        return _this7;
+        _this6.handleClick = _this6.handleClick.bind(_this6);
+        return _this6;
     }
 
     _createClass(Cord, [{
@@ -395,6 +467,9 @@ var Cord = function (_React$Component4) {
 
     return Cord;
 }(React.Component);
+
+//sidebar with buttons for creation
+
 
 var SideButtons = function (_React$Component5) {
     _inherits(SideButtons, _React$Component5);
@@ -422,24 +497,24 @@ var SideButtons = function (_React$Component5) {
     return SideButtons;
 }(React.Component);
 
+//buttons in side area that create modules for the playspace
+
+
 var MyButton = function (_React$Component6) {
     _inherits(MyButton, _React$Component6);
 
     function MyButton(props) {
         _classCallCheck(this, MyButton);
 
-        var _this9 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
+        var _this8 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
 
-        _this9.state = {
+        _this8.state = {
             count: 0
         };
 
-        _this9.handleClick = _this9.handleClick.bind(_this9);
-        return _this9;
+        _this8.handleClick = _this8.handleClick.bind(_this8);
+        return _this8;
     }
-
-    //Return up to App a new module to be added to the play area.
-
 
     _createClass(MyButton, [{
         key: "handleClick",

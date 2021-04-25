@@ -4,8 +4,11 @@ port over patch cable designs including update when modules move.
 work on patch cord click options and design.
 have "input selected" lifecycle in App component.
 
+resizing issues!
+custom ALERT
 
 
-make sure you cant connect more than once
 
-delete cords when delete module
+optional: 
+prevent module overlap on spawn
+make it so that you can type in new module name?

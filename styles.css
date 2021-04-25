@@ -107,6 +107,7 @@ html, body {
 }
 
 #playSpace .dragDiv {
+  position: absolute;
   width: 12.5vw;
   height: 10.5vh;
 }
@@ -121,16 +122,22 @@ html, body {
   text-align: center;
   width: 12.5vw;
   height: 10.5vh;
+  border-radius: 2px;
 }
 
-#playSpace .moduleDiv:hover .fa-times, #playSpace .moduleDiv:hover .cordOuter {
+#playSpace .moduleDiv:hover .cordOuter.show {
   visibility: visible;
   opacity: 1;
 }
 
+#playSpace .moduleDiv:hover .cordOuter.hide {
+  visibility: none;
+  opacity: 0;
+}
+
 #playSpace .moduleDiv .fa-times {
   text-align: center;
-  background-color: #555;
+  background-color: #6f6f6f;
   color: #ddd;
   font-size: 1.8vh;
   visibility: hidden;
@@ -143,31 +150,22 @@ html, body {
   margin: 0px;
   padding: 0px;
   border-radius: 50%;
-  -webkit-transition: background-color .6s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
-  transition: background-color .6s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
-  transition: background-color .6s, transform .6s, filter .6s, visibility .3s, opacity .3s;
-  transition: background-color .6s, transform .6s, filter .6s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .6s;
+  -webkit-transition: background-color .6s, visibility .45s, opacity .45s, -webkit-transform .6s, -webkit-filter .6s;
+  transition: background-color .6s, visibility .45s, opacity .45s, -webkit-transform .6s, -webkit-filter .6s;
+  transition: background-color .6s, transform .6s, filter .6s, visibility .45s, opacity .45s;
+  transition: background-color .6s, transform .6s, filter .6s, visibility .45s, opacity .45s, -webkit-transform .6s, -webkit-filter .6s;
   cursor: pointer;
 }
 
 #playSpace .moduleDiv .fa-times:hover {
-  background-color: #6f6f6f;
   -webkit-transform: rotate(180deg);
           transform: rotate(180deg);
   -webkit-filter: drop-shadow(0 0 2px #555);
           filter: drop-shadow(0 0 2px #555);
 }
 
-#playSpace .moduleDiv #patchCords {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  stroke-linecap: round;
-  z-index: 100;
-}
-
 #playSpace .moduleDiv p {
+  border-radius: 2px 2px 0px 0px;
   width: 100%;
   height: 25%;
   background-color: #555;
@@ -184,6 +182,11 @@ html, body {
 #playSpace .moduleDiv p:hover {
   background-color: #6f6f6f;
   color: #f7f7f7;
+}
+
+#playSpace .moduleDiv p:hover .fa-times {
+  visibility: visible;
+  opacity: 1;
 }
 
 #playSpace .moduleDiv #fillingDiv {
@@ -273,13 +276,19 @@ svg {
   position: absolute;
   width: 100%;
   height: 100%;
+  pointer-events: none;
+  stroke-linecap: round;
 }
 
 svg line {
   position: absolute;
   stroke: #555;
   stroke-width: 3;
-  z-index: 10000;
+  pointer-events: all;
+}
+
+svg line:hover {
+  stroke: #660000;
 }
 
 .show {

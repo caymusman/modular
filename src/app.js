@@ -7,8 +7,10 @@ class App extends React.Component{
         this.state = {
             list: new Map(),
             patchCords: [],
-            cordCount: 0,
-            outputMode: false
+            currentCordCount: 0,
+            cumulativeCordCount: 0,
+            outputMode: false,
+            cordCombos: {}
         }
         this.handleClick=this.handleClick.bind(this);
         this.handleClose=this.handleClose.bind(this);
@@ -18,21 +20,20 @@ class App extends React.Component{
         this.handleOutput=this.handleOutput.bind(this);
         this.deleteCord=this.deleteCord.bind(this);
         this.handleDrag=this.handleDrag.bind(this);
+        this.handleComboDelete=this.handleComboDelete.bind(this);
     }
 
     //Passed to SideButtons to control which buttons are added to PlaySpace
     handleClick(childKey, childJSX){
+        if(this.state.outputMode){
+            this.handlePatchExit();
+        }
+        let newCombos = {...this.state.cordCombos, [childKey]: []};
         this.setState((state) => ({
-            list: new Map(state.list.set(childKey, <Area 
-                                                        key={childKey} 
-                                                        myKey={childKey}
-                                                        filling={childJSX} 
-                                                        name={childKey.split(" ")[0]}
-                                                        handleClose={this.handleClose}
-                                                        outputMode={this.state.outputMode} 
-                                                        addPatch={this.addCord} 
-                                                        handleOutput={this.handleOutput}
-                                                        />)) ,
+            list: new Map([...state.list, [childKey, {myKey: childKey,
+                                                    filling: childJSX,
+                                                    name:childKey.split(" ")[0]}]]),
+            cordCombos: newCombos
         }));
     };
 
@@ -40,9 +41,6 @@ class App extends React.Component{
     handleClose(childKey){
         let newMap = new Map(this.state.list);
         newMap.delete(childKey);
-        this.setState((state) => ({
-            list: newMap
-        }))
 
         //need to delete all patchcords attached to it, and disconnect all audio streams.
         let newCords = [...this.state.patchCords];
@@ -55,55 +53,95 @@ class App extends React.Component{
                 minCount++;
                 }
             })
+
+        //delete property from cordCombos object    
+        let newCombos = {...this.state.cordCombos};
+        delete newCombos[childKey];
+
+
         this.setState(state => ({
+            list: newMap,
             patchCords: finCords,
-            cordCount: state.cordCount - minCount
+            currentCordCount: state.currentCordCount - minCount,
+            cordCombos: newCombos
         }))
     }
 
+    //click X to not make patch cord after input click
     handlePatchExit(){
         let newCords = [...this.state.patchCords];
         let popped = newCords.pop();
         this.setState(state => ({
-            cordCount: state.cordCount - 1,
+            currentCordCount: state.currentCordCount - 1,
+            cumulativeCordCount: state.cumulativeCordCount - 1,
             outputMode: false,
             patchCords: newCords
         }))
     }
 
+    //add initial patch cord data upon input click
     addCord(info){
         this.setState((state) => ({
-            patchCords: [...state.patchCords, {id: "cord" + this.state.cordCount, inputData: info, outputData: null}],
-            cordCount: state.cordCount + 1,
+            patchCords: [...state.patchCords, {id: "cord" + this.state.cumulativeCordCount, inputData: info, outputData: null}],
+            currentCordCount: state.currentCordCount + 1,
+            cumulativeCordCount: state.cumulativeCordCount + 1,
             outputMode: true
         }))
     }
 
+    //add output data to fully formed patch cords
     handleOutput(info){
         if(this.state.outputMode){
             let newCords = [...this.state.patchCords];
             let outData = "outputData";
-            newCords[this.state.cordCount - 1][outData]=info;
-            this.setState((state) => ({
-                patchCords: newCords
-            }));
+            let lastEl = newCords[this.state.currentCordCount-1];
+            let fromMod = lastEl.inputData.fromModID;
+            console.log(fromMod);
+            console.log(this.state.cordCombos[fromMod]);
+            if(fromMod == info.tomyKey){
+                alert("You can't plug a module into itself!");
+                this.handlePatchExit();
+            }else if(this.state.cordCombos[fromMod].includes(info.tomyKey)){
+                alert("You've already patched this cord!");
+                this.handlePatchExit();
+            }else{
+                lastEl[outData]=info;
+                let newCombo = {...this.state.cordCombos};
+                newCombo[fromMod].push(info.tomyKey);
+                this.setState((state) => ({
+                    patchCords: newCords,
+                    cordCombos: newCombo
+             }));
 
-            this.setState({
-                outputMode: false
-            })
+             this.setState({
+                    outputMode: false
+             })
+            }
         }
     }
 
+    
     deleteCord(cordID){
         let newArr = [...this.state.patchCords];
         this.setState(state => ({
             patchCords: newArr.filter(el => {
                 return el.id !== cordID;
             }),
-            cordCount: state.cordCount - 1
+            currentCordCount: state.currentCordCount - 1,
         }))
     }
 
+    handleComboDelete(cordID){
+        const cordVal = this.state.patchCords.find(val => val.id == cordID);
+        let fromCombo = cordVal.inputData.fromModID;
+        let newCombo = {...this.state.cordCombos};
+        newCombo[fromCombo].splice(newCombo[fromCombo].indexOf(cordVal.outputData.tomyKey), 1);
+        this.setState({
+            cordCombos: newCombo
+        })
+    }
+
+    //redraw cords when module is dragged
     handleDrag(modID){
         let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
         let newCords = [...this.state.patchCords];
@@ -162,10 +200,20 @@ class App extends React.Component{
                         className={this.state.outputMode ? "show fa fa-times-circle" : "hide fa fa-times-circle"} 
                         aria-hidden="true"></i>
 
-                {[...this.state.list].map((entry) => {
-                        let key = entry[0];
-                        let value = entry[1];
-                        return <Draggable onDrag={() => {this.handleDrag(key)}} key={key} handle="p" {...dragHandlers} bounds="parent"><div className="dragDiv">{value}</div></Draggable>
+                {[...this.state.list].map(([key, {myKey, filling, name}]) => {
+                        return <Draggable onDrag={() => {this.handleDrag(key)}} key={key} handle="p" {...dragHandlers} bounds="parent">
+                                    <div className="dragDiv">
+                                        <Area 
+                                                        key={myKey} 
+                                                        myKey={myKey}
+                                                        filling={filling} 
+                                                        name={name}
+                                                        handleClose={this.handleClose}
+                                                        outputMode={this.state.outputMode}
+                                                        addPatch={this.addCord} 
+                                                        handleOutput={this.handleOutput}
+                                                        />
+                                    </div></Draggable>
                     })}
                 </div>
             </div>
@@ -184,11 +232,12 @@ class Area extends React.Component{
         this.handleOutput=this.handleOutput.bind(this);
     }
 
+    //Close on press of X icon. Pass key up to App and remove from state.list
     handleClose(){
         this.props.handleClose(this.props.myKey);
     }
-    //Close on press of X icon. Pass key up to App and remove from state.list
 
+    //handle first click in input area
     handleCreatePatch(){
         if(!this.props.outputMode){
             let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
@@ -204,6 +253,7 @@ class Area extends React.Component{
             }
     }
 
+    //handle patchcord click in output area
     handleOutput(){
         let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
         let el = document.getElementById(this.props.myKey + "outputInner").getBoundingClientRect();
@@ -220,22 +270,31 @@ class Area extends React.Component{
 
 
     render(){
-        
         return(
                 <div className="moduleDiv"
                     >
-                    <i className="fa fa-times" aria-hidden="true" onClick={this.handleClose}></i>
-                    <p id="modTitle">{this.props.name}</p>
+
+                    <p id="modTitle">
+                        <i className="fa fa-times" aria-hidden="true" onClick={this.handleClose}></i>{
+                        this.props.name}
+                    </p>
+
+                    {/*eventually will be unique module fillings*/}
                     <div id="innerModDiv">
                         {this.props.filling}
                     </div>
-                    <div className={this.props.outputMode ? "cordOuter hide" : "cordOuter show"} id="inputOuter" onClick={this.handleCreatePatch}>
-                        <div className="cordInner" id={this.props.myKey + "inputInner"}>
-                        </div>
+
+                    {/*input patch cords area*/}
+                    <div className={this.props.outputMode ? "cordOuter hide" : "cordOuter show interactive"} 
+                         id="inputOuter" onClick={this.handleCreatePatch}>
+                            <div className="cordInner" id={this.props.myKey + "inputInner"}>
+                            </div>
                     </div>
-                    <div className={this.props.outputMode ? "cordOuter raise" : "cordOuter"} id="outputOuter" onClick={this.handleOutput}>
-                        <div className="cordInner" id={this.props.myKey + "outputInner"}>
-                        </div>
+                    {/*output patch cords area*/}
+                    <div className={this.props.outputMode ? "cordOuter show raise interactive" : "cordOuter show"} 
+                         id="outputOuter" onClick={this.handleOutput}>
+                            <div className="cordInner" id={this.props.myKey + "outputInner"}>
+                            </div>
                     </div>       
                 </div>
         )
@@ -257,6 +316,7 @@ class Filling extends React.Component{
     }
 }
 
+//patchcords with delete capability
 class Cord extends React.Component{
     constructor(props){
         super(props);
@@ -280,7 +340,7 @@ class Cord extends React.Component{
     }
 }
 
-
+//sidebar with buttons for creation
 class SideButtons extends React.Component{
     constructor(props){
         super(props);
@@ -299,6 +359,7 @@ class SideButtons extends React.Component{
     }
 }
 
+//buttons in side area that create modules for the playspace
 class MyButton extends React.Component{
     constructor(props){
         super(props);
@@ -310,7 +371,6 @@ class MyButton extends React.Component{
         this.handleClick=this.handleClick.bind(this);
     }
 
-    //Return up to App a new module to be added to the play area.
     handleClick(){
         this.props.handleClick(this.props.name + " " + this.state.count, <Filling name={this.props.name}/>)
         this.setState((state) => ({
