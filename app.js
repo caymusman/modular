@@ -74,16 +74,23 @@ var App = function (_React$Component) {
             var newCords = [].concat(_toConsumableArray(this.state.patchCords));
             var finCords = [].concat(_toConsumableArray(this.state.patchCords));
             var minCount = 0;
+            var newCombos = Object.assign({}, this.state.cordCombos);
             newCords.forEach(function (el) {
-                if (el.inputData.fromModID == childKey || el.outputData.tomyKey == childKey) {
+                if (el.inputData.fromModID == childKey) {
                     var val = finCords.indexOf(el);
                     finCords.splice(val, 1);
                     minCount++;
                 }
+                if (el.outputData.tomyKey == childKey) {
+                    var _val = finCords.indexOf(el);
+                    finCords.splice(_val, 1);
+                    minCount++;
+
+                    newCombos[el.inputData.fromModID].splice(newCombos[el.inputData.fromModID].indexOf(childKey), 1);
+                }
             });
 
             //delete property from cordCombos object    
-            var newCombos = Object.assign({}, this.state.cordCombos);
             delete newCombos[childKey];
 
             this.setState(function (state) {

@@ -46,16 +46,23 @@ class App extends React.Component{
         let newCords = [...this.state.patchCords];
         let finCords = [...this.state.patchCords];
         let minCount = 0;
+        let newCombos = {...this.state.cordCombos};
         newCords.forEach(el => {
-            if(el.inputData.fromModID == childKey || el.outputData.tomyKey == childKey){
+            if(el.inputData.fromModID == childKey){
                 let val = finCords.indexOf(el);
                 finCords.splice(val, 1);
                 minCount++;
                 }
+            if(el.outputData.tomyKey == childKey){
+                let val = finCords.indexOf(el);
+                finCords.splice(val, 1);
+                minCount++;
+
+                newCombos[el.inputData.fromModID].splice(newCombos[el.inputData.fromModID].indexOf(childKey), 1);
+            }
             })
 
         //delete property from cordCombos object    
-        let newCombos = {...this.state.cordCombos};
         delete newCombos[childKey];
 
 
