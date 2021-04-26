@@ -12,3 +12,6 @@ custom ALERT
 optional: 
 prevent module overlap on spawn
 make it so that you can type in new module name?
+
+
+if delete a module, make sure any cables to connected to it are also taken care of

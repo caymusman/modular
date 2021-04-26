@@ -29,7 +29,9 @@ var App = function (_React$Component) {
             currentCordCount: 0,
             cumulativeCordCount: 0,
             outputMode: false,
-            cordCombos: {}
+            cordCombos: {},
+            alert: false,
+            pingText: ""
         };
         _this.handleClick = _this.handleClick.bind(_this);
         _this.handleClose = _this.handleClose.bind(_this);
@@ -40,6 +42,8 @@ var App = function (_React$Component) {
         _this.deleteCord = _this.deleteCord.bind(_this);
         _this.handleDrag = _this.handleDrag.bind(_this);
         _this.handleComboDelete = _this.handleComboDelete.bind(_this);
+        _this.handlePingExit = _this.handlePingExit.bind(_this);
+        _this.myAlert = _this.myAlert.bind(_this);
         return _this;
     }
 
@@ -87,6 +91,7 @@ var App = function (_React$Component) {
                     finCords.splice(_val, 1);
                     minCount++;
 
+                    //make sure any output cords are removed from cordCombos
                     newCombos[el.inputData.fromModID].splice(newCombos[el.inputData.fromModID].indexOf(childKey), 1);
                 }
             });
@@ -148,13 +153,11 @@ var App = function (_React$Component) {
                 var outData = "outputData";
                 var lastEl = newCords[this.state.currentCordCount - 1];
                 var fromMod = lastEl.inputData.fromModID;
-                console.log(fromMod);
-                console.log(this.state.cordCombos[fromMod]);
                 if (fromMod == info.tomyKey) {
-                    alert("You can't plug a module into itself!");
+                    this.myAlert("You cannot plug a module into itself!");
                     this.handlePatchExit();
                 } else if (this.state.cordCombos[fromMod].includes(info.tomyKey)) {
-                    alert("You've already patched this cord!");
+                    this.myAlert("You've already patched this cable!");
                     this.handlePatchExit();
                 } else {
                     lastEl[outData] = info;
@@ -236,6 +239,22 @@ var App = function (_React$Component) {
             });
         }
     }, {
+        key: "myAlert",
+        value: function myAlert(ping) {
+            this.setState({
+                alert: true,
+                pingText: ping
+            });
+        }
+    }, {
+        key: "handlePingExit",
+        value: function handlePingExit() {
+            this.setState({
+                alert: false,
+                pingText: ""
+            });
+        }
+    }, {
         key: "render",
         value: function render() {
             var _this3 = this;
@@ -267,6 +286,29 @@ var App = function (_React$Component) {
                         "svg",
                         { id: "patchCords" },
                         cords
+                    ),
+                    React.createElement(
+                        "div",
+                        { className: this.state.alert ? "show pingBox" : "hide pingBox" },
+                        React.createElement(
+                            "div",
+                            { id: "pingTextDiv" },
+                            React.createElement(
+                                "h3",
+                                { className: "error" },
+                                "Not so fast!"
+                            )
+                        ),
+                        React.createElement(
+                            "p",
+                            { id: "pingText" },
+                            this.state.pingText
+                        ),
+                        React.createElement("i", {
+                            id: "pingExit",
+                            onClick: this.handlePingExit,
+                            className: "fa fa-times-circle",
+                            "aria-hidden": "true" })
                     ),
                     React.createElement("i", {
                         id: "patchExit",

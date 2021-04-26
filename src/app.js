@@ -10,7 +10,9 @@ class App extends React.Component{
             currentCordCount: 0,
             cumulativeCordCount: 0,
             outputMode: false,
-            cordCombos: {}
+            cordCombos: {},
+            alert: false,
+            pingText: ""
         }
         this.handleClick=this.handleClick.bind(this);
         this.handleClose=this.handleClose.bind(this);
@@ -21,6 +23,8 @@ class App extends React.Component{
         this.deleteCord=this.deleteCord.bind(this);
         this.handleDrag=this.handleDrag.bind(this);
         this.handleComboDelete=this.handleComboDelete.bind(this);
+        this.handlePingExit=this.handlePingExit.bind(this);
+        this.myAlert=this.myAlert.bind(this);
     }
 
     //Passed to SideButtons to control which buttons are added to PlaySpace
@@ -57,7 +61,8 @@ class App extends React.Component{
                 let val = finCords.indexOf(el);
                 finCords.splice(val, 1);
                 minCount++;
-
+                
+                //make sure any output cords are removed from cordCombos
                 newCombos[el.inputData.fromModID].splice(newCombos[el.inputData.fromModID].indexOf(childKey), 1);
             }
             })
@@ -103,13 +108,11 @@ class App extends React.Component{
             let outData = "outputData";
             let lastEl = newCords[this.state.currentCordCount-1];
             let fromMod = lastEl.inputData.fromModID;
-            console.log(fromMod);
-            console.log(this.state.cordCombos[fromMod]);
             if(fromMod == info.tomyKey){
-                alert("You can't plug a module into itself!");
+                this.myAlert("You cannot plug a module into itself!");
                 this.handlePatchExit();
             }else if(this.state.cordCombos[fromMod].includes(info.tomyKey)){
-                alert("You've already patched this cord!");
+                this.myAlert("You've already patched this cable!");
                 this.handlePatchExit();
             }else{
                 lastEl[outData]=info;
@@ -179,6 +182,20 @@ class App extends React.Component{
         }))
     }
 
+    myAlert(ping){
+        this.setState({
+            alert: true,
+            pingText: ping
+        })
+    }
+
+    handlePingExit(){
+        this.setState({
+            alert: false,
+            pingText: ""
+        })
+    }
+
 
     render(){
         const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
@@ -200,7 +217,17 @@ class App extends React.Component{
                 </div>
                 <div id="playSpace">
                     <svg id="patchCords">{cords}</svg>
-
+                    <div className={this.state.alert ? "show pingBox" : "hide pingBox"}>
+                        <div id="pingTextDiv">
+                            <h3 className="error">Not so fast!</h3>
+                        </div>
+                        <p id="pingText">{this.state.pingText}</p>
+                        <i 
+                        id="pingExit" 
+                        onClick={this.handlePingExit}
+                        className="fa fa-times-circle"
+                        aria-hidden="true"></i>
+                    </div>
                     <i 
                         id="patchExit" 
                         onClick={this.handlePatchExit}
