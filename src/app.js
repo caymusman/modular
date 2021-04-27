@@ -12,7 +12,8 @@ class App extends React.Component{
             outputMode: false,
             cordCombos: {},
             alert: false,
-            pingText: ""
+            pingText: "",
+            audioContext: new AudioContext()
         }
         this.handleClick=this.handleClick.bind(this);
         this.handleClose=this.handleClose.bind(this);
@@ -246,9 +247,13 @@ class App extends React.Component{
                                                         outputMode={this.state.outputMode}
                                                         addPatch={this.addCord} 
                                                         handleOutput={this.handleOutput}
+                                                        audioContext={this.state.audioContext}
                                                         />
                                     </div></Draggable>
                     })}
+                    <Output handleOutput={this.handleOutput}
+                            audioContext={this.state.audioContext}
+                    />
                 </div>
             </div>
         )
@@ -345,6 +350,53 @@ class Filling extends React.Component{
             <div id="fillingDiv">
                 <input type="range" min='-1' max='1' step='.1'/>
                 <button>On</button>
+            </div>
+        )
+    }
+}
+
+class Output extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state={
+            gainNode: this.props.audioContext.createGain()
+        }
+        this.handleOutput=this.handleOutput.bind(this);
+        this.handleChange=this.handleClick.bind(this);
+    }
+
+    handleOutput(){
+        let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
+        let el = document.getElementById("OutputoutputInner").getBoundingClientRect();
+        let x = el.x;
+        let y = el.y;
+        let bottom = el.bottom;
+        let right = el.right;
+        let xCenter = ((right - x) / 2 + x) - (largerDim * .04);
+        let yCenter = ((bottom - y) / 2 + y) - (largerDim * .04);
+        
+        this.props.handleOutput({tomyKey: "Output",
+                                 toLocation: {x: xCenter, y: yCenter}});
+    }
+    
+    handleChange(event){
+        this.state.gainNode.gain.setValueAtTime(evet.target.value, this.props.audioContext.currentTime);
+    }
+        
+
+    render(){
+        this.state.gainNode.gain.setValueAtTime(0, this.props.audioContext.currentTime);
+        this.state.gainNode.connect(this.props.audioContext.destination);
+        return(
+            <div id="outputDiv">
+                <p>Output</p>
+                <input id="gainSlider" type="range" min="0" max="1" step=".05" onChange={this.handleChange}></input>
+                <div className="cordOuter"
+                        onClick={this.handleOutput}>
+                            <div className="cordInner" id={"Output" + "outputInner"}>
+                            </div>
+                    </div> 
             </div>
         )
     }

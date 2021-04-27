@@ -276,7 +276,21 @@ html, body {
   height: 20%;
 }
 
-#playSpace .moduleDiv .cordOuter {
+#playSpace #inputOuter {
+  bottom: -1vh;
+  right: 75%;
+}
+
+#playSpace #outputOuter {
+  bottom: -1vh;
+  right: 25%;
+}
+
+#playSpace #outputOuter .cordInner {
+  background-color: #555;
+}
+
+.cordOuter {
   visibility: 0;
   opacity: 0;
   position: absolute;
@@ -302,12 +316,12 @@ html, body {
           transform: translate(50%);
 }
 
-#playSpace .moduleDiv .cordOuter:hover {
+.cordOuter:hover {
   -webkit-filter: drop-shadow(0 0 5px #555);
           filter: drop-shadow(0 0 5px #555);
 }
 
-#playSpace .moduleDiv .cordOuter .cordInner {
+.cordOuter .cordInner {
   width: 65%;
   height: 65%;
   border-radius: 50%;
@@ -316,17 +330,45 @@ html, body {
   background-color: #ddd;
 }
 
-#playSpace .moduleDiv #inputOuter {
-  bottom: -1vh;
-  right: 75%;
+#outputDiv {
+  position: absolute;
+  right: 0%;
+  bottom: 0%;
+  width: 6vmax;
+  height: 6vmax;
+  background-color: #ddd;
+  -webkit-filter: drop-shadow(0 0 10px #555);
+          filter: drop-shadow(0 0 10px #555);
+  text-align: center;
+  border-radius: 3px;
 }
 
-#playSpace .moduleDiv #outputOuter {
-  bottom: -1vh;
-  right: 25%;
+#outputDiv p {
+  border-radius: 2px 2px 0px 0px;
+  width: 100%;
+  height: 33%;
+  line-height: 180%;
+  background-color: #555;
+  color: #ddd;
+  margin: 0px;
+  padding-top: 4%;
+  padding-bottom: 4%;
 }
 
-#playSpace .moduleDiv #outputOuter .cordInner {
+#outputDiv .cordOuter {
+  position: absolute;
+  left: 50%;
+  top: 70%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  visibility: 1;
+  opacity: 1;
+  background-color: #6f6f6f;
+  width: 2vmax;
+  height: 2vmax;
+}
+
+#outputDiv .cordInner {
   background-color: #555;
 }
 

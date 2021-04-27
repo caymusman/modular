@@ -30,7 +30,8 @@ var App = function (_React$Component) {
             outputMode: false,
             cordCombos: {},
             alert: false,
-            pingText: ""
+            pingText: "",
+            audioContext: new AudioContext()
         };
         _this.handleClick = _this.handleClick.bind(_this);
         _this.handleClose = _this.handleClose.bind(_this);
@@ -338,10 +339,14 @@ var App = function (_React$Component) {
                                     handleClose: _this3.handleClose,
                                     outputMode: _this3.state.outputMode,
                                     addPatch: _this3.addCord,
-                                    handleOutput: _this3.handleOutput
+                                    handleOutput: _this3.handleOutput,
+                                    audioContext: _this3.state.audioContext
                                 })
                             )
                         );
+                    }),
+                    React.createElement(Output, { handleOutput: this.handleOutput,
+                        audioContext: this.state.audioContext
                     })
                 )
             );
@@ -481,19 +486,82 @@ var Filling = function (_React$Component3) {
     return Filling;
 }(React.Component);
 
+var Output = function (_React$Component4) {
+    _inherits(Output, _React$Component4);
+
+    function Output(props) {
+        _classCallCheck(this, Output);
+
+        var _this6 = _possibleConstructorReturn(this, (Output.__proto__ || Object.getPrototypeOf(Output)).call(this, props));
+
+        _this6.state = {
+            gainNode: _this6.props.audioContext.createGain()
+        };
+        _this6.handleOutput = _this6.handleOutput.bind(_this6);
+        _this6.handleChange = _this6.handleClick.bind(_this6);
+        return _this6;
+    }
+
+    _createClass(Output, [{
+        key: "handleOutput",
+        value: function handleOutput() {
+            var largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
+            var el = document.getElementById("OutputoutputInner").getBoundingClientRect();
+            var x = el.x;
+            var y = el.y;
+            var bottom = el.bottom;
+            var right = el.right;
+            var xCenter = (right - x) / 2 + x - largerDim * .04;
+            var yCenter = (bottom - y) / 2 + y - largerDim * .04;
+
+            this.props.handleOutput({ tomyKey: "Output",
+                toLocation: { x: xCenter, y: yCenter } });
+        }
+    }, {
+        key: "handleChange",
+        value: function handleChange(event) {
+            this.state.gainNode.gain.setValueAtTime(evet.target.value, this.props.audioContext.currentTime);
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            this.state.gainNode.gain.setValueAtTime(0, this.props.audioContext.currentTime);
+            this.state.gainNode.connect(this.props.audioContext.destination);
+            return React.createElement(
+                "div",
+                { id: "outputDiv" },
+                React.createElement(
+                    "p",
+                    null,
+                    "Output"
+                ),
+                React.createElement("input", { id: "gainSlider", type: "range", min: "0", max: "1", step: ".05", onChange: this.handleChange }),
+                React.createElement(
+                    "div",
+                    { className: "cordOuter",
+                        onClick: this.handleOutput },
+                    React.createElement("div", { className: "cordInner", id: "Output" + "outputInner" })
+                )
+            );
+        }
+    }]);
+
+    return Output;
+}(React.Component);
+
 //patchcords with delete capability
 
 
-var Cord = function (_React$Component4) {
-    _inherits(Cord, _React$Component4);
+var Cord = function (_React$Component5) {
+    _inherits(Cord, _React$Component5);
 
     function Cord(props) {
         _classCallCheck(this, Cord);
 
-        var _this6 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
+        var _this7 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
 
-        _this6.handleClick = _this6.handleClick.bind(_this6);
-        return _this6;
+        _this7.handleClick = _this7.handleClick.bind(_this7);
+        return _this7;
     }
 
     _createClass(Cord, [{
@@ -519,8 +587,8 @@ var Cord = function (_React$Component4) {
 //sidebar with buttons for creation
 
 
-var SideButtons = function (_React$Component5) {
-    _inherits(SideButtons, _React$Component5);
+var SideButtons = function (_React$Component6) {
+    _inherits(SideButtons, _React$Component6);
 
     function SideButtons(props) {
         _classCallCheck(this, SideButtons);
@@ -548,20 +616,20 @@ var SideButtons = function (_React$Component5) {
 //buttons in side area that create modules for the playspace
 
 
-var MyButton = function (_React$Component6) {
-    _inherits(MyButton, _React$Component6);
+var MyButton = function (_React$Component7) {
+    _inherits(MyButton, _React$Component7);
 
     function MyButton(props) {
         _classCallCheck(this, MyButton);
 
-        var _this8 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
+        var _this9 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
 
-        _this8.state = {
+        _this9.state = {
             count: 0
         };
 
-        _this8.handleClick = _this8.handleClick.bind(_this8);
-        return _this8;
+        _this9.handleClick = _this9.handleClick.bind(_this9);
+        return _this9;
     }
 
     _createClass(MyButton, [{
