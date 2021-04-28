@@ -29,7 +29,7 @@ class App extends React.Component{
     }
 
     //Passed to SideButtons to control which buttons are added to PlaySpace
-    handleClick(childKey, childJSX){
+    handleClick(childKey, childJSX, inputOnly){
         if(this.state.outputMode){
             this.handlePatchExit();
         }
@@ -37,7 +37,8 @@ class App extends React.Component{
         this.setState((state) => ({
             list: new Map([...state.list, [childKey, {myKey: childKey,
                                                     filling: childJSX,
-                                                    name:childKey.split(" ")[0]}]]),
+                                                    name:childKey.split(" ")[0],
+                                                    inputOnly: inputOnly}]]),
             cordCombos: newCombos
         }));
     };
@@ -57,11 +58,15 @@ class App extends React.Component{
                 let val = finCords.indexOf(el);
                 finCords.splice(val, 1);
                 minCount++;
+
+                el.inputData.audio.disconnect(el.outputData.audio);
                 }
             if(el.outputData.tomyKey == childKey){
                 let val = finCords.indexOf(el);
                 finCords.splice(val, 1);
                 minCount++;
+
+                el.inputData.audio.disconnect(el.outputData.audio);
                 
                 //make sure any output cords are removed from cordCombos
                 newCombos[el.inputData.fromModID].splice(newCombos[el.inputData.fromModID].indexOf(childKey), 1);
@@ -128,18 +133,27 @@ class App extends React.Component{
                     outputMode: false
              })
             }
+            //handle Audio
+            lastEl.inputData.audio.connect(info.audio);
         }
     }
 
     
     deleteCord(cordID){
         let newArr = [...this.state.patchCords];
+        for(let i = 0; i < newArr.length; i++){
+            if(newArr[i].id == cordID){
+                newArr[i].inputData.audio.disconnect(newArr[i].outputData.audio);
+                break;
+            }
+        }
         this.setState(state => ({
             patchCords: newArr.filter(el => {
                 return el.id !== cordID;
             }),
             currentCordCount: state.currentCordCount - 1,
         }))
+        this.handleComboDelete(cordID);
     }
 
     handleComboDelete(cordID){
@@ -235,7 +249,7 @@ class App extends React.Component{
                         className={this.state.outputMode ? "show fa fa-times-circle" : "hide fa fa-times-circle"} 
                         aria-hidden="true"></i>
 
-                {[...this.state.list].map(([key, {myKey, filling, name}]) => {
+                {[...this.state.list].map(([key, {myKey, filling, name, inputOnly}]) => {
                         return <Draggable onDrag={() => {this.handleDrag(key)}} key={key} handle="p" {...dragHandlers} bounds="parent">
                                     <div className="dragDiv">
                                         <Area 
@@ -247,6 +261,7 @@ class App extends React.Component{
                                                         outputMode={this.state.outputMode}
                                                         addPatch={this.addCord} 
                                                         handleOutput={this.handleOutput}
+                                                        inputOnly={inputOnly}
                                                         audioContext={this.state.audioContext}
                                                         />
                                     </div></Draggable>
@@ -266,10 +281,17 @@ class Area extends React.Component{
     constructor(props){
         super(props);
 
+        this.state={
+            audio: {}
+        }
+
         this.handleClose=this.handleClose.bind(this);
         this.handleCreatePatch=this.handleCreatePatch.bind(this);
         this.handleOutput=this.handleOutput.bind(this);
+        this.createAudio=this.createAudio.bind(this);
+        this.renderFilling=this.renderFilling.bind(this);
     }
+
 
     //Close on press of X icon. Pass key up to App and remove from state.list
     handleClose(){
@@ -288,7 +310,8 @@ class Area extends React.Component{
             let xCenter = ((right - x) / 2 + x) - (largerDim * .04);
             let yCenter = ((bottom - y) / 2 + y) - (largerDim * .04);
             this.props.addPatch({fromModID: this.props.myKey,
-                             fromLocation: {x: xCenter, y: yCenter}});
+                             fromLocation: {x: xCenter, y: yCenter},
+                            audio: this.state.audio});
             }
     }
 
@@ -304,8 +327,24 @@ class Area extends React.Component{
         let yCenter = ((bottom - y) / 2 + y) - (largerDim * .04);
         
         this.props.handleOutput({tomyKey: this.props.myKey,
-                                 toLocation: {x: xCenter, y: yCenter}});
+                                 toLocation: {x: xCenter, y: yCenter},
+                                audio: this.state.audioContext});
         }
+
+    createAudio(childAudio){
+        this.setState({
+            audio: childAudio
+        })
+    }
+
+    renderFilling(){
+        switch(this.props.filling){
+            case "Oscillator":
+                return filling= <Oscillator audioContext={this.props.audioContext} createAudio={this.createAudio}/>;
+            default:
+                return filling= <div>Nothing</div>;
+        }
+    }
 
 
     render(){
@@ -320,7 +359,7 @@ class Area extends React.Component{
 
                     {/*eventually will be unique module fillings*/}
                     <div id="innerModDiv">
-                        {this.props.filling}
+                         {this.renderFilling()}
                     </div>
 
                     {/*input patch cords area*/}
@@ -330,26 +369,55 @@ class Area extends React.Component{
                             </div>
                     </div>
                     {/*output patch cords area*/}
-                    <div className={this.props.outputMode ? "cordOuter show raise interactive" : "cordOuter show"} 
-                         id="outputOuter" onClick={this.handleOutput}>
-                            <div className="cordInner" id={this.props.myKey + "outputInner"}>
-                            </div>
-                    </div>       
+                    
+                    {
+                        this.props.inputOnly == "false" &&
+                        <div className={this.props.outputMode ? "cordOuter show raise interactive" : "cordOuter show"} 
+                             id="outputOuter" onClick={this.handleOutput}>
+                                 <div className="cordInner" id={this.props.myKey + "outputInner"}>
+                                 </div>
+                         </div>
+                    }
                 </div>
         )
     }
 }
 
-//Filling belongs to SideButtons to render the inner part of each Area
-class Filling extends React.Component{
+//Oscillator Module
+class Oscillator extends React.Component{
     constructor(props){
         super(props);
+
+        this.state={
+            audio: this.props.audioContext.createOscillator(),
+            wave: "sine"
+        }
+
+        this.handleFreqChange=this.handleFreqChange.bind(this);
+        this.handleWaveChange=this.handleWaveChange.bind(this);
     }
+
+    handleFreqChange(event){
+        this.state.audio.frequency.setValueAtTime(event.target.value, this.props.audioContext.currentTime);
+    }
+
+    handleWaveChange(event){
+        this.state.audio.type=event.target.value;
+        this.setState({
+            wave: event.target.value
+        })
+    }
+
     render(){
         return(
-            <div id="fillingDiv">
-                <input type="range" min='-1' max='1' step='.1'/>
-                <button>On</button>
+            <div className="oscDiv">
+            <button onClick={(() => {this.props.createAudio(this.state.audio);this.state.audio.start()})}>Start</button>
+                <select value={this.state.wave} onChange={this.handleWaveChange}>
+                    <option value="sine">Sine</option>
+                    <option value="sawtooth">Sawtooth</option>
+                    <option value="triangle">Triangle</option>
+                </select>
+                <input type="range" min="50" max="700" step="1" onChange={this.handleFreqChange}></input>
             </div>
         )
     }
@@ -363,7 +431,7 @@ class Output extends React.Component{
             gainNode: this.props.audioContext.createGain()
         }
         this.handleOutput=this.handleOutput.bind(this);
-        this.handleChange=this.handleClick.bind(this);
+        this.handleChange=this.handleChange.bind(this);
     }
 
     handleOutput(){
@@ -377,16 +445,16 @@ class Output extends React.Component{
         let yCenter = ((bottom - y) / 2 + y) - (largerDim * .04);
         
         this.props.handleOutput({tomyKey: "Output",
-                                 toLocation: {x: xCenter, y: yCenter}});
+                                 toLocation: {x: xCenter, y: yCenter},
+                                 audio: this.state.gainNode});
     }
     
     handleChange(event){
-        this.state.gainNode.gain.setValueAtTime(evet.target.value, this.props.audioContext.currentTime);
+        this.state.gainNode.gain.setValueAtTime(event.target.value, this.props.audioContext.currentTime);
     }
         
 
     render(){
-        this.state.gainNode.gain.setValueAtTime(0, this.props.audioContext.currentTime);
         this.state.gainNode.connect(this.props.audioContext.destination);
         return(
             <div id="outputDiv">
@@ -435,10 +503,10 @@ class SideButtons extends React.Component{
     render(){
         return(
             <div id={this.props.id}>
-                <MyButton name="TestButton" handleClick={this.props.handleClick}/>
-                <MyButton name="AnotherTest" handleClick={this.props.handleClick}/>
-                <MyButton name="Poopoop" handleClick={this.props.handleClick}/>
-                <MyButton name="PeePee" handleClick={this.props.handleClick}/>
+                <MyButton name="Oscillator" handleClick={this.props.handleClick} inputOnly="true"/>
+                <MyButton name="AnotherTest" handleClick={this.props.handleClick} inputOnly="false"/>
+                <MyButton name="Poopoop" handleClick={this.props.handleClick} inputOnly="false"/>
+                <MyButton name="PeePee" handleClick={this.props.handleClick} inputOnly="false"/>
             </div>
         )
         
@@ -458,7 +526,7 @@ class MyButton extends React.Component{
     }
 
     handleClick(){
-        this.props.handleClick(this.props.name + " " + this.state.count, <Filling name={this.props.name}/>)
+        this.props.handleClick(this.props.name + " " + this.state.count, this.props.name, this.props.inputOnly)
         this.setState((state) => ({
             count: state.count + 1
         }))

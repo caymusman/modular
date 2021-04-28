@@ -8,10 +8,25 @@ resizing issues!
 custom ALERT
 
 
+Make modules start on creation! Or make a better "Start" overlay.
+
+Make sure mass disconnect works.
+
+QOL: on disconnect, make it mute in like .2 seconds and then disconnect.
+
+
 
 optional: 
 prevent module overlap on spawn
 make it so that you can type in new module name?
 
 
-if delete a module, make sure any cables to connected to it are also taken care of
+Oscillator needs:
+Design bits;
+have frequency show up as a number; (label?)
+
+
+Modules:
+Gain
+Filter
+

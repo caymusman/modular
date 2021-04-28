@@ -113,16 +113,20 @@ html,body
         z-index: 200;
         display: flex;
         flex-direction: column;
+        border-style: inset;
+        border-color: $cancelRed;
         border-radius: 3px;
         filter: drop-shadow(0 0 10px $dark);
+        
 
         #pingTextDiv{
             width: 100%;
-            height: 20%;
+            height: 25%;
             margin-top: 0px;
-            background: darken(red, 30%);
+            background: rgb(150, 91, 91);
             text-align: center;
-            border-radius: 3px, 3px, 0px, 0px;
+            text-decoration-color: $cancelRed;
+            
 
             .error{
                 color: $light;
@@ -131,9 +135,11 @@ html,body
         #pingText{
             margin: auto;
             color: $light;
-            font-size: 2.7vh;
+            font-size: 120%;
             text-decoration: underline;
+            text-decoration-color: $cancelRed;
             font-style: oblique;
+            text-transform: lowercase;
         }
 
         .fa-times-circle{
@@ -296,7 +302,7 @@ html,body
         right: 0%;
         bottom: 0%;
         width: 6vmax;
-        height: 6vmax;
+        height: 12vmax;
         background-color:$light;
         filter: drop-shadow(0 0 10px $dark);
         text-align: center;
@@ -305,7 +311,7 @@ html,body
         p{
             border-radius: 2px 2px 0px 0px;
             width: 100%;
-            height: 33%;
+            height: 20%;
             line-height: 180%;
             background-color: $dark;
             color: $light;
@@ -317,19 +323,74 @@ html,body
         .cordOuter{
             position: absolute;
             left: 50%;
-            top: 70%;
+            top: 90%;
             transform: translate(-50%, -50%);
             visibility: 1;
             opacity: 1;
             background-color: lighten($dark, 10%);
-            width: 2vmax;
-            height: 2vmax;
+            width: 1.2vmax;
+            height: 1.2vmax;
 
         }
 
         .cordInner{
             background-color: $dark;
         }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            position: relative;
+            top: 25%;
+            right: 2.5%;
+            width: 100%;
+            height: .5vw;
+            transform: rotate(270deg);
+            border-radius: 10px;
+          }
+          input[type=range]:focus {
+            outline: none;
+            border-radius: 10px;
+          }
+          input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 120%;
+            cursor: pointer;
+            background: $dark;
+            border-radius: 3px;
+            border: 0.2px solid lighten($dark, 10%);
+          }
+          input[type=range]::-webkit-slider-thumb {
+            border: 2px solid lighten($dark, 10%);
+            height: 1vw;
+            width: 1vw;
+            border-radius: 50%;
+            background: $light;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -4.5%;
+          }
+          input[type=range]:focus::-webkit-slider-runnable-track {
+            background: $dark;
+            border-radius: 3px;
+          }
+          input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            background: $dark;
+            border-radius: 3px;
+            border: 0.2px solid lighten($dark, 10%);
+          }
+          input[type=range]::-moz-range-thumb {
+            border: 2px solid lighten($dark, 10%);
+            height: .7vw;
+            width: .7vw;
+            border-radius: 50%;
+            background: $light;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -6%;
+          }
 }
 
 #returnSpace{
@@ -367,4 +428,11 @@ svg{
 
 .raise{
     filter:drop-shadow(0 0 5px $light);
+}
+
+@media only screen and (max-device-width: 480px){    
+    #mainDiv{
+        visibility: 0;
+        opacity: 0;
+    }
 }

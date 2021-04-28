@@ -123,6 +123,8 @@ html, body {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
+  border-style: inset;
+  border-color: #660000;
   border-radius: 3px;
   -webkit-filter: drop-shadow(0 0 10px #555);
           filter: drop-shadow(0 0 10px #555);
@@ -130,11 +132,12 @@ html, body {
 
 #playSpace .pingBox #pingTextDiv {
   width: 100%;
-  height: 20%;
+  height: 25%;
   margin-top: 0px;
-  background: #660000;
+  background: #965b5b;
   text-align: center;
-  border-radius: 3px, 3px, 0px, 0px;
+  -webkit-text-decoration-color: #660000;
+          text-decoration-color: #660000;
 }
 
 #playSpace .pingBox #pingTextDiv .error {
@@ -144,9 +147,12 @@ html, body {
 #playSpace .pingBox #pingText {
   margin: auto;
   color: #ddd;
-  font-size: 2.7vh;
+  font-size: 120%;
   text-decoration: underline;
+  -webkit-text-decoration-color: #660000;
+          text-decoration-color: #660000;
   font-style: oblique;
+  text-transform: lowercase;
 }
 
 #playSpace .pingBox .fa-times-circle {
@@ -335,7 +341,7 @@ html, body {
   right: 0%;
   bottom: 0%;
   width: 6vmax;
-  height: 6vmax;
+  height: 12vmax;
   background-color: #ddd;
   -webkit-filter: drop-shadow(0 0 10px #555);
           filter: drop-shadow(0 0 10px #555);
@@ -346,7 +352,7 @@ html, body {
 #outputDiv p {
   border-radius: 2px 2px 0px 0px;
   width: 100%;
-  height: 33%;
+  height: 20%;
   line-height: 180%;
   background-color: #555;
   color: #ddd;
@@ -358,18 +364,80 @@ html, body {
 #outputDiv .cordOuter {
   position: absolute;
   left: 50%;
-  top: 70%;
+  top: 90%;
   -webkit-transform: translate(-50%, -50%);
           transform: translate(-50%, -50%);
   visibility: 1;
   opacity: 1;
   background-color: #6f6f6f;
-  width: 2vmax;
-  height: 2vmax;
+  width: 1.2vmax;
+  height: 1.2vmax;
 }
 
 #outputDiv .cordInner {
   background-color: #555;
+}
+
+#outputDiv input[type=range] {
+  -webkit-appearance: none;
+  position: relative;
+  top: 25%;
+  right: 2.5%;
+  width: 100%;
+  height: .5vw;
+  -webkit-transform: rotate(270deg);
+          transform: rotate(270deg);
+  border-radius: 10px;
+}
+
+#outputDiv input[type=range]:focus {
+  outline: none;
+  border-radius: 10px;
+}
+
+#outputDiv input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 120%;
+  cursor: pointer;
+  background: #555;
+  border-radius: 3px;
+  border: 0.2px solid #6f6f6f;
+}
+
+#outputDiv input[type=range]::-webkit-slider-thumb {
+  border: 2px solid #6f6f6f;
+  height: 1vw;
+  width: 1vw;
+  border-radius: 50%;
+  background: #ddd;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -4.5%;
+}
+
+#outputDiv input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #555;
+  border-radius: 3px;
+}
+
+#outputDiv input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  background: #555;
+  border-radius: 3px;
+  border: 0.2px solid #6f6f6f;
+}
+
+#outputDiv input[type=range]::-moz-range-thumb {
+  border: 2px solid #6f6f6f;
+  height: .7vw;
+  width: .7vw;
+  border-radius: 50%;
+  background: #ddd;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -6%;
 }
 
 #returnSpace {
@@ -407,5 +475,12 @@ svg line:hover {
 .raise {
   -webkit-filter: drop-shadow(0 0 5px #ddd);
           filter: drop-shadow(0 0 5px #ddd);
+}
+
+@media only screen and (max-device-width: 480px) {
+  #mainDiv {
+    visibility: 0;
+    opacity: 0;
+  }
 }
 /*# sourceMappingURL=styles.css.map */
