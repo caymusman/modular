@@ -394,18 +394,23 @@ class Oscillator extends React.Component{
             audio: this.props.audioContext.createOscillator(),
             wave: "sine",
             value: 220,
+            min: 20,
+            max: 700,
+            step: 1,
+            LFO: false
         }
 
         this.handleFreqChange=this.handleFreqChange.bind(this);
         this.handleWaveChange=this.handleWaveChange.bind(this);
+        this.handleLFOClick=this.handleLFOClick.bind(this);
     }
 
     handleFreqChange(event){
         let freq = event.target.value;
-        if(freq > 700){
-            freq=700;
-        }else if(freq < 50){
-            freq=50;
+        if(freq > this.state.max){
+            freq=this.state.max;
+        }else if(freq < this.state.min){
+            freq=this.state.min;
         }
         this.state.audio.frequency.setValueAtTime(freq, this.props.audioContext.currentTime);
         this.setState({
@@ -420,6 +425,24 @@ class Oscillator extends React.Component{
         })
     }
 
+    handleLFOClick(){
+        if(this.state.LFO){
+            this.setState({
+                max: 700,
+                min:20,
+                step: 1,
+                LFO: false
+            })
+        }else{
+            this.setState({
+                max: 20,
+                min: 0,
+                step: .1,
+                LFO: true
+            })
+        }
+    }
+
     componentDidMount(){
         this.props.createAudio(this.state.audio);
         this.state.audio.frequency.setValueAtTime(this.state.value, this.props.audioContext.currentTime);
@@ -429,17 +452,20 @@ class Oscillator extends React.Component{
     render(){
         return(
             <div className="oscDiv">
-                <select value={this.state.wave} onChange={this.handleWaveChange}>
-                    <option value="sine">Sine</option>
-                    <option value="sawtooth">Sawtooth</option>
-                    <option value="triangle">Triangle</option>
-                </select>
-                <label class="switch">
-                     <input type="checkbox"></input>
-                     <span class="slider round"></span>
+                <div className="customSelect">
+                    <select value={this.state.wave} onChange={this.handleWaveChange}>
+                        <option value="sine">Sine</option>
+                        <option value="sawtooth">Sawtooth</option>
+                        <option value="triangle">Triangle</option>
+                    </select>
+                </div>
+                <label className="switch tooltip">
+                     <input type="checkbox" onClick={this.handleLFOClick}></input>
+                     <span className="slider round"></span>
+                     <span className="tooltiptext">LFO Mode</span>
                  </label>
-                <input type="range" value={this.state.value} min="50" max="700" step="1" onChange={this.handleFreqChange}></input>
-                <input type="number" value={this.state.value} min="50" max="700" onChange={this.handleFreqChange}></input>
+                <input type="range" value={this.state.value} min={this.state.min} max={this.state.max} step={this.state.step} onChange={this.handleFreqChange}></input>
+                <input type="number" value={this.state.value} min={this.state.min} max={this.state.max} onChange={this.handleFreqChange}></input>
                 </div>
         )
     }
@@ -497,8 +523,9 @@ class Gain extends React.Component{
                 <input type="range" value={this.state.value} min="0" max="1" step=".05" onChange={this.handleGainChange}></input>
                 <input type="number" value={this.state.value} min="0" max="1" onChange={this.handleGainChange}></input>
 
-                <div className="cordOuter" id="firstParam" onClick={this.handleOutput}>
+                <div className="cordOuter tooltip" id="firstParam" onClick={this.handleOutput}>
                     <div className="cordInner" id={this.props.parent + "param" + "outputInner"}>
+                    <span className="tooltiptext"><span className="paramSpan">param: </span>Gain</span>
                     </div>
                 </div>
             </div>

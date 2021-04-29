@@ -2,6 +2,7 @@ $dark: #555;
 $light: #ddd;
 $cancelRed: darken(red, 30%);
 $darkGreen: lighten(#013220, 5%);
+$mainPurple: #b6a8b5;
 
 html,body
 {
@@ -67,7 +68,7 @@ html,body
 
     .addBtn{
         font-size: .6vmax;
-        text-shadow: .1vmax .1vmax .05vmax #b6a8b5;
+        text-shadow: .1vmax .1vmax .05vmax $mainPurple;
         width: 100%;
         height: 10%;
         background-color: $light;
@@ -87,7 +88,7 @@ html,body
 #playSpace{ 
     z-index: 1;
     position: relative;
-    background-color: #b6a8b5;
+    background-color: $mainPurple;
     background-image: url('/media/bedge-grunge.png');
     width: 100%;
 
@@ -503,6 +504,26 @@ svg{
     filter:drop-shadow(0 0 5px $light);
 }
 
+//Neutralizing Selects
+
+.customSelect{
+    select{
+        appearance: none;
+        margin: 50px;
+        width: 150px;
+        padding: 5px 35px 5px 5px;
+        font-size: 16px;
+        border: 1px solid #CCC;
+        height: 34px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background: url(https://stackoverflow.com/favicon.ico) 96% / 15% no-repeat #EEE;
+    }
+}
+
+
+
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -516,6 +537,49 @@ input[type=number] {
   -moz-appearance: textfield;
   text-align: center;
 }
+
+.tooltiptext {
+    visibility: hidden;
+    width: 60px;
+    font-size: 12px;;
+    background-color: lighten($dark, 10%);
+    color: $light;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+  
+    /* Position the tooltip */
+    position: absolute;
+    bottom: 140%;
+    right: -25px;
+    z-index: 1;
+
+    .paramSpan{
+        color: white;
+        text-decoration: underline;
+    }
+  }
+
+.tooltip{
+    &:hover{
+        .tooltiptext {
+            visibility: visible;
+          }
+    }
+}
+
+.tooltiptext::after {
+    content: " ";
+    position: absolute;
+    top: 100%; /* At the bottom of the tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: $dark transparent transparent transparent;
+  }
+  
+  
 
 @media only screen and (max-device-width: 480px){    
     #mainDiv{

@@ -517,11 +517,16 @@ var Oscillator = function (_React$Component3) {
         _this5.state = {
             audio: _this5.props.audioContext.createOscillator(),
             wave: "sine",
-            value: 220
+            value: 220,
+            min: 20,
+            max: 700,
+            step: 1,
+            LFO: false
         };
 
         _this5.handleFreqChange = _this5.handleFreqChange.bind(_this5);
         _this5.handleWaveChange = _this5.handleWaveChange.bind(_this5);
+        _this5.handleLFOClick = _this5.handleLFOClick.bind(_this5);
         return _this5;
     }
 
@@ -529,10 +534,10 @@ var Oscillator = function (_React$Component3) {
         key: "handleFreqChange",
         value: function handleFreqChange(event) {
             var freq = event.target.value;
-            if (freq > 700) {
-                freq = 700;
-            } else if (freq < 50) {
-                freq = 50;
+            if (freq > this.state.max) {
+                freq = this.state.max;
+            } else if (freq < this.state.min) {
+                freq = this.state.min;
             }
             this.state.audio.frequency.setValueAtTime(freq, this.props.audioContext.currentTime);
             this.setState({
@@ -548,6 +553,25 @@ var Oscillator = function (_React$Component3) {
             });
         }
     }, {
+        key: "handleLFOClick",
+        value: function handleLFOClick() {
+            if (this.state.LFO) {
+                this.setState({
+                    max: 700,
+                    min: 20,
+                    step: 1,
+                    LFO: false
+                });
+            } else {
+                this.setState({
+                    max: 20,
+                    min: 0,
+                    step: .1,
+                    LFO: true
+                });
+            }
+        }
+    }, {
         key: "componentDidMount",
         value: function componentDidMount() {
             this.props.createAudio(this.state.audio);
@@ -561,32 +585,41 @@ var Oscillator = function (_React$Component3) {
                 "div",
                 { className: "oscDiv" },
                 React.createElement(
-                    "select",
-                    { value: this.state.wave, onChange: this.handleWaveChange },
+                    "div",
+                    { className: "customSelect" },
                     React.createElement(
-                        "option",
-                        { value: "sine" },
-                        "Sine"
-                    ),
-                    React.createElement(
-                        "option",
-                        { value: "sawtooth" },
-                        "Sawtooth"
-                    ),
-                    React.createElement(
-                        "option",
-                        { value: "triangle" },
-                        "Triangle"
+                        "select",
+                        { value: this.state.wave, onChange: this.handleWaveChange },
+                        React.createElement(
+                            "option",
+                            { value: "sine" },
+                            "Sine"
+                        ),
+                        React.createElement(
+                            "option",
+                            { value: "sawtooth" },
+                            "Sawtooth"
+                        ),
+                        React.createElement(
+                            "option",
+                            { value: "triangle" },
+                            "Triangle"
+                        )
                     )
                 ),
                 React.createElement(
                     "label",
-                    { "class": "switch" },
-                    React.createElement("input", { type: "checkbox" }),
-                    React.createElement("span", { "class": "slider round" })
+                    { className: "switch tooltip" },
+                    React.createElement("input", { type: "checkbox", onClick: this.handleLFOClick }),
+                    React.createElement("span", { className: "slider round" }),
+                    React.createElement(
+                        "span",
+                        { className: "tooltiptext" },
+                        "LFO Mode"
+                    )
                 ),
-                React.createElement("input", { type: "range", value: this.state.value, min: "50", max: "700", step: "1", onChange: this.handleFreqChange }),
-                React.createElement("input", { type: "number", value: this.state.value, min: "50", max: "700", onChange: this.handleFreqChange })
+                React.createElement("input", { type: "range", value: this.state.value, min: this.state.min, max: this.state.max, step: this.state.step, onChange: this.handleFreqChange }),
+                React.createElement("input", { type: "number", value: this.state.value, min: this.state.min, max: this.state.max, onChange: this.handleFreqChange })
             );
         }
     }]);
@@ -658,8 +691,21 @@ var Gain = function (_React$Component4) {
                 React.createElement("input", { type: "number", value: this.state.value, min: "0", max: "1", onChange: this.handleGainChange }),
                 React.createElement(
                     "div",
-                    { className: "cordOuter", id: "firstParam", onClick: this.handleOutput },
-                    React.createElement("div", { className: "cordInner", id: this.props.parent + "param" + "outputInner" })
+                    { className: "cordOuter tooltip", id: "firstParam", onClick: this.handleOutput },
+                    React.createElement(
+                        "div",
+                        { className: "cordInner", id: this.props.parent + "param" + "outputInner" },
+                        React.createElement(
+                            "span",
+                            { className: "tooltiptext" },
+                            React.createElement(
+                                "span",
+                                { className: "paramSpan" },
+                                "param: "
+                            ),
+                            "Gain"
+                        )
+                    )
                 )
             );
         }
