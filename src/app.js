@@ -328,7 +328,7 @@ class Area extends React.Component{
         
         this.props.handleOutput({tomyKey: this.props.myKey,
                                  toLocation: {x: xCenter, y: yCenter},
-                                audio: this.state.audioContext});
+                                audio: this.state.audio});
         }
 
     createAudio(childAudio){
@@ -340,9 +340,11 @@ class Area extends React.Component{
     renderFilling(){
         switch(this.props.filling){
             case "Oscillator":
-                return filling= <Oscillator audioContext={this.props.audioContext} createAudio={this.createAudio}/>;
+                return <Oscillator audioContext={this.props.audioContext} createAudio={this.createAudio}/>;
+            case "Gain":
+                return <Gain audioContext={this.props.audioContext} createAudio={this.createAudio} parent={this.props.myKey} handleOutput={this.props.handleOutput}/>
             default:
-                return filling= <div>Nothing</div>;
+                return <div>Nothing</div>;
         }
     }
 
@@ -390,7 +392,8 @@ class Oscillator extends React.Component{
 
         this.state={
             audio: this.props.audioContext.createOscillator(),
-            wave: "sine"
+            wave: "sine",
+            value: 220,
         }
 
         this.handleFreqChange=this.handleFreqChange.bind(this);
@@ -398,7 +401,16 @@ class Oscillator extends React.Component{
     }
 
     handleFreqChange(event){
-        this.state.audio.frequency.setValueAtTime(event.target.value, this.props.audioContext.currentTime);
+        let freq = event.target.value;
+        if(freq > 700){
+            freq=700;
+        }else if(freq < 50){
+            freq=50;
+        }
+        this.state.audio.frequency.setValueAtTime(freq, this.props.audioContext.currentTime);
+        this.setState({
+            value: freq
+        })
     }
 
     handleWaveChange(event){
@@ -408,16 +420,87 @@ class Oscillator extends React.Component{
         })
     }
 
+    componentDidMount(){
+        this.props.createAudio(this.state.audio);
+        this.state.audio.frequency.setValueAtTime(this.state.value, this.props.audioContext.currentTime);
+        this.state.audio.start();
+    }
+
     render(){
         return(
             <div className="oscDiv">
-            <button onClick={(() => {this.props.createAudio(this.state.audio);this.state.audio.start()})}>Start</button>
                 <select value={this.state.wave} onChange={this.handleWaveChange}>
                     <option value="sine">Sine</option>
                     <option value="sawtooth">Sawtooth</option>
                     <option value="triangle">Triangle</option>
                 </select>
-                <input type="range" min="50" max="700" step="1" onChange={this.handleFreqChange}></input>
+                <label class="switch">
+                     <input type="checkbox"></input>
+                     <span class="slider round"></span>
+                 </label>
+                <input type="range" value={this.state.value} min="50" max="700" step="1" onChange={this.handleFreqChange}></input>
+                <input type="number" value={this.state.value} min="50" max="700" onChange={this.handleFreqChange}></input>
+                </div>
+        )
+    }
+}
+
+class Gain extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state={
+            audio: this.props.audioContext.createGain(),
+            value: .5
+        }
+
+        this.handleGainChange=this.handleGainChange.bind(this);
+        this.handleOutput=this.handleOutput.bind(this);
+    }
+
+    handleGainChange(event){
+        let gainVal = event.target.value;
+        if(gainVal > 1){
+            gainVal=1;
+        }else if(gainVal < 0){
+            gainVal=0;
+        }
+        this.state.audio.gain.setValueAtTime(gainVal, this.props.audioContext.currentTime);
+        this.setState({
+            value: gainVal
+        });
+    }
+
+    handleOutput(){
+        let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
+        let el = document.getElementById(this.props.parent + "param" + "outputInner").getBoundingClientRect();
+        let x = el.x;
+        let y = el.y;
+        let bottom = el.bottom;
+        let right = el.right;
+        let xCenter = ((right - x) / 2 + x) - (largerDim * .04);
+        let yCenter = ((bottom - y) / 2 + y) - (largerDim * .04);
+        
+        this.props.handleOutput({tomyKey: this.props.parent+ "param",
+                                 toLocation: {x: xCenter, y: yCenter},
+                                audio: this.state.audio.gain});
+        }
+
+    componentDidMount(){
+        this.props.createAudio(this.state.audio);
+        this.state.audio.gain.setValueAtTime(.5, this.props.audioContext.currentTime);
+    }
+
+    render(){
+        return(
+            <div className="gainDiv">
+                <input type="range" value={this.state.value} min="0" max="1" step=".05" onChange={this.handleGainChange}></input>
+                <input type="number" value={this.state.value} min="0" max="1" onChange={this.handleGainChange}></input>
+
+                <div className="cordOuter" id="firstParam" onClick={this.handleOutput}>
+                    <div className="cordInner" id={this.props.parent + "param" + "outputInner"}>
+                    </div>
+                </div>
             </div>
         )
     }
@@ -504,7 +587,7 @@ class SideButtons extends React.Component{
         return(
             <div id={this.props.id}>
                 <MyButton name="Oscillator" handleClick={this.props.handleClick} inputOnly="true"/>
-                <MyButton name="AnotherTest" handleClick={this.props.handleClick} inputOnly="false"/>
+                <MyButton name="Gain" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="Poopoop" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="PeePee" handleClick={this.props.handleClick} inputOnly="false"/>
             </div>

@@ -190,8 +190,8 @@ html, body {
           filter: drop-shadow(0 0 10px #555);
   text-align: center;
   width: 12.5vw;
-  height: 10.5vh;
   border-radius: 2px;
+  padding-bottom: 10%;
 }
 
 #playSpace .moduleDiv:hover .cordOuter.show {
@@ -204,31 +204,28 @@ html, body {
   opacity: 0;
 }
 
+#playSpace .moduleDiv:hover #firstParam {
+  opacity: 1;
+}
+
 #playSpace .moduleDiv .fa-times {
-  text-align: center;
-  background-color: #6f6f6f;
   color: #ddd;
-  font-size: 1.8vh;
   visibility: hidden;
   opacity: 0;
   position: absolute;
-  width: 1.8vh;
-  height: 1.8vh;
-  top: -10%;
+  width: 12px;
+  height: 12px;
+  top: -8%;
   left: -4%;
-  margin: 0px;
-  padding: 0px;
   border-radius: 50%;
-  -webkit-transition: background-color .6s, visibility .45s, opacity .45s, -webkit-transform .6s, -webkit-filter .6s;
-  transition: background-color .6s, visibility .45s, opacity .45s, -webkit-transform .6s, -webkit-filter .6s;
-  transition: background-color .6s, transform .6s, filter .6s, visibility .45s, opacity .45s;
-  transition: background-color .6s, transform .6s, filter .6s, visibility .45s, opacity .45s, -webkit-transform .6s, -webkit-filter .6s;
+  -webkit-transition: visibility .45s, opacity .45s, -webkit-filter .6s;
+  transition: visibility .45s, opacity .45s, -webkit-filter .6s;
+  transition: filter .6s, visibility .45s, opacity .45s;
+  transition: filter .6s, visibility .45s, opacity .45s, -webkit-filter .6s;
   cursor: pointer;
 }
 
 #playSpace .moduleDiv .fa-times:hover {
-  -webkit-transform: rotate(180deg);
-          transform: rotate(180deg);
   -webkit-filter: drop-shadow(0 0 2px #555);
           filter: drop-shadow(0 0 2px #555);
 }
@@ -236,7 +233,7 @@ html, body {
 #playSpace .moduleDiv p {
   border-radius: 2px 2px 0px 0px;
   width: 100%;
-  height: 25%;
+  height: 30%;
   background-color: #555;
   color: #ddd;
   margin: 0px;
@@ -282,6 +279,17 @@ html, body {
   height: 20%;
 }
 
+#playSpace #firstParam {
+  position: absolute;
+  top: -1vh;
+  left: 75%;
+  background-color: #024b30;
+}
+
+#playSpace #firstParam .cordInner {
+  background-color: #555;
+}
+
 #playSpace #inputOuter {
   bottom: -1vh;
   right: 75%;
@@ -296,44 +304,64 @@ html, body {
   background-color: #555;
 }
 
-.cordOuter {
-  visibility: 0;
+.oscDiv .switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 22px;
+  margin-left: 4%;
+}
+
+.oscDiv .switch input {
   opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.oscDiv .slider {
   position: absolute;
-  width: 2vh;
-  height: 2vh;
-  background-color: #888888;
-  border-radius: 50%;
-  -webkit-transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .3s;
-  transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .3s;
-  transition: transform .6s, filter .3s, visibility .3s, opacity .3s;
-  transition: transform .6s, filter .3s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .3s;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  padding: 0px;
-  -webkit-transform: translate(50%);
-          transform: translate(50%);
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
 }
 
-.cordOuter:hover {
-  -webkit-filter: drop-shadow(0 0 5px #555);
-          filter: drop-shadow(0 0 5px #555);
+.oscDiv .slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
 }
 
-.cordOuter .cordInner {
-  width: 65%;
-  height: 65%;
+.oscDiv input:checked + .slider {
+  background-color: #555;
+}
+
+.oscDiv input:focus + .slider {
+  -webkit-box-shadow: 0 0 1px #555;
+          box-shadow: 0 0 1px #555;
+}
+
+.oscDiv input:checked + .slider:before {
+  -webkit-transform: translateX(34px);
+  transform: translateX(34px);
+}
+
+.oscDiv .slider.round {
+  border-radius: 34px;
+}
+
+.oscDiv .slider.round:before {
   border-radius: 50%;
-  padding: 0px;
-  margin: 0px;
-  background-color: #ddd;
 }
 
 #outputDiv {
@@ -440,6 +468,46 @@ html, body {
   margin-top: -6%;
 }
 
+.cordOuter {
+  visibility: 0;
+  opacity: 0;
+  position: absolute;
+  width: 2vh;
+  height: 2vh;
+  background-color: #888888;
+  border-radius: 50%;
+  -webkit-transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .3s;
+  transition: visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .3s;
+  transition: transform .6s, filter .3s, visibility .3s, opacity .3s;
+  transition: transform .6s, filter .3s, visibility .3s, opacity .3s, -webkit-transform .6s, -webkit-filter .3s;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  padding: 0px;
+  -webkit-transform: translate(50%);
+          transform: translate(50%);
+}
+
+.cordOuter:hover {
+  -webkit-filter: drop-shadow(0 0 5px #555);
+          filter: drop-shadow(0 0 5px #555);
+}
+
+.cordOuter .cordInner {
+  width: 65%;
+  height: 65%;
+  border-radius: 50%;
+  padding: 0px;
+  margin: 0px;
+  background-color: #ddd;
+}
+
 #returnSpace {
   height: 100%;
   width: 100%;
@@ -475,6 +543,20 @@ svg line:hover {
 .raise {
   -webkit-filter: drop-shadow(0 0 5px #ddd);
           filter: drop-shadow(0 0 5px #ddd);
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  text-align: center;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+  text-align: center;
 }
 
 @media only screen and (max-device-width: 480px) {

@@ -440,7 +440,7 @@ var Area = function (_React$Component2) {
 
             this.props.handleOutput({ tomyKey: this.props.myKey,
                 toLocation: { x: xCenter, y: yCenter },
-                audio: this.state.audioContext });
+                audio: this.state.audio });
         }
     }, {
         key: "createAudio",
@@ -454,9 +454,11 @@ var Area = function (_React$Component2) {
         value: function renderFilling() {
             switch (this.props.filling) {
                 case "Oscillator":
-                    return filling = React.createElement(Oscillator, { audioContext: this.props.audioContext, createAudio: this.createAudio });
+                    return React.createElement(Oscillator, { audioContext: this.props.audioContext, createAudio: this.createAudio });
+                case "Gain":
+                    return React.createElement(Gain, { audioContext: this.props.audioContext, createAudio: this.createAudio, parent: this.props.myKey, handleOutput: this.props.handleOutput });
                 default:
-                    return filling = React.createElement(
+                    return React.createElement(
                         "div",
                         null,
                         "Nothing"
@@ -513,7 +515,8 @@ var Oscillator = function (_React$Component3) {
 
         _this5.state = {
             audio: _this5.props.audioContext.createOscillator(),
-            wave: "sine"
+            wave: "sine",
+            value: 220
         };
 
         _this5.handleFreqChange = _this5.handleFreqChange.bind(_this5);
@@ -524,7 +527,16 @@ var Oscillator = function (_React$Component3) {
     _createClass(Oscillator, [{
         key: "handleFreqChange",
         value: function handleFreqChange(event) {
-            this.state.audio.frequency.setValueAtTime(event.target.value, this.props.audioContext.currentTime);
+            var freq = event.target.value;
+            if (freq > 700) {
+                freq = 700;
+            } else if (freq < 50) {
+                freq = 50;
+            }
+            this.state.audio.frequency.setValueAtTime(freq, this.props.audioContext.currentTime);
+            this.setState({
+                value: freq
+            });
         }
     }, {
         key: "handleWaveChange",
@@ -535,20 +547,18 @@ var Oscillator = function (_React$Component3) {
             });
         }
     }, {
+        key: "componentDidMount",
+        value: function componentDidMount() {
+            this.props.createAudio(this.state.audio);
+            this.state.audio.frequency.setValueAtTime(this.state.value, this.props.audioContext.currentTime);
+            this.state.audio.start();
+        }
+    }, {
         key: "render",
         value: function render() {
-            var _this6 = this;
-
             return React.createElement(
                 "div",
                 { className: "oscDiv" },
-                React.createElement(
-                    "button",
-                    { onClick: function onClick() {
-                            _this6.props.createAudio(_this6.state.audio);_this6.state.audio.start();
-                        } },
-                    "Start"
-                ),
                 React.createElement(
                     "select",
                     { value: this.state.wave, onChange: this.handleWaveChange },
@@ -568,7 +578,14 @@ var Oscillator = function (_React$Component3) {
                         "Triangle"
                     )
                 ),
-                React.createElement("input", { type: "range", min: "50", max: "700", step: "1", onChange: this.handleFreqChange })
+                React.createElement(
+                    "label",
+                    { "class": "switch" },
+                    React.createElement("input", { type: "checkbox" }),
+                    React.createElement("span", { "class": "slider round" })
+                ),
+                React.createElement("input", { type: "range", value: this.state.value, min: "50", max: "700", step: "1", onChange: this.handleFreqChange }),
+                React.createElement("input", { type: "number", value: this.state.value, min: "50", max: "700", onChange: this.handleFreqChange })
             );
         }
     }]);
@@ -576,8 +593,82 @@ var Oscillator = function (_React$Component3) {
     return Oscillator;
 }(React.Component);
 
-var Output = function (_React$Component4) {
-    _inherits(Output, _React$Component4);
+var Gain = function (_React$Component4) {
+    _inherits(Gain, _React$Component4);
+
+    function Gain(props) {
+        _classCallCheck(this, Gain);
+
+        var _this6 = _possibleConstructorReturn(this, (Gain.__proto__ || Object.getPrototypeOf(Gain)).call(this, props));
+
+        _this6.state = {
+            audio: _this6.props.audioContext.createGain(),
+            value: .5
+        };
+
+        _this6.handleGainChange = _this6.handleGainChange.bind(_this6);
+        _this6.handleOutput = _this6.handleOutput.bind(_this6);
+        return _this6;
+    }
+
+    _createClass(Gain, [{
+        key: "handleGainChange",
+        value: function handleGainChange(event) {
+            var gainVal = event.target.value;
+            if (gainVal > 1) {
+                gainVal = 1;
+            } else if (gainVal < 0) {
+                gainVal = 0;
+            }
+            this.state.audio.gain.setValueAtTime(gainVal, this.props.audioContext.currentTime);
+            this.setState({
+                value: gainVal
+            });
+        }
+    }, {
+        key: "handleOutput",
+        value: function handleOutput() {
+            var largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
+            var el = document.getElementById(this.props.parent + "param" + "outputInner").getBoundingClientRect();
+            var x = el.x;
+            var y = el.y;
+            var bottom = el.bottom;
+            var right = el.right;
+            var xCenter = (right - x) / 2 + x - largerDim * .04;
+            var yCenter = (bottom - y) / 2 + y - largerDim * .04;
+
+            this.props.handleOutput({ tomyKey: this.props.parent + "param",
+                toLocation: { x: xCenter, y: yCenter },
+                audio: this.state.audio.gain });
+        }
+    }, {
+        key: "componentDidMount",
+        value: function componentDidMount() {
+            this.props.createAudio(this.state.audio);
+            this.state.audio.gain.setValueAtTime(.5, this.props.audioContext.currentTime);
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            return React.createElement(
+                "div",
+                { className: "gainDiv" },
+                React.createElement("input", { type: "range", value: this.state.value, min: "0", max: "1", step: ".05", onChange: this.handleGainChange }),
+                React.createElement("input", { type: "number", value: this.state.value, min: "0", max: "1", onChange: this.handleGainChange }),
+                React.createElement(
+                    "div",
+                    { className: "cordOuter", id: "firstParam", onClick: this.handleOutput },
+                    React.createElement("div", { className: "cordInner", id: this.props.parent + "param" + "outputInner" })
+                )
+            );
+        }
+    }]);
+
+    return Gain;
+}(React.Component);
+
+var Output = function (_React$Component5) {
+    _inherits(Output, _React$Component5);
 
     function Output(props) {
         _classCallCheck(this, Output);
@@ -642,8 +733,8 @@ var Output = function (_React$Component4) {
 //patchcords with delete capability
 
 
-var Cord = function (_React$Component5) {
-    _inherits(Cord, _React$Component5);
+var Cord = function (_React$Component6) {
+    _inherits(Cord, _React$Component6);
 
     function Cord(props) {
         _classCallCheck(this, Cord);
@@ -677,8 +768,8 @@ var Cord = function (_React$Component5) {
 //sidebar with buttons for creation
 
 
-var SideButtons = function (_React$Component6) {
-    _inherits(SideButtons, _React$Component6);
+var SideButtons = function (_React$Component7) {
+    _inherits(SideButtons, _React$Component7);
 
     function SideButtons(props) {
         _classCallCheck(this, SideButtons);
@@ -693,7 +784,7 @@ var SideButtons = function (_React$Component6) {
                 "div",
                 { id: this.props.id },
                 React.createElement(MyButton, { name: "Oscillator", handleClick: this.props.handleClick, inputOnly: "true" }),
-                React.createElement(MyButton, { name: "AnotherTest", handleClick: this.props.handleClick, inputOnly: "false" }),
+                React.createElement(MyButton, { name: "Gain", handleClick: this.props.handleClick, inputOnly: "false" }),
                 React.createElement(MyButton, { name: "Poopoop", handleClick: this.props.handleClick, inputOnly: "false" }),
                 React.createElement(MyButton, { name: "PeePee", handleClick: this.props.handleClick, inputOnly: "false" })
             );
@@ -706,8 +797,8 @@ var SideButtons = function (_React$Component6) {
 //buttons in side area that create modules for the playspace
 
 
-var MyButton = function (_React$Component7) {
-    _inherits(MyButton, _React$Component7);
+var MyButton = function (_React$Component8) {
+    _inherits(MyButton, _React$Component8);
 
     function MyButton(props) {
         _classCallCheck(this, MyButton);

@@ -19,11 +19,14 @@ QOL: on disconnect, make it mute in like .2 seconds and then disconnect.
 optional: 
 prevent module overlap on spawn
 make it so that you can type in new module name?
+LFO and parameter inputs??  off the left side of the filling!!! unique to each filling.
+Tooltips
 
 
 Oscillator needs:
 Design bits;
 have frequency show up as a number; (label?)
+make it so that you can type in a number and it sets that value in the class and in the slider.
 
 
 Modules:
