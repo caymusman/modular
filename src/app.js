@@ -343,6 +343,8 @@ class Area extends React.Component{
                 return <Oscillator audioContext={this.props.audioContext} createAudio={this.createAudio}/>;
             case "Gain":
                 return <Gain audioContext={this.props.audioContext} createAudio={this.createAudio} parent={this.props.myKey} handleOutput={this.props.handleOutput}/>
+            case "Filter":
+                return <Filter audioContext={this.props.audioContext} createAudio={this.createAudio}/>;
             default:
                 return <div>Nothing</div>;
         }
@@ -394,15 +396,18 @@ class Oscillator extends React.Component{
             audio: this.props.audioContext.createOscillator(),
             wave: "sine",
             value: 220,
+            num: 220,
             min: 20,
             max: 700,
             step: 1,
-            LFO: false
+            LFO: false,
         }
 
         this.handleFreqChange=this.handleFreqChange.bind(this);
         this.handleWaveChange=this.handleWaveChange.bind(this);
         this.handleLFOClick=this.handleLFOClick.bind(this);
+        this.handleNumChange=this.handleNumChange.bind(this);
+        this.handleNumFreqChange=this.handleNumFreqChange.bind(this);
     }
 
     handleFreqChange(event){
@@ -443,6 +448,18 @@ class Oscillator extends React.Component{
         }
     }
 
+    handleNumChange(event){
+        this.setState({
+            num: event.target.value
+        })
+    }
+
+    handleNumFreqChange(){
+        this.setState(state => ({
+            value: state.num
+        }))
+    }
+
     componentDidMount(){
         this.props.createAudio(this.state.audio);
         this.state.audio.frequency.setValueAtTime(this.state.value, this.props.audioContext.currentTime);
@@ -462,10 +479,14 @@ class Oscillator extends React.Component{
                 <label className="switch tooltip">
                      <input type="checkbox" onClick={this.handleLFOClick}></input>
                      <span className="slider round"></span>
-                     <span className="tooltiptext">LFO Mode</span>
+                     <span className="tooltiptext oscLFOTip">LFO Mode</span>
                  </label>
-                <input type="range" value={this.state.value} min={this.state.min} max={this.state.max} step={this.state.step} onChange={this.handleFreqChange}></input>
-                <input type="number" value={this.state.value} min={this.state.min} max={this.state.max} onChange={this.handleFreqChange}></input>
+                 <div className="tooltip">
+                    <input type="range" value={this.state.value} min={this.state.min} max={this.state.max} step={this.state.step} onChange={this.handleFreqChange}></input>
+                    <span className="tooltiptext oscGainTip">Gain</span>
+                </div>
+                <div id="rangeNum">{this.state.value}</div>
+                <input type="number" value={this.state.num} min={this.state.min} max={this.state.max} onChange={this.handleNumChange} onKeyPress={((event) => {if(event.key == "Enter"){this.handleNumFreqChange}})}></input>
                 </div>
         )
     }
@@ -525,9 +546,45 @@ class Gain extends React.Component{
 
                 <div className="cordOuter tooltip" id="firstParam" onClick={this.handleOutput}>
                     <div className="cordInner" id={this.props.parent + "param" + "outputInner"}>
-                    <span className="tooltiptext"><span className="paramSpan">param: </span>Gain</span>
+                    <span className="tooltiptext gainGainParamTip"><span className="paramSpan">param: </span>Gain</span>
                     </div>
                 </div>
+            </div>
+        )
+    }
+}
+
+class Filter extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state={
+            audio: this.props.audioContext.createBiquadFilter(),
+            type: "lowpass"
+        }
+
+        this.handleFilterType=this.handleFilterType.bind(this);
+    }
+
+    handleFilterType(event){
+        this.state.audio.type = event.target.value;
+        this.setState({
+            type: event.target.value
+        })
+    }
+
+    componentDidMount(){
+        this.props.createAudio(this.state.audio);
+    }
+
+    render(){
+        return(
+            <div className="filterDiv">
+                <select value={this.state.type} onChange={this.handleFilterType}>
+                        <option value="lowpass">Lowpass</option>
+                        <option value="highpass">Highpass</option>
+                        <option value="bandpass">Bandpass</option>
+                    </select>
             </div>
         )
     }
@@ -615,7 +672,7 @@ class SideButtons extends React.Component{
             <div id={this.props.id}>
                 <MyButton name="Oscillator" handleClick={this.props.handleClick} inputOnly="true"/>
                 <MyButton name="Gain" handleClick={this.props.handleClick} inputOnly="false"/>
-                <MyButton name="Poopoop" handleClick={this.props.handleClick} inputOnly="false"/>
+                <MyButton name="Filter" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="PeePee" handleClick={this.props.handleClick} inputOnly="false"/>
             </div>
         )

@@ -457,6 +457,8 @@ var Area = function (_React$Component2) {
                     return React.createElement(Oscillator, { audioContext: this.props.audioContext, createAudio: this.createAudio });
                 case "Gain":
                     return React.createElement(Gain, { audioContext: this.props.audioContext, createAudio: this.createAudio, parent: this.props.myKey, handleOutput: this.props.handleOutput });
+                case "Filter":
+                    return React.createElement(Filter, { audioContext: this.props.audioContext, createAudio: this.createAudio });
                 default:
                     return React.createElement(
                         "div",
@@ -517,6 +519,7 @@ var Oscillator = function (_React$Component3) {
             audio: _this5.props.audioContext.createOscillator(),
             wave: "sine",
             value: 220,
+            num: 220,
             min: 20,
             max: 700,
             step: 1,
@@ -526,6 +529,8 @@ var Oscillator = function (_React$Component3) {
         _this5.handleFreqChange = _this5.handleFreqChange.bind(_this5);
         _this5.handleWaveChange = _this5.handleWaveChange.bind(_this5);
         _this5.handleLFOClick = _this5.handleLFOClick.bind(_this5);
+        _this5.handleNumChange = _this5.handleNumChange.bind(_this5);
+        _this5.handleNumFreqChange = _this5.handleNumFreqChange.bind(_this5);
         return _this5;
     }
 
@@ -571,6 +576,22 @@ var Oscillator = function (_React$Component3) {
             }
         }
     }, {
+        key: "handleNumChange",
+        value: function handleNumChange(event) {
+            this.setState({
+                num: event.target.value
+            });
+        }
+    }, {
+        key: "handleNumFreqChange",
+        value: function handleNumFreqChange() {
+            this.setState(function (state) {
+                return {
+                    value: state.num
+                };
+            });
+        }
+    }, {
         key: "componentDidMount",
         value: function componentDidMount() {
             this.props.createAudio(this.state.audio);
@@ -580,6 +601,8 @@ var Oscillator = function (_React$Component3) {
     }, {
         key: "render",
         value: function render() {
+            var _this6 = this;
+
             return React.createElement(
                 "div",
                 { className: "oscDiv" },
@@ -613,12 +636,30 @@ var Oscillator = function (_React$Component3) {
                     React.createElement("span", { className: "slider round" }),
                     React.createElement(
                         "span",
-                        { className: "tooltiptext" },
+                        { className: "tooltiptext oscLFOTip" },
                         "LFO Mode"
                     )
                 ),
-                React.createElement("input", { type: "range", value: this.state.value, min: this.state.min, max: this.state.max, step: this.state.step, onChange: this.handleFreqChange }),
-                React.createElement("input", { type: "number", value: this.state.value, min: this.state.min, max: this.state.max, onChange: this.handleFreqChange })
+                React.createElement(
+                    "div",
+                    { className: "tooltip" },
+                    React.createElement("input", { type: "range", value: this.state.value, min: this.state.min, max: this.state.max, step: this.state.step, onChange: this.handleFreqChange }),
+                    React.createElement(
+                        "span",
+                        { className: "tooltiptext oscGainTip" },
+                        "Gain"
+                    )
+                ),
+                React.createElement(
+                    "div",
+                    { id: "rangeNum" },
+                    this.state.value
+                ),
+                React.createElement("input", { type: "number", value: this.state.num, min: this.state.min, max: this.state.max, onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {
+                        if (event.key == "Enter") {
+                            _this6.handleNumFreqChange;
+                        }
+                    } })
             );
         }
     }]);
@@ -632,16 +673,16 @@ var Gain = function (_React$Component4) {
     function Gain(props) {
         _classCallCheck(this, Gain);
 
-        var _this6 = _possibleConstructorReturn(this, (Gain.__proto__ || Object.getPrototypeOf(Gain)).call(this, props));
+        var _this7 = _possibleConstructorReturn(this, (Gain.__proto__ || Object.getPrototypeOf(Gain)).call(this, props));
 
-        _this6.state = {
-            audio: _this6.props.audioContext.createGain(),
+        _this7.state = {
+            audio: _this7.props.audioContext.createGain(),
             value: .5
         };
 
-        _this6.handleGainChange = _this6.handleGainChange.bind(_this6);
-        _this6.handleOutput = _this6.handleOutput.bind(_this6);
-        return _this6;
+        _this7.handleGainChange = _this7.handleGainChange.bind(_this7);
+        _this7.handleOutput = _this7.handleOutput.bind(_this7);
+        return _this7;
     }
 
     _createClass(Gain, [{
@@ -696,7 +737,7 @@ var Gain = function (_React$Component4) {
                         { className: "cordInner", id: this.props.parent + "param" + "outputInner" },
                         React.createElement(
                             "span",
-                            { className: "tooltiptext" },
+                            { className: "tooltiptext gainGainParamTip" },
                             React.createElement(
                                 "span",
                                 { className: "paramSpan" },
@@ -713,20 +754,82 @@ var Gain = function (_React$Component4) {
     return Gain;
 }(React.Component);
 
-var Output = function (_React$Component5) {
-    _inherits(Output, _React$Component5);
+var Filter = function (_React$Component5) {
+    _inherits(Filter, _React$Component5);
+
+    function Filter(props) {
+        _classCallCheck(this, Filter);
+
+        var _this8 = _possibleConstructorReturn(this, (Filter.__proto__ || Object.getPrototypeOf(Filter)).call(this, props));
+
+        _this8.state = {
+            audio: _this8.props.audioContext.createBiquadFilter(),
+            type: "lowpass"
+        };
+
+        _this8.handleFilterType = _this8.handleFilterType.bind(_this8);
+        return _this8;
+    }
+
+    _createClass(Filter, [{
+        key: "handleFilterType",
+        value: function handleFilterType(event) {
+            this.state.audio.type = event.target.value;
+            this.setState({
+                type: event.target.value
+            });
+        }
+    }, {
+        key: "componentDidMount",
+        value: function componentDidMount() {
+            this.props.createAudio(this.state.audio);
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            return React.createElement(
+                "div",
+                { className: "filterDiv" },
+                React.createElement(
+                    "select",
+                    { value: this.state.type, onChange: this.handleFilterType },
+                    React.createElement(
+                        "option",
+                        { value: "lowpass" },
+                        "Lowpass"
+                    ),
+                    React.createElement(
+                        "option",
+                        { value: "highpass" },
+                        "Highpass"
+                    ),
+                    React.createElement(
+                        "option",
+                        { value: "bandpass" },
+                        "Bandpass"
+                    )
+                )
+            );
+        }
+    }]);
+
+    return Filter;
+}(React.Component);
+
+var Output = function (_React$Component6) {
+    _inherits(Output, _React$Component6);
 
     function Output(props) {
         _classCallCheck(this, Output);
 
-        var _this7 = _possibleConstructorReturn(this, (Output.__proto__ || Object.getPrototypeOf(Output)).call(this, props));
+        var _this9 = _possibleConstructorReturn(this, (Output.__proto__ || Object.getPrototypeOf(Output)).call(this, props));
 
-        _this7.state = {
-            gainNode: _this7.props.audioContext.createGain()
+        _this9.state = {
+            gainNode: _this9.props.audioContext.createGain()
         };
-        _this7.handleOutput = _this7.handleOutput.bind(_this7);
-        _this7.handleChange = _this7.handleChange.bind(_this7);
-        return _this7;
+        _this9.handleOutput = _this9.handleOutput.bind(_this9);
+        _this9.handleChange = _this9.handleChange.bind(_this9);
+        return _this9;
     }
 
     _createClass(Output, [{
@@ -779,16 +882,16 @@ var Output = function (_React$Component5) {
 //patchcords with delete capability
 
 
-var Cord = function (_React$Component6) {
-    _inherits(Cord, _React$Component6);
+var Cord = function (_React$Component7) {
+    _inherits(Cord, _React$Component7);
 
     function Cord(props) {
         _classCallCheck(this, Cord);
 
-        var _this8 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
+        var _this10 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
 
-        _this8.handleClick = _this8.handleClick.bind(_this8);
-        return _this8;
+        _this10.handleClick = _this10.handleClick.bind(_this10);
+        return _this10;
     }
 
     _createClass(Cord, [{
@@ -814,8 +917,8 @@ var Cord = function (_React$Component6) {
 //sidebar with buttons for creation
 
 
-var SideButtons = function (_React$Component7) {
-    _inherits(SideButtons, _React$Component7);
+var SideButtons = function (_React$Component8) {
+    _inherits(SideButtons, _React$Component8);
 
     function SideButtons(props) {
         _classCallCheck(this, SideButtons);
@@ -831,7 +934,7 @@ var SideButtons = function (_React$Component7) {
                 { id: this.props.id },
                 React.createElement(MyButton, { name: "Oscillator", handleClick: this.props.handleClick, inputOnly: "true" }),
                 React.createElement(MyButton, { name: "Gain", handleClick: this.props.handleClick, inputOnly: "false" }),
-                React.createElement(MyButton, { name: "Poopoop", handleClick: this.props.handleClick, inputOnly: "false" }),
+                React.createElement(MyButton, { name: "Filter", handleClick: this.props.handleClick, inputOnly: "false" }),
                 React.createElement(MyButton, { name: "PeePee", handleClick: this.props.handleClick, inputOnly: "false" })
             );
         }
@@ -843,20 +946,20 @@ var SideButtons = function (_React$Component7) {
 //buttons in side area that create modules for the playspace
 
 
-var MyButton = function (_React$Component8) {
-    _inherits(MyButton, _React$Component8);
+var MyButton = function (_React$Component9) {
+    _inherits(MyButton, _React$Component9);
 
     function MyButton(props) {
         _classCallCheck(this, MyButton);
 
-        var _this10 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
+        var _this12 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
 
-        _this10.state = {
+        _this12.state = {
             count: 0
         };
 
-        _this10.handleClick = _this10.handleClick.bind(_this10);
-        return _this10;
+        _this12.handleClick = _this12.handleClick.bind(_this12);
+        return _this12;
     }
 
     _createClass(MyButton, [{

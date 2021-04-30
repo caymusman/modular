@@ -358,6 +358,7 @@ html, body {
 
 .oscDiv .slider.round {
   border-radius: 34px;
+  z-index: 100;
 }
 
 .oscDiv .slider.round:before {
@@ -545,18 +546,14 @@ svg line:hover {
           filter: drop-shadow(0 0 5px #ddd);
 }
 
+.customSelect {
+  width: 40%;
+}
+
 .customSelect select {
-  appearance: none;
-  margin: 50px;
-  width: 150px;
-  padding: 5px 35px 5px 5px;
-  font-size: 16px;
-  border: 1px solid #CCC;
-  height: 34px;
   -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background: url(https://stackoverflow.com/favicon.ico) 96%/15% no-repeat #EEE;
+     -moz-appearance: none;
+          appearance: none;
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -584,9 +581,12 @@ input[type=number] {
   padding: 5px;
   /* Position the tooltip */
   position: absolute;
-  bottom: 140%;
-  right: -25px;
   z-index: 1;
+}
+
+.tooltiptext .gainGainParamTip {
+  right: -25px;
+  bottom: 200%;
 }
 
 .tooltiptext .paramSpan {
