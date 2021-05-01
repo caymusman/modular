@@ -191,7 +191,7 @@ html, body {
   text-align: center;
   width: 12.5vw;
   border-radius: 2px;
-  padding-bottom: 10%;
+  padding-bottom: 5%;
 }
 
 #playSpace .moduleDiv:hover .cordOuter.show {
@@ -267,7 +267,6 @@ html, body {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  margin-bottom: 10%;
 }
 
 #playSpace .moduleDiv #fillingDiv input {
@@ -304,12 +303,65 @@ html, body {
   background-color: #555;
 }
 
-.oscDiv .switch {
+.selectorDiv {
+  width: 40%;
+  color: #ddd;
+  background: #555;
+  text-transform: capitalize;
+  position: absolute;
+  border-radius: 3px;
+}
+
+.selectorDiv span {
+  display: block;
+  padding: 3px;
+}
+
+.selectorDiv .selectorVal {
   position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 22px;
-  margin-left: 4%;
+  display: none;
+  background: #555;
+  padding: 3px;
+}
+
+.selectorDiv .selectorVal:hover {
+  background: #6f6f6f;
+  cursor: pointer;
+}
+
+.selectorDiv:hover span {
+  color: #b6a8b5;
+}
+
+.selectorDiv:hover .selectorVal {
+  display: block;
+}
+
+.oscDiv #oscSlider {
+  right: -20%;
+  margin-top: 5%;
+}
+
+.oscDiv #waveSelector {
+  left: 10%;
+  top: 49px;
+  z-index: 100;
+}
+
+.oscDiv #rangeNum {
+  background: #6f6f6f;
+  color: #ddd;
+  width: 29%;
+  position: relative;
+  left: 35%;
+  border-radius: 3px;
+  margin-bottom: 5%;
+}
+
+.oscDiv #freqNumInput {
+  width: 29%;
+  position: relative;
+  border-radius: 3px;
 }
 
 .oscDiv .switch input {
@@ -365,6 +417,19 @@ html, body {
   border-radius: 50%;
 }
 
+#gainGainParamTip {
+  right: -27.5px;
+  bottom: 140%;
+}
+
+#gainRangeInput {
+  margin-top: 3.5%;
+}
+
+#gainNumInput {
+  width: 33%;
+}
+
 #outputDiv {
   position: absolute;
   right: 0%;
@@ -408,64 +473,34 @@ html, body {
 }
 
 #outputDiv input[type=range] {
-  -webkit-appearance: none;
   position: relative;
+  -webkit-transform: rotate(270deg);
+          transform: rotate(270deg);
   top: 25%;
   right: 2.5%;
   width: 100%;
   height: .5vw;
-  -webkit-transform: rotate(270deg);
-          transform: rotate(270deg);
-  border-radius: 10px;
-}
-
-#outputDiv input[type=range]:focus {
-  outline: none;
-  border-radius: 10px;
 }
 
 #outputDiv input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
   height: 120%;
-  cursor: pointer;
-  background: #555;
-  border-radius: 3px;
-  border: 0.2px solid #6f6f6f;
 }
 
 #outputDiv input[type=range]::-webkit-slider-thumb {
   border: 2px solid #6f6f6f;
-  height: 1vw;
-  width: 1vw;
   border-radius: 50%;
-  background: #ddd;
-  cursor: pointer;
-  -webkit-appearance: none;
   margin-top: -4.5%;
-}
-
-#outputDiv input[type=range]:focus::-webkit-slider-runnable-track {
-  background: #555;
-  border-radius: 3px;
 }
 
 #outputDiv input[type=range]::-moz-range-track {
   width: 100%;
   height: 100%;
-  cursor: pointer;
-  background: #555;
-  border-radius: 3px;
-  border: 0.2px solid #6f6f6f;
 }
 
 #outputDiv input[type=range]::-moz-range-thumb {
-  border: 2px solid #6f6f6f;
   height: .7vw;
   width: .7vw;
-  border-radius: 50%;
-  background: #ddd;
-  cursor: pointer;
-  -webkit-appearance: none;
   margin-top: -6%;
 }
 
@@ -546,16 +581,6 @@ svg line:hover {
           filter: drop-shadow(0 0 5px #ddd);
 }
 
-.customSelect {
-  width: 40%;
-}
-
-.customSelect select {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-}
-
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -565,9 +590,21 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number] {
+input[type=text] {
   -moz-appearance: textfield;
   text-align: center;
+  background: #ddd;
+  color: #555;
+}
+
+input, input:focus {
+  border: 0;
+  outline: none;
+}
+
+input:focus {
+  background: #555;
+  color: #ddd;
 }
 
 .tooltiptext {
@@ -579,14 +616,11 @@ input[type=number] {
   text-align: center;
   border-radius: 6px;
   padding: 5px;
+  display: block;
+  z-index: 100;
   /* Position the tooltip */
   position: absolute;
   z-index: 1;
-}
-
-.tooltiptext .gainGainParamTip {
-  right: -25px;
-  bottom: 200%;
 }
 
 .tooltiptext .paramSpan {
@@ -595,7 +629,19 @@ input[type=number] {
 }
 
 .tooltip:hover .tooltiptext {
+  display: block;
+  z-index: 2000;
   visibility: visible;
+}
+
+.tooltip #oscFreqTip {
+  right: 25%;
+  bottom: 47%;
+}
+
+.tooltip #oscLFOTip {
+  right: -10px;
+  bottom: 140%;
 }
 
 .tooltiptext::after {
@@ -608,6 +654,116 @@ input[type=number] {
   border-width: 5px;
   border-style: solid;
   border-color: #555 transparent transparent transparent;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  position: relative;
+  border-radius: 6.5px;
+}
+
+input[type=range]:focus {
+  outline: none;
+  border-radius: 10px;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  cursor: pointer;
+  background: #555;
+  border-radius: 3px;
+  border: 0.2px solid #6f6f6f;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  border: 2px solid #6f6f6f;
+  border-radius: 50%;
+  background: #ddd;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #555;
+  border-radius: 3px;
+}
+
+input[type=range]::-moz-range-track {
+  cursor: pointer;
+  background: #555;
+  height: 100%;
+  border-radius: 3px;
+  border: 0.2px solid #6f6f6f;
+}
+
+input[type=range]::-moz-range-thumb {
+  border: 2px solid #6f6f6f;
+  border-radius: 50%;
+  background: #ddd;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -6%;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 22px;
+  margin-left: 4%;
+  margin-bottom: 6%;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #555;
+}
+
+input:focus + .slider {
+  -webkit-box-shadow: 0 0 1px #555;
+          box-shadow: 0 0 1px #555;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(34px);
+  transform: translateX(34px);
+}
+
+.slider.round {
+  border-radius: 34px;
+  z-index: 100;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
 
 @media only screen and (max-device-width: 480px) {

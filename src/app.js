@@ -299,10 +299,10 @@ class Area extends React.Component{
     }
 
     //handle first click in input area
-    handleCreatePatch(){
+    handleCreatePatch(event){
         if(!this.props.outputMode){
             let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
-            let el = document.getElementById(this.props.myKey + "inputInner").getBoundingClientRect();
+            let el = event.target.getBoundingClientRect();
             let x = el.x;
             let y = el.y;
             let bottom = el.bottom;
@@ -316,9 +316,9 @@ class Area extends React.Component{
     }
 
     //handle patchcord click in output area
-    handleOutput(){
+    handleOutput(event){
         let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
-        let el = document.getElementById(this.props.myKey + "outputInner").getBoundingClientRect();
+        let el = event.target.getBoundingClientRect();
         let x = el.x;
         let y = el.y;
         let bottom = el.bottom;
@@ -419,14 +419,15 @@ class Oscillator extends React.Component{
         }
         this.state.audio.frequency.setValueAtTime(freq, this.props.audioContext.currentTime);
         this.setState({
+            num: freq,
             value: freq
         })
     }
 
-    handleWaveChange(event){
-        this.state.audio.type=event.target.value;
+    handleWaveChange(wave){
+        this.state.audio.type=wave;
         this.setState({
-            wave: event.target.value
+            wave: wave
         })
     }
 
@@ -434,12 +435,16 @@ class Oscillator extends React.Component{
         if(this.state.LFO){
             this.setState({
                 max: 700,
+                val: 220,
+                num: 220,
                 min:20,
                 step: 1,
                 LFO: false
             })
         }else{
             this.setState({
+                val: 10,
+                num: 10,
                 max: 20,
                 min: 0,
                 step: .1,
@@ -449,15 +454,25 @@ class Oscillator extends React.Component{
     }
 
     handleNumChange(event){
+        if(isNaN(event.target.value)){
+            return;
+        }
         this.setState({
             num: event.target.value
         })
     }
 
     handleNumFreqChange(){
-        this.setState(state => ({
-            value: state.num
-        }))
+        let temp = this.state.num;
+        if(temp > this.state.max){
+            temp=this.state.max
+        }else if(temp < this.state.min){
+            temp=this.state.min
+        }
+        this.setState({
+            value: temp,
+            num: temp
+        })
     }
 
     componentDidMount(){
@@ -469,24 +484,17 @@ class Oscillator extends React.Component{
     render(){
         return(
             <div className="oscDiv">
-                <div className="customSelect">
-                    <select value={this.state.wave} onChange={this.handleWaveChange}>
-                        <option value="sine">Sine</option>
-                        <option value="sawtooth">Sawtooth</option>
-                        <option value="triangle">Triangle</option>
-                    </select>
-                </div>
-                <label className="switch tooltip">
+                <Selector id="waveSelector" values={["sine", "sawtooth", "triangle"]} handleClick={this.handleWaveChange} />
+                <label id="oscSlider" className="switch tooltip">
                      <input type="checkbox" onClick={this.handleLFOClick}></input>
                      <span className="slider round"></span>
-                     <span className="tooltiptext oscLFOTip">LFO Mode</span>
+                     <span id="oscLFOTip" className="tooltiptext">LFO Mode</span>
                  </label>
                  <div className="tooltip">
                     <input type="range" value={this.state.value} min={this.state.min} max={this.state.max} step={this.state.step} onChange={this.handleFreqChange}></input>
-                    <span className="tooltiptext oscGainTip">Gain</span>
+                    <span id="oscFreqTip" className="tooltiptext">Freq</span>
                 </div>
-                <div id="rangeNum">{this.state.value}</div>
-                <input type="number" value={this.state.num} min={this.state.min} max={this.state.max} onChange={this.handleNumChange} onKeyPress={((event) => {if(event.key == "Enter"){this.handleNumFreqChange}})}></input>
+                <input id="freqNumInput" value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumFreqChange()}}}></input>
                 </div>
         )
     }
@@ -498,10 +506,13 @@ class Gain extends React.Component{
 
         this.state={
             audio: this.props.audioContext.createGain(),
-            value: .5
+            value: .5,
+            num: .5
         }
 
         this.handleGainChange=this.handleGainChange.bind(this);
+        this.handleNumChange=this.handleNumChange.bind(this);
+        this.handleNumGainChange=this.handleNumGainChange.bind(this);
         this.handleOutput=this.handleOutput.bind(this);
     }
 
@@ -514,13 +525,36 @@ class Gain extends React.Component{
         }
         this.state.audio.gain.setValueAtTime(gainVal, this.props.audioContext.currentTime);
         this.setState({
-            value: gainVal
+            value: gainVal,
+            num: gainVal
         });
     }
 
-    handleOutput(){
+    handleNumChange(event){
+        if(isNaN(event.target.value)){
+            return;
+        }
+        this.setState({
+            num: event.target.value
+        })
+    }
+
+    handleNumGainChange(){
+        let temp = this.state.num;
+        if(temp > this.state.max){
+            temp=this.state.max
+        }else if(temp < this.state.min){
+            temp=this.state.min
+        }
+        this.setState({
+            value: temp,
+            num: temp
+        })
+    }
+
+    handleOutput(event){
         let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
-        let el = document.getElementById(this.props.parent + "param" + "outputInner").getBoundingClientRect();
+        let el = event.target.getBoundingClientRect();
         let x = el.x;
         let y = el.y;
         let bottom = el.bottom;
@@ -541,12 +575,12 @@ class Gain extends React.Component{
     render(){
         return(
             <div className="gainDiv">
-                <input type="range" value={this.state.value} min="0" max="1" step=".05" onChange={this.handleGainChange}></input>
-                <input type="number" value={this.state.value} min="0" max="1" onChange={this.handleGainChange}></input>
+                <input id="gainRangeInput" type="range" value={this.state.value} min="0" max="1" step=".05" onChange={this.handleGainChange}></input>
+                <input id="gainNumInput" value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumGainChange()}}}></input>
 
                 <div className="cordOuter tooltip" id="firstParam" onClick={this.handleOutput}>
                     <div className="cordInner" id={this.props.parent + "param" + "outputInner"}>
-                    <span className="tooltiptext gainGainParamTip"><span className="paramSpan">param: </span>Gain</span>
+                    <span id="gainGainParamTip" className="tooltiptext"><span className="paramSpan">param: </span>Gain</span>
                     </div>
                 </div>
             </div>
@@ -601,9 +635,9 @@ class Output extends React.Component{
         this.handleChange=this.handleChange.bind(this);
     }
 
-    handleOutput(){
+    handleOutput(event){
         let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
-        let el = document.getElementById("OutputoutputInner").getBoundingClientRect();
+        let el = event.target.getBoundingClientRect();
         let x = el.x;
         let y = el.y;
         let bottom = el.bottom;
@@ -703,6 +737,36 @@ class MyButton extends React.Component{
     render(){
         return(
             <button className="addBtn" onClick={this.handleClick}>{this.props.name}</button>
+        )
+    }
+}
+
+class Selector extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state={
+            val: this.props.values[0]
+        }
+
+        this.handleClick=this.handleClick.bind(this);
+    }
+
+    handleClick(event){
+        this.setState({
+            val: event.target.innerHTML
+        })
+        this.props.handleClick(event.target.innerHTML);
+    }
+
+    render(){
+        return(
+            <div id={this.props.id} className="selectorDiv">
+                <span>{this.state.val}</span>
+                {this.props.values.map(el => {
+                    return <div key={el} className="selectorVal" onClick={this.handleClick}>{el}</div>
+                })}
+            </div>
         )
     }
 }

@@ -29,3 +29,10 @@ Style modules.
 Fix Osc Freq Input.
 Finish Filter.
 Work on tooltips.
+
+
+Things for the top helpbar: 
+Notes as frequencies dropdown!
+Metronome
+Calculator
+Mute all?

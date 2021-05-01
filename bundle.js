@@ -409,10 +409,10 @@ var Area = function (_React$Component2) {
 
     }, {
         key: "handleCreatePatch",
-        value: function handleCreatePatch() {
+        value: function handleCreatePatch(event) {
             if (!this.props.outputMode) {
                 var largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
-                var el = document.getElementById(this.props.myKey + "inputInner").getBoundingClientRect();
+                var el = event.target.getBoundingClientRect();
                 var x = el.x;
                 var y = el.y;
                 var bottom = el.bottom;
@@ -429,9 +429,9 @@ var Area = function (_React$Component2) {
 
     }, {
         key: "handleOutput",
-        value: function handleOutput() {
+        value: function handleOutput(event) {
             var largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
-            var el = document.getElementById(this.props.myKey + "outputInner").getBoundingClientRect();
+            var el = event.target.getBoundingClientRect();
             var x = el.x;
             var y = el.y;
             var bottom = el.bottom;
@@ -546,15 +546,16 @@ var Oscillator = function (_React$Component3) {
             }
             this.state.audio.frequency.setValueAtTime(freq, this.props.audioContext.currentTime);
             this.setState({
+                num: freq,
                 value: freq
             });
         }
     }, {
         key: "handleWaveChange",
-        value: function handleWaveChange(event) {
-            this.state.audio.type = event.target.value;
+        value: function handleWaveChange(wave) {
+            this.state.audio.type = wave;
             this.setState({
-                wave: event.target.value
+                wave: wave
             });
         }
     }, {
@@ -563,12 +564,16 @@ var Oscillator = function (_React$Component3) {
             if (this.state.LFO) {
                 this.setState({
                     max: 700,
+                    val: 220,
+                    num: 220,
                     min: 20,
                     step: 1,
                     LFO: false
                 });
             } else {
                 this.setState({
+                    val: 10,
+                    num: 10,
                     max: 20,
                     min: 0,
                     step: .1,
@@ -579,6 +584,9 @@ var Oscillator = function (_React$Component3) {
     }, {
         key: "handleNumChange",
         value: function handleNumChange(event) {
+            if (isNaN(event.target.value)) {
+                return;
+            }
             this.setState({
                 num: event.target.value
             });
@@ -586,10 +594,15 @@ var Oscillator = function (_React$Component3) {
     }, {
         key: "handleNumFreqChange",
         value: function handleNumFreqChange() {
-            this.setState(function (state) {
-                return {
-                    value: state.num
-                };
+            var temp = this.state.num;
+            if (temp > this.state.max) {
+                temp = this.state.max;
+            } else if (temp < this.state.min) {
+                temp = this.state.min;
+            }
+            this.setState({
+                value: temp,
+                num: temp
             });
         }
     }, {
@@ -607,37 +620,15 @@ var Oscillator = function (_React$Component3) {
             return React.createElement(
                 "div",
                 { className: "oscDiv" },
-                React.createElement(
-                    "div",
-                    { className: "customSelect" },
-                    React.createElement(
-                        "select",
-                        { value: this.state.wave, onChange: this.handleWaveChange },
-                        React.createElement(
-                            "option",
-                            { value: "sine" },
-                            "Sine"
-                        ),
-                        React.createElement(
-                            "option",
-                            { value: "sawtooth" },
-                            "Sawtooth"
-                        ),
-                        React.createElement(
-                            "option",
-                            { value: "triangle" },
-                            "Triangle"
-                        )
-                    )
-                ),
+                React.createElement(Selector, { id: "waveSelector", values: ["sine", "sawtooth", "triangle"], handleClick: this.handleWaveChange }),
                 React.createElement(
                     "label",
-                    { className: "switch tooltip" },
+                    { id: "oscSlider", className: "switch tooltip" },
                     React.createElement("input", { type: "checkbox", onClick: this.handleLFOClick }),
                     React.createElement("span", { className: "slider round" }),
                     React.createElement(
                         "span",
-                        { className: "tooltiptext oscLFOTip" },
+                        { id: "oscLFOTip", className: "tooltiptext" },
                         "LFO Mode"
                     )
                 ),
@@ -647,18 +638,13 @@ var Oscillator = function (_React$Component3) {
                     React.createElement("input", { type: "range", value: this.state.value, min: this.state.min, max: this.state.max, step: this.state.step, onChange: this.handleFreqChange }),
                     React.createElement(
                         "span",
-                        { className: "tooltiptext oscGainTip" },
-                        "Gain"
+                        { id: "oscFreqTip", className: "tooltiptext" },
+                        "Freq"
                     )
                 ),
-                React.createElement(
-                    "div",
-                    { id: "rangeNum" },
-                    this.state.value
-                ),
-                React.createElement("input", { type: "number", value: this.state.num, min: this.state.min, max: this.state.max, onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {
+                React.createElement("input", { id: "freqNumInput", value: this.state.num, type: "text", onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {
                         if (event.key == "Enter") {
-                            _this6.handleNumFreqChange;
+                            _this6.handleNumFreqChange();
                         }
                     } })
             );
@@ -678,10 +664,13 @@ var Gain = function (_React$Component4) {
 
         _this7.state = {
             audio: _this7.props.audioContext.createGain(),
-            value: .5
+            value: .5,
+            num: .5
         };
 
         _this7.handleGainChange = _this7.handleGainChange.bind(_this7);
+        _this7.handleNumChange = _this7.handleNumChange.bind(_this7);
+        _this7.handleNumGainChange = _this7.handleNumGainChange.bind(_this7);
         _this7.handleOutput = _this7.handleOutput.bind(_this7);
         return _this7;
     }
@@ -697,14 +686,39 @@ var Gain = function (_React$Component4) {
             }
             this.state.audio.gain.setValueAtTime(gainVal, this.props.audioContext.currentTime);
             this.setState({
-                value: gainVal
+                value: gainVal,
+                num: gainVal
+            });
+        }
+    }, {
+        key: "handleNumChange",
+        value: function handleNumChange(event) {
+            if (isNaN(event.target.value)) {
+                return;
+            }
+            this.setState({
+                num: event.target.value
+            });
+        }
+    }, {
+        key: "handleNumGainChange",
+        value: function handleNumGainChange() {
+            var temp = this.state.num;
+            if (temp > this.state.max) {
+                temp = this.state.max;
+            } else if (temp < this.state.min) {
+                temp = this.state.min;
+            }
+            this.setState({
+                value: temp,
+                num: temp
             });
         }
     }, {
         key: "handleOutput",
-        value: function handleOutput() {
+        value: function handleOutput(event) {
             var largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
-            var el = document.getElementById(this.props.parent + "param" + "outputInner").getBoundingClientRect();
+            var el = event.target.getBoundingClientRect();
             var x = el.x;
             var y = el.y;
             var bottom = el.bottom;
@@ -725,11 +739,17 @@ var Gain = function (_React$Component4) {
     }, {
         key: "render",
         value: function render() {
+            var _this8 = this;
+
             return React.createElement(
                 "div",
                 { className: "gainDiv" },
-                React.createElement("input", { type: "range", value: this.state.value, min: "0", max: "1", step: ".05", onChange: this.handleGainChange }),
-                React.createElement("input", { type: "number", value: this.state.value, min: "0", max: "1", onChange: this.handleGainChange }),
+                React.createElement("input", { id: "gainRangeInput", type: "range", value: this.state.value, min: "0", max: "1", step: ".05", onChange: this.handleGainChange }),
+                React.createElement("input", { id: "gainNumInput", value: this.state.num, type: "text", onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {
+                        if (event.key == "Enter") {
+                            _this8.handleNumGainChange();
+                        }
+                    } }),
                 React.createElement(
                     "div",
                     { className: "cordOuter tooltip", id: "firstParam", onClick: this.handleOutput },
@@ -738,7 +758,7 @@ var Gain = function (_React$Component4) {
                         { className: "cordInner", id: this.props.parent + "param" + "outputInner" },
                         React.createElement(
                             "span",
-                            { className: "tooltiptext gainGainParamTip" },
+                            { id: "gainGainParamTip", className: "tooltiptext" },
                             React.createElement(
                                 "span",
                                 { className: "paramSpan" },
@@ -761,15 +781,15 @@ var Filter = function (_React$Component5) {
     function Filter(props) {
         _classCallCheck(this, Filter);
 
-        var _this8 = _possibleConstructorReturn(this, (Filter.__proto__ || Object.getPrototypeOf(Filter)).call(this, props));
+        var _this9 = _possibleConstructorReturn(this, (Filter.__proto__ || Object.getPrototypeOf(Filter)).call(this, props));
 
-        _this8.state = {
-            audio: _this8.props.audioContext.createBiquadFilter(),
+        _this9.state = {
+            audio: _this9.props.audioContext.createBiquadFilter(),
             type: "lowpass"
         };
 
-        _this8.handleFilterType = _this8.handleFilterType.bind(_this8);
-        return _this8;
+        _this9.handleFilterType = _this9.handleFilterType.bind(_this9);
+        return _this9;
     }
 
     _createClass(Filter, [{
@@ -823,21 +843,21 @@ var Output = function (_React$Component6) {
     function Output(props) {
         _classCallCheck(this, Output);
 
-        var _this9 = _possibleConstructorReturn(this, (Output.__proto__ || Object.getPrototypeOf(Output)).call(this, props));
+        var _this10 = _possibleConstructorReturn(this, (Output.__proto__ || Object.getPrototypeOf(Output)).call(this, props));
 
-        _this9.state = {
-            gainNode: _this9.props.audioContext.createGain()
+        _this10.state = {
+            gainNode: _this10.props.audioContext.createGain()
         };
-        _this9.handleOutput = _this9.handleOutput.bind(_this9);
-        _this9.handleChange = _this9.handleChange.bind(_this9);
-        return _this9;
+        _this10.handleOutput = _this10.handleOutput.bind(_this10);
+        _this10.handleChange = _this10.handleChange.bind(_this10);
+        return _this10;
     }
 
     _createClass(Output, [{
         key: "handleOutput",
-        value: function handleOutput() {
+        value: function handleOutput(event) {
             var largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
-            var el = document.getElementById("OutputoutputInner").getBoundingClientRect();
+            var el = event.target.getBoundingClientRect();
             var x = el.x;
             var y = el.y;
             var bottom = el.bottom;
@@ -889,10 +909,10 @@ var Cord = function (_React$Component7) {
     function Cord(props) {
         _classCallCheck(this, Cord);
 
-        var _this10 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
+        var _this11 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
 
-        _this10.handleClick = _this10.handleClick.bind(_this10);
-        return _this10;
+        _this11.handleClick = _this11.handleClick.bind(_this11);
+        return _this11;
     }
 
     _createClass(Cord, [{
@@ -953,14 +973,14 @@ var MyButton = function (_React$Component9) {
     function MyButton(props) {
         _classCallCheck(this, MyButton);
 
-        var _this12 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
+        var _this13 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
 
-        _this12.state = {
+        _this13.state = {
             count: 0
         };
 
-        _this12.handleClick = _this12.handleClick.bind(_this12);
-        return _this12;
+        _this13.handleClick = _this13.handleClick.bind(_this13);
+        return _this13;
     }
 
     _createClass(MyButton, [{
@@ -985,6 +1005,57 @@ var MyButton = function (_React$Component9) {
     }]);
 
     return MyButton;
+}(React.Component);
+
+var Selector = function (_React$Component10) {
+    _inherits(Selector, _React$Component10);
+
+    function Selector(props) {
+        _classCallCheck(this, Selector);
+
+        var _this14 = _possibleConstructorReturn(this, (Selector.__proto__ || Object.getPrototypeOf(Selector)).call(this, props));
+
+        _this14.state = {
+            val: _this14.props.values[0]
+        };
+
+        _this14.handleClick = _this14.handleClick.bind(_this14);
+        return _this14;
+    }
+
+    _createClass(Selector, [{
+        key: "handleClick",
+        value: function handleClick(event) {
+            this.setState({
+                val: event.target.innerHTML
+            });
+            this.props.handleClick(event.target.innerHTML);
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            var _this15 = this;
+
+            return React.createElement(
+                "div",
+                { id: this.props.id, className: "selectorDiv" },
+                React.createElement(
+                    "span",
+                    null,
+                    this.state.val
+                ),
+                this.props.values.map(function (el) {
+                    return React.createElement(
+                        "div",
+                        { key: el, className: "selectorVal", onClick: _this15.handleClick },
+                        el
+                    );
+                })
+            );
+        }
+    }]);
+
+    return Selector;
 }(React.Component);
 
 ReactDOM.render(React.createElement(App, null), document.getElementById("App"));
