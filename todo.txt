@@ -1,34 +1,27 @@
-Make modules fixed sizes to ameliorate resizing issues with patch cables.
 Make side menu change when size is too small.
 
 resizing issues!
 
 QOL: on disconnect, make it mute in like .2 seconds and then disconnect.
 
-
-
-optional: 
-make it so that you can type in new module name?
-LFO and parameter inputs??  off the left side of the filling!!! unique to each filling.
-Tooltips
-
-
-Oscillator needs:
-Custom Select
-
-
 Modules:
 Gain - check
 LFO - check
 Filter
+Panner
 Recording out
 
 
-ToDO 4.29:
-Style modules.
-Fix Osc Freq Input.
-Finish Filter.
-Work on tooltips.
+
+Reorganize Selector SCSS;
+work on Module X CSS;
+Add tooltips;
+Style with animations
+
+Reorganize selector divs;
+
+output to center;
+input to top left
 
 
 Things for the top helpbar: 
@@ -36,3 +29,5 @@ Notes as frequencies dropdown!
 Metronome
 Calculator
 Mute all?
+
+Make a "No support on Mobile!" banner.

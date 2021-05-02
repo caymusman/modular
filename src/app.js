@@ -54,22 +54,22 @@ class App extends React.Component{
         let minCount = 0;
         let newCombos = {...this.state.cordCombos};
         newCords.forEach(el => {
-            if(el.inputData.fromModID == childKey){
+            if(el.fromData.fromModID == childKey){
                 let val = finCords.indexOf(el);
                 finCords.splice(val, 1);
                 minCount++;
 
-                el.inputData.audio.disconnect(el.outputData.audio);
+                el.fromData.audio.disconnect(el.toData.audio);
                 }
-            if(el.outputData.tomyKey == childKey){
+            if(el.toData.tomyKey == childKey || el.toData.tomyKey.split(' ')[0] + " " + el.toData.tomyKey.split(' ')[1] == childKey){
                 let val = finCords.indexOf(el);
                 finCords.splice(val, 1);
                 minCount++;
 
-                el.inputData.audio.disconnect(el.outputData.audio);
+                el.fromData.audio.disconnect(el.toData.audio);
                 
                 //make sure any output cords are removed from cordCombos
-                newCombos[el.inputData.fromModID].splice(newCombos[el.inputData.fromModID].indexOf(childKey), 1);
+                newCombos[el.fromData.fromModID].splice(newCombos[el.fromData.fromModID].indexOf(childKey), 1);
             }
             })
 
@@ -100,7 +100,7 @@ class App extends React.Component{
     //add initial patch cord data upon input click
     addCord(info){
         this.setState((state) => ({
-            patchCords: [...state.patchCords, {id: "cord" + this.state.cumulativeCordCount, inputData: info, outputData: null}],
+            patchCords: [...state.patchCords, {id: "cord" + this.state.cumulativeCordCount, fromData: info, toData: null}],
             currentCordCount: state.currentCordCount + 1,
             cumulativeCordCount: state.cumulativeCordCount + 1,
             outputMode: true
@@ -111,9 +111,9 @@ class App extends React.Component{
     handleOutput(info){
         if(this.state.outputMode){
             let newCords = [...this.state.patchCords];
-            let outData = "outputData";
+            let toData = "toData";
             let lastEl = newCords[this.state.currentCordCount-1];
-            let fromMod = lastEl.inputData.fromModID;
+            let fromMod = lastEl.fromData.fromModID;
             if(fromMod == info.tomyKey){
                 this.myAlert("You cannot plug a module into itself!");
                 this.handlePatchExit();
@@ -121,7 +121,7 @@ class App extends React.Component{
                 this.myAlert("You've already patched this cable!");
                 this.handlePatchExit();
             }else{
-                lastEl[outData]=info;
+                lastEl[toData]=info;
                 let newCombo = {...this.state.cordCombos};
                 newCombo[fromMod].push(info.tomyKey);
                 this.setState((state) => ({
@@ -134,7 +134,7 @@ class App extends React.Component{
              })
             }
             //handle Audio
-            lastEl.inputData.audio.connect(info.audio);
+            lastEl.fromData.audio.connect(info.audio);
         }
     }
 
@@ -143,7 +143,7 @@ class App extends React.Component{
         let newArr = [...this.state.patchCords];
         for(let i = 0; i < newArr.length; i++){
             if(newArr[i].id == cordID){
-                newArr[i].inputData.audio.disconnect(newArr[i].outputData.audio);
+                newArr[i].fromData.audio.disconnect(newArr[i].toData.audio);
                 break;
             }
         }
@@ -158,9 +158,9 @@ class App extends React.Component{
 
     handleComboDelete(cordID){
         const cordVal = this.state.patchCords.find(val => val.id == cordID);
-        let fromCombo = cordVal.inputData.fromModID;
+        let fromCombo = cordVal.fromData.fromModID;
         let newCombo = {...this.state.cordCombos};
-        newCombo[fromCombo].splice(newCombo[fromCombo].indexOf(cordVal.outputData.tomyKey), 1);
+        newCombo[fromCombo].splice(newCombo[fromCombo].indexOf(cordVal.toData.tomyKey), 1);
         this.setState({
             cordCombos: newCombo
         })
@@ -171,26 +171,40 @@ class App extends React.Component{
         let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
         let newCords = [...this.state.patchCords];
         newCords.forEach(el => {
-            if(el.inputData.fromModID == modID){ 
-                let in_el = document.getElementById(modID + "inputInner").getBoundingClientRect();
+            if(el.toData.tomyKey.includes(" ")){
+                console.log(el.toData.tomyKey);
+            }
+            if(el.fromData.fromModID == modID){ 
+                let in_el = document.getElementById(modID + "outputInner").getBoundingClientRect();
                 let in_x = in_el.x;
                 let in_y = in_el.y;
                 let in_bottom = in_el.bottom;
                 let in_right = in_el.right;
                 let in_xCenter = ((in_right - in_x) / 2 + in_x) - (largerDim * .04);
                 let in_yCenter = ((in_bottom - in_y) / 2 + in_y) - (largerDim * .04);
-                el.inputData.fromLocation = {x: in_xCenter, y: in_yCenter}
-            }else if(el.outputData.tomyKey == modID){
-                let out_el = document.getElementById(modID + "outputInner").getBoundingClientRect();
-                let out_x = out_el.x;
-                let out_y = out_el.y;
-                let out_bottom = out_el.bottom;
-                let out_right = out_el.right;
-                let out_xCenter = ((out_right - out_x) / 2 + out_x) - (largerDim * .04);
-                let out_yCenter = ((out_bottom - out_y) / 2 + out_y) - (largerDim * .04);
-                el.outputData.toLocation = {x: out_xCenter, y: out_yCenter}
+                el.fromData.fromLocation = {x: in_xCenter, y: in_yCenter}
+            }else if(el.toData.tomyKey == modID){
+                let to_el = document.getElementById(modID + "inputInner").getBoundingClientRect();
+                let to_x = to_el.x;
+                let to_y = to_el.y;
+                let to_bottom = to_el.bottom;
+                let to_right = to_el.right;
+                let to_xCenter = ((to_right - to_x) / 2 + to_x) - (largerDim * .04);
+                let to_yCenter = ((to_bottom - to_y) / 2 + to_y) - (largerDim * .04);
+                el.toData.toLocation = {x: to_xCenter, y: to_yCenter}
+            }else if(el.toData.tomyKey.includes(" ") && el.toData.tomyKey.split(' ')[0] + " " + el.toData.tomyKey.split(' ')[1] == modID){
+                let newStr = el.toData.tomyKey.split(' ')[2];
+                console.log("I'M IN HERE: " + newStr);
+                let to_el = document.getElementById(el.toData.tomyKey + " inputInner").getBoundingClientRect();
+                let to_x = to_el.x;
+                let to_y = to_el.y;
+                let to_bottom = to_el.bottom;
+                let to_right = to_el.right;
+                let to_xCenter = ((to_right - to_x) / 2 + to_x) - (largerDim * .04);
+                let to_yCenter = ((to_bottom - to_y) / 2 + to_y) - (largerDim * .04);
+                el.toData.toLocation = {x: to_xCenter, y: to_yCenter}
             }
-        });
+        })
 
         this.setState(state => ({
             patchCords: newCords
@@ -217,8 +231,8 @@ class App extends React.Component{
         let cords = []; //loop through the cords in the state, add line version to this array
         let tempArr = [...this.state.patchCords];
         tempArr.forEach(el => {
-            if(el['outputData']){
-                cords.push(<Cord deleteCord={this.deleteCord} key={el.id} id={el.id} x1={el.inputData.fromLocation.x} y1={el.inputData.fromLocation.y} x2={el.outputData.toLocation.x} y2={el.outputData.toLocation.y}></Cord>)
+            if(el['toData']){
+                cords.push(<Cord deleteCord={this.deleteCord} key={el.id} id={el.id} x1={el.fromData.fromLocation.x} y1={el.fromData.fromLocation.y} x2={el.toData.toLocation.x} y2={el.toData.toLocation.y}></Cord>)
             }
         })
         return(
@@ -346,7 +360,7 @@ class Area extends React.Component{
             case "Filter":
                 return <Filter audioContext={this.props.audioContext} createAudio={this.createAudio}/>;
             default:
-                return <div>Nothing</div>;
+                return <div>Hahahahaha theres nothing here!</div>;
         }
     }
 
@@ -368,8 +382,8 @@ class Area extends React.Component{
 
                     {/*input patch cords area*/}
                     <div className={this.props.outputMode ? "cordOuter hide" : "cordOuter show interactive"} 
-                         id="inputOuter" onClick={this.handleCreatePatch}>
-                            <div className="cordInner" id={this.props.myKey + "inputInner"}>
+                         id="outputOuter" onClick={this.handleCreatePatch}>
+                            <div className="cordInner" id={this.props.myKey + "outputInner"}>
                             </div>
                     </div>
                     {/*output patch cords area*/}
@@ -377,8 +391,8 @@ class Area extends React.Component{
                     {
                         this.props.inputOnly == "false" &&
                         <div className={this.props.outputMode ? "cordOuter show raise interactive" : "cordOuter show"} 
-                             id="outputOuter" onClick={this.handleOutput}>
-                                 <div className="cordInner" id={this.props.myKey + "outputInner"}>
+                             id="inputOuter" onClick={this.handleOutput}>
+                                 <div className="cordInner" id={this.props.myKey + "inputInner"}>
                                  </div>
                          </div>
                     }
@@ -395,7 +409,7 @@ class Oscillator extends React.Component{
         this.state={
             audio: this.props.audioContext.createOscillator(),
             wave: "sine",
-            value: 220,
+            val: 220,
             num: 220,
             min: 20,
             max: 700,
@@ -420,7 +434,7 @@ class Oscillator extends React.Component{
         this.state.audio.frequency.setValueAtTime(freq, this.props.audioContext.currentTime);
         this.setState({
             num: freq,
-            value: freq
+            val: freq
         })
     }
 
@@ -441,6 +455,7 @@ class Oscillator extends React.Component{
                 step: 1,
                 LFO: false
             })
+            this.state.audio.frequency.setValueAtTime(220, this.props.audioContext.currentTime);
         }else{
             this.setState({
                 val: 10,
@@ -450,6 +465,7 @@ class Oscillator extends React.Component{
                 step: .1,
                 LFO: true
             })
+            this.state.audio.frequency.setValueAtTime(10, this.props.audioContext.currentTime);
         }
     }
 
@@ -470,14 +486,15 @@ class Oscillator extends React.Component{
             temp=this.state.min
         }
         this.setState({
-            value: temp,
+            val: temp,
             num: temp
         })
+        this.state.audio.frequency.setValueAtTime(temp, this.props.audioContext.currentTime);
     }
 
     componentDidMount(){
         this.props.createAudio(this.state.audio);
-        this.state.audio.frequency.setValueAtTime(this.state.value, this.props.audioContext.currentTime);
+        this.state.audio.frequency.setValueAtTime(this.state.val, this.props.audioContext.currentTime);
         this.state.audio.start();
     }
 
@@ -491,7 +508,7 @@ class Oscillator extends React.Component{
                      <span id="oscLFOTip" className="tooltiptext">LFO Mode</span>
                  </label>
                  <div className="tooltip">
-                    <input type="range" value={this.state.value} min={this.state.min} max={this.state.max} step={this.state.step} onChange={this.handleFreqChange}></input>
+                    <input type="range" value={this.state.val} min={this.state.min} max={this.state.max} step={this.state.step} onChange={this.handleFreqChange}></input>
                     <span id="oscFreqTip" className="tooltiptext">Freq</span>
                 </div>
                 <input id="freqNumInput" value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumFreqChange()}}}></input>
@@ -507,7 +524,9 @@ class Gain extends React.Component{
         this.state={
             audio: this.props.audioContext.createGain(),
             value: .5,
-            num: .5
+            num: .5,
+            max: 1,
+            min: 0
         }
 
         this.handleGainChange=this.handleGainChange.bind(this);
@@ -562,7 +581,7 @@ class Gain extends React.Component{
         let xCenter = ((right - x) / 2 + x) - (largerDim * .04);
         let yCenter = ((bottom - y) / 2 + y) - (largerDim * .04);
         
-        this.props.handleOutput({tomyKey: this.props.parent+ "param",
+        this.props.handleOutput({tomyKey: this.props.parent+ " param",
                                  toLocation: {x: xCenter, y: yCenter},
                                 audio: this.state.audio.gain});
         }
@@ -579,7 +598,7 @@ class Gain extends React.Component{
                 <input id="gainNumInput" value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumGainChange()}}}></input>
 
                 <div className="cordOuter tooltip" id="firstParam" onClick={this.handleOutput}>
-                    <div className="cordInner" id={this.props.parent + "param" + "outputInner"}>
+                    <div className="cordInner" id={this.props.parent + " param" + " inputInner"}>
                     <span id="gainGainParamTip" className="tooltiptext"><span className="paramSpan">param: </span>Gain</span>
                     </div>
                 </div>
@@ -594,16 +613,103 @@ class Filter extends React.Component{
 
         this.state={
             audio: this.props.audioContext.createBiquadFilter(),
-            type: "lowpass"
+            type: "lowpass",
+            gainNum: .5,
+            gainVal: .5,
+            gainMax: 1,
+            gainMin: 0,
+            freqNum: 440,
+            freqVal: 440,
+            freqMax: 3000,
+            freqMin: 0
+
         }
 
         this.handleFilterType=this.handleFilterType.bind(this);
+        this.handleGainRangeChange=this.handleGainRangeChange.bind(this);
+        this.handleGainNumChange=this.handleGainNumChange.bind(this);
+        this.handleGainNumSubmit=this.handleGainNumSubmit.bind(this);
+        this.handleFreqRangeChange=this.handleFreqRangeChange.bind(this);
+        this.handleFreqNumChange=this.handleFreqNumChange.bind(this);
+        this.handleFreqNumSubmit=this.handleFreqNumSubmit.bind(this);
     }
 
-    handleFilterType(event){
-        this.state.audio.type = event.target.value;
+    handleFilterType(val){
+        this.state.audio.type = val;
         this.setState({
-            type: event.target.value
+            type: val
+        })
+    }
+
+    handleGainRangeChange(event){
+        let gainVal = event.target.value;
+        if(gainVal > this.state.gainMax){
+            gainVal=this.state.gainMax;
+        }else if(gainVal < this.state.gainMin){
+            gainVal=this.state.gainMin;
+        }
+        this.state.audio.gain.setValueAtTime(gainVal, this.props.audioContext.currentTime);
+        this.setState({
+            gainVal: gainVal,
+            gainNum: gainVal
+        });
+    }
+
+    handleGainNumChange(event){
+        if(isNaN(event.target.value)){
+            return;
+        }
+        this.setState({
+            gainNum: event.target.value
+        })
+    }
+
+    handleGainNumSubmit(){
+        let temp = this.state.gainNum;
+        if(temp > this.state.gainMax){
+            temp=this.state.gainMax;
+        }else if(temp < this.state.gainMin){
+            temp=this.state.gainMin
+        }
+        this.setState({
+            gainVal: temp,
+            gainNum: temp
+        })
+    }
+
+    handleFreqRangeChange(event){
+        let freqVal = event.target.value;
+        if(freqVal > this.state.freqMax){
+            freqVal=this.state.freqMax;
+        }else if(freqVal < this.state.freqMin){
+            freqVal=this.state.freqMin;
+        }
+        this.state.audio.frequency.setValueAtTime(freqVal, this.props.audioContext.currentTime);
+        this.setState({
+            freqVal: freqVal,
+            freqNum: freqVal
+        });
+    }
+
+    handleFreqNumChange(event){
+        if(isNaN(event.target.value)){
+            return;
+        }
+        this.setState({
+            freqNum: event.target.value
+        })
+    }
+
+    handleFreqNumSubmit(){
+        let temp = this.state.freqNum;
+        if(temp > this.state.freqMax){
+            temp=this.state.freqMax;
+        }else if(temp < this.state.freqMin){
+            temp=this.state.freqMin
+        }
+        this.setState({
+            freqVal: temp,
+            freqNum: temp
         })
     }
 
@@ -612,13 +718,21 @@ class Filter extends React.Component{
     }
 
     render(){
+        let filterTypes=["lowpass", "highpass", "bandpass", "lowshelf", "highshelf", "peaking", "notch", "allpass"];
         return(
             <div className="filterDiv">
-                <select value={this.state.type} onChange={this.handleFilterType}>
-                        <option value="lowpass">Lowpass</option>
-                        <option value="highpass">Highpass</option>
-                        <option value="bandpass">Bandpass</option>
-                    </select>
+                <Selector id="filterSelector" values={filterTypes} handleClick={this.handleFilterType}/>
+                <div id="filterGainDiv" className="tooltip">
+                    <input id="filterGainRange" type="range" value={this.state.gainVal} min="0" max="1" step=".05" onChange={this.handleGainRangeChange}></input>
+                    <input id="filterGainNumber" value={this.state.gainNum} type="text" onChange={this.handleGainNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleGainNumSubmit()}}}></input>
+                    <span id="filterGainTip" className="tooltiptext">Filter Gain</span>
+                </div>
+                <div id="filterFreqDiv" className="tooltip">
+                    <input id="filterFreqRange" type="range" value={this.state.freqVal} min="0" max="3000" step="5" onChange={this.handleFreqRangeChange}></input>
+                    <input id="filterFreqNumber" value={this.state.freqNum} type="text" onChange={this.handleFreqNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleFreqNumSubmit()}}}></input>
+                    <span id="filterFreqTip" className="tooltiptext">Filter Frequency</span>
+                </div>
+
             </div>
         )
     }
@@ -629,7 +743,8 @@ class Output extends React.Component{
         super(props);
 
         this.state={
-            gainNode: this.props.audioContext.createGain()
+            gainNode: this.props.audioContext.createGain(),
+            value: .5
         }
         this.handleOutput=this.handleOutput.bind(this);
         this.handleChange=this.handleChange.bind(this);
@@ -652,6 +767,9 @@ class Output extends React.Component{
     
     handleChange(event){
         this.state.gainNode.gain.setValueAtTime(event.target.value, this.props.audioContext.currentTime);
+        this.setState({
+            value: event.target.value
+        })
     }
         
 
@@ -660,10 +778,10 @@ class Output extends React.Component{
         return(
             <div id="outputDiv">
                 <p>Output</p>
-                <input id="gainSlider" type="range" min="0" max="1" step=".05" onChange={this.handleChange}></input>
+                <input id="gainSlider" value={this.state.value} type="range" min="0" max="1" step=".05" onChange={this.handleChange}></input>
                 <div className="cordOuter"
                         onClick={this.handleOutput}>
-                            <div className="cordInner" id={"Output" + "outputInner"}>
+                            <div className="cordInner" id={"Output" + "inputInner"}>
                             </div>
                     </div> 
             </div>

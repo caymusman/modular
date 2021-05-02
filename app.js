@@ -82,22 +82,22 @@ var App = function (_React$Component) {
             var minCount = 0;
             var newCombos = Object.assign({}, this.state.cordCombos);
             newCords.forEach(function (el) {
-                if (el.inputData.fromModID == childKey) {
+                if (el.fromData.fromModID == childKey) {
                     var val = finCords.indexOf(el);
                     finCords.splice(val, 1);
                     minCount++;
 
-                    el.inputData.audio.disconnect(el.outputData.audio);
+                    el.fromData.audio.disconnect(el.toData.audio);
                 }
-                if (el.outputData.tomyKey == childKey) {
+                if (el.toData.tomyKey == childKey || el.toData.tomyKey.split(' ')[0] + " " + el.toData.tomyKey.split(' ')[1] == childKey) {
                     var _val = finCords.indexOf(el);
                     finCords.splice(_val, 1);
                     minCount++;
 
-                    el.inputData.audio.disconnect(el.outputData.audio);
+                    el.fromData.audio.disconnect(el.toData.audio);
 
                     //make sure any output cords are removed from cordCombos
-                    newCombos[el.inputData.fromModID].splice(newCombos[el.inputData.fromModID].indexOf(childKey), 1);
+                    newCombos[el.fromData.fromModID].splice(newCombos[el.fromData.fromModID].indexOf(childKey), 1);
                 }
             });
 
@@ -140,7 +140,7 @@ var App = function (_React$Component) {
 
             this.setState(function (state) {
                 return {
-                    patchCords: [].concat(_toConsumableArray(state.patchCords), [{ id: "cord" + _this2.state.cumulativeCordCount, inputData: info, outputData: null }]),
+                    patchCords: [].concat(_toConsumableArray(state.patchCords), [{ id: "cord" + _this2.state.cumulativeCordCount, fromData: info, toData: null }]),
                     currentCordCount: state.currentCordCount + 1,
                     cumulativeCordCount: state.cumulativeCordCount + 1,
                     outputMode: true
@@ -155,9 +155,9 @@ var App = function (_React$Component) {
         value: function handleOutput(info) {
             if (this.state.outputMode) {
                 var newCords = [].concat(_toConsumableArray(this.state.patchCords));
-                var outData = "outputData";
+                var toData = "toData";
                 var lastEl = newCords[this.state.currentCordCount - 1];
-                var fromMod = lastEl.inputData.fromModID;
+                var fromMod = lastEl.fromData.fromModID;
                 if (fromMod == info.tomyKey) {
                     this.myAlert("You cannot plug a module into itself!");
                     this.handlePatchExit();
@@ -165,7 +165,7 @@ var App = function (_React$Component) {
                     this.myAlert("You've already patched this cable!");
                     this.handlePatchExit();
                 } else {
-                    lastEl[outData] = info;
+                    lastEl[toData] = info;
                     var newCombo = Object.assign({}, this.state.cordCombos);
                     newCombo[fromMod].push(info.tomyKey);
                     this.setState(function (state) {
@@ -180,7 +180,7 @@ var App = function (_React$Component) {
                     });
                 }
                 //handle Audio
-                lastEl.inputData.audio.connect(info.audio);
+                lastEl.fromData.audio.connect(info.audio);
             }
         }
     }, {
@@ -189,7 +189,7 @@ var App = function (_React$Component) {
             var newArr = [].concat(_toConsumableArray(this.state.patchCords));
             for (var i = 0; i < newArr.length; i++) {
                 if (newArr[i].id == cordID) {
-                    newArr[i].inputData.audio.disconnect(newArr[i].outputData.audio);
+                    newArr[i].fromData.audio.disconnect(newArr[i].toData.audio);
                     break;
                 }
             }
@@ -209,9 +209,9 @@ var App = function (_React$Component) {
             var cordVal = this.state.patchCords.find(function (val) {
                 return val.id == cordID;
             });
-            var fromCombo = cordVal.inputData.fromModID;
+            var fromCombo = cordVal.fromData.fromModID;
             var newCombo = Object.assign({}, this.state.cordCombos);
-            newCombo[fromCombo].splice(newCombo[fromCombo].indexOf(cordVal.outputData.tomyKey), 1);
+            newCombo[fromCombo].splice(newCombo[fromCombo].indexOf(cordVal.toData.tomyKey), 1);
             this.setState({
                 cordCombos: newCombo
             });
@@ -225,24 +225,38 @@ var App = function (_React$Component) {
             var largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
             var newCords = [].concat(_toConsumableArray(this.state.patchCords));
             newCords.forEach(function (el) {
-                if (el.inputData.fromModID == modID) {
-                    var in_el = document.getElementById(modID + "inputInner").getBoundingClientRect();
+                if (el.toData.tomyKey.includes(" ")) {
+                    console.log(el.toData.tomyKey);
+                }
+                if (el.fromData.fromModID == modID) {
+                    var in_el = document.getElementById(modID + "outputInner").getBoundingClientRect();
                     var in_x = in_el.x;
                     var in_y = in_el.y;
                     var in_bottom = in_el.bottom;
                     var in_right = in_el.right;
                     var in_xCenter = (in_right - in_x) / 2 + in_x - largerDim * .04;
                     var in_yCenter = (in_bottom - in_y) / 2 + in_y - largerDim * .04;
-                    el.inputData.fromLocation = { x: in_xCenter, y: in_yCenter };
-                } else if (el.outputData.tomyKey == modID) {
-                    var out_el = document.getElementById(modID + "outputInner").getBoundingClientRect();
-                    var out_x = out_el.x;
-                    var out_y = out_el.y;
-                    var out_bottom = out_el.bottom;
-                    var out_right = out_el.right;
-                    var out_xCenter = (out_right - out_x) / 2 + out_x - largerDim * .04;
-                    var out_yCenter = (out_bottom - out_y) / 2 + out_y - largerDim * .04;
-                    el.outputData.toLocation = { x: out_xCenter, y: out_yCenter };
+                    el.fromData.fromLocation = { x: in_xCenter, y: in_yCenter };
+                } else if (el.toData.tomyKey == modID) {
+                    var to_el = document.getElementById(modID + "inputInner").getBoundingClientRect();
+                    var to_x = to_el.x;
+                    var to_y = to_el.y;
+                    var to_bottom = to_el.bottom;
+                    var to_right = to_el.right;
+                    var to_xCenter = (to_right - to_x) / 2 + to_x - largerDim * .04;
+                    var to_yCenter = (to_bottom - to_y) / 2 + to_y - largerDim * .04;
+                    el.toData.toLocation = { x: to_xCenter, y: to_yCenter };
+                } else if (el.toData.tomyKey.includes(" ") && el.toData.tomyKey.split(' ')[0] + " " + el.toData.tomyKey.split(' ')[1] == modID) {
+                    var newStr = el.toData.tomyKey.split(' ')[2];
+                    console.log("I'M IN HERE: " + newStr);
+                    var _to_el = document.getElementById(el.toData.tomyKey + " inputInner").getBoundingClientRect();
+                    var _to_x = _to_el.x;
+                    var _to_y = _to_el.y;
+                    var _to_bottom = _to_el.bottom;
+                    var _to_right = _to_el.right;
+                    var _to_xCenter = (_to_right - _to_x) / 2 + _to_x - largerDim * .04;
+                    var _to_yCenter = (_to_bottom - _to_y) / 2 + _to_y - largerDim * .04;
+                    el.toData.toLocation = { x: _to_xCenter, y: _to_yCenter };
                 }
             });
 
@@ -277,8 +291,8 @@ var App = function (_React$Component) {
             var cords = []; //loop through the cords in the state, add line version to this array
             var tempArr = [].concat(_toConsumableArray(this.state.patchCords));
             tempArr.forEach(function (el) {
-                if (el['outputData']) {
-                    cords.push(React.createElement(Cord, { deleteCord: _this3.deleteCord, key: el.id, id: el.id, x1: el.inputData.fromLocation.x, y1: el.inputData.fromLocation.y, x2: el.outputData.toLocation.x, y2: el.outputData.toLocation.y }));
+                if (el['toData']) {
+                    cords.push(React.createElement(Cord, { deleteCord: _this3.deleteCord, key: el.id, id: el.id, x1: el.fromData.fromLocation.x, y1: el.fromData.fromLocation.y, x2: el.toData.toLocation.x, y2: el.toData.toLocation.y }));
                 }
             });
             return React.createElement(
@@ -463,7 +477,7 @@ var Area = function (_React$Component2) {
                     return React.createElement(
                         "div",
                         null,
-                        "Nothing"
+                        "Hahahahaha theres nothing here!"
                     );
             }
         }
@@ -488,14 +502,14 @@ var Area = function (_React$Component2) {
                 React.createElement(
                     "div",
                     { className: this.props.outputMode ? "cordOuter hide" : "cordOuter show interactive",
-                        id: "inputOuter", onClick: this.handleCreatePatch },
-                    React.createElement("div", { className: "cordInner", id: this.props.myKey + "inputInner" })
+                        id: "outputOuter", onClick: this.handleCreatePatch },
+                    React.createElement("div", { className: "cordInner", id: this.props.myKey + "outputInner" })
                 ),
                 this.props.inputOnly == "false" && React.createElement(
                     "div",
                     { className: this.props.outputMode ? "cordOuter show raise interactive" : "cordOuter show",
-                        id: "outputOuter", onClick: this.handleOutput },
-                    React.createElement("div", { className: "cordInner", id: this.props.myKey + "outputInner" })
+                        id: "inputOuter", onClick: this.handleOutput },
+                    React.createElement("div", { className: "cordInner", id: this.props.myKey + "inputInner" })
                 )
             );
         }
@@ -518,7 +532,7 @@ var Oscillator = function (_React$Component3) {
         _this5.state = {
             audio: _this5.props.audioContext.createOscillator(),
             wave: "sine",
-            value: 220,
+            val: 220,
             num: 220,
             min: 20,
             max: 700,
@@ -546,7 +560,7 @@ var Oscillator = function (_React$Component3) {
             this.state.audio.frequency.setValueAtTime(freq, this.props.audioContext.currentTime);
             this.setState({
                 num: freq,
-                value: freq
+                val: freq
             });
         }
     }, {
@@ -569,6 +583,7 @@ var Oscillator = function (_React$Component3) {
                     step: 1,
                     LFO: false
                 });
+                this.state.audio.frequency.setValueAtTime(220, this.props.audioContext.currentTime);
             } else {
                 this.setState({
                     val: 10,
@@ -578,6 +593,7 @@ var Oscillator = function (_React$Component3) {
                     step: .1,
                     LFO: true
                 });
+                this.state.audio.frequency.setValueAtTime(10, this.props.audioContext.currentTime);
             }
         }
     }, {
@@ -600,15 +616,16 @@ var Oscillator = function (_React$Component3) {
                 temp = this.state.min;
             }
             this.setState({
-                value: temp,
+                val: temp,
                 num: temp
             });
+            this.state.audio.frequency.setValueAtTime(temp, this.props.audioContext.currentTime);
         }
     }, {
         key: "componentDidMount",
         value: function componentDidMount() {
             this.props.createAudio(this.state.audio);
-            this.state.audio.frequency.setValueAtTime(this.state.value, this.props.audioContext.currentTime);
+            this.state.audio.frequency.setValueAtTime(this.state.val, this.props.audioContext.currentTime);
             this.state.audio.start();
         }
     }, {
@@ -634,7 +651,7 @@ var Oscillator = function (_React$Component3) {
                 React.createElement(
                     "div",
                     { className: "tooltip" },
-                    React.createElement("input", { type: "range", value: this.state.value, min: this.state.min, max: this.state.max, step: this.state.step, onChange: this.handleFreqChange }),
+                    React.createElement("input", { type: "range", value: this.state.val, min: this.state.min, max: this.state.max, step: this.state.step, onChange: this.handleFreqChange }),
                     React.createElement(
                         "span",
                         { id: "oscFreqTip", className: "tooltiptext" },
@@ -664,7 +681,9 @@ var Gain = function (_React$Component4) {
         _this7.state = {
             audio: _this7.props.audioContext.createGain(),
             value: .5,
-            num: .5
+            num: .5,
+            max: 1,
+            min: 0
         };
 
         _this7.handleGainChange = _this7.handleGainChange.bind(_this7);
@@ -725,7 +744,7 @@ var Gain = function (_React$Component4) {
             var xCenter = (right - x) / 2 + x - largerDim * .04;
             var yCenter = (bottom - y) / 2 + y - largerDim * .04;
 
-            this.props.handleOutput({ tomyKey: this.props.parent + "param",
+            this.props.handleOutput({ tomyKey: this.props.parent + " param",
                 toLocation: { x: xCenter, y: yCenter },
                 audio: this.state.audio.gain });
         }
@@ -754,7 +773,7 @@ var Gain = function (_React$Component4) {
                     { className: "cordOuter tooltip", id: "firstParam", onClick: this.handleOutput },
                     React.createElement(
                         "div",
-                        { className: "cordInner", id: this.props.parent + "param" + "outputInner" },
+                        { className: "cordInner", id: this.props.parent + " param" + " inputInner" },
                         React.createElement(
                             "span",
                             { id: "gainGainParamTip", className: "tooltiptext" },
@@ -784,19 +803,112 @@ var Filter = function (_React$Component5) {
 
         _this9.state = {
             audio: _this9.props.audioContext.createBiquadFilter(),
-            type: "lowpass"
+            type: "lowpass",
+            gainNum: .5,
+            gainVal: .5,
+            gainMax: 1,
+            gainMin: 0,
+            freqNum: 440,
+            freqVal: 440,
+            freqMax: 3000,
+            freqMin: 0
+
         };
 
         _this9.handleFilterType = _this9.handleFilterType.bind(_this9);
+        _this9.handleGainRangeChange = _this9.handleGainRangeChange.bind(_this9);
+        _this9.handleGainNumChange = _this9.handleGainNumChange.bind(_this9);
+        _this9.handleGainNumSubmit = _this9.handleGainNumSubmit.bind(_this9);
+        _this9.handleFreqRangeChange = _this9.handleFreqRangeChange.bind(_this9);
+        _this9.handleFreqNumChange = _this9.handleFreqNumChange.bind(_this9);
+        _this9.handleFreqNumSubmit = _this9.handleFreqNumSubmit.bind(_this9);
         return _this9;
     }
 
     _createClass(Filter, [{
         key: "handleFilterType",
-        value: function handleFilterType(event) {
-            this.state.audio.type = event.target.value;
+        value: function handleFilterType(val) {
+            this.state.audio.type = val;
             this.setState({
-                type: event.target.value
+                type: val
+            });
+        }
+    }, {
+        key: "handleGainRangeChange",
+        value: function handleGainRangeChange(event) {
+            var gainVal = event.target.value;
+            if (gainVal > this.state.gainMax) {
+                gainVal = this.state.gainMax;
+            } else if (gainVal < this.state.gainMin) {
+                gainVal = this.state.gainMin;
+            }
+            this.state.audio.gain.setValueAtTime(gainVal, this.props.audioContext.currentTime);
+            this.setState({
+                gainVal: gainVal,
+                gainNum: gainVal
+            });
+        }
+    }, {
+        key: "handleGainNumChange",
+        value: function handleGainNumChange(event) {
+            if (isNaN(event.target.value)) {
+                return;
+            }
+            this.setState({
+                gainNum: event.target.value
+            });
+        }
+    }, {
+        key: "handleGainNumSubmit",
+        value: function handleGainNumSubmit() {
+            var temp = this.state.gainNum;
+            if (temp > this.state.gainMax) {
+                temp = this.state.gainMax;
+            } else if (temp < this.state.gainMin) {
+                temp = this.state.gainMin;
+            }
+            this.setState({
+                gainVal: temp,
+                gainNum: temp
+            });
+        }
+    }, {
+        key: "handleFreqRangeChange",
+        value: function handleFreqRangeChange(event) {
+            var freqVal = event.target.value;
+            if (freqVal > this.state.freqMax) {
+                freqVal = this.state.freqMax;
+            } else if (freqVal < this.state.freqMin) {
+                freqVal = this.state.freqMin;
+            }
+            this.state.audio.frequency.setValueAtTime(freqVal, this.props.audioContext.currentTime);
+            this.setState({
+                freqVal: freqVal,
+                freqNum: freqVal
+            });
+        }
+    }, {
+        key: "handleFreqNumChange",
+        value: function handleFreqNumChange(event) {
+            if (isNaN(event.target.value)) {
+                return;
+            }
+            this.setState({
+                freqNum: event.target.value
+            });
+        }
+    }, {
+        key: "handleFreqNumSubmit",
+        value: function handleFreqNumSubmit() {
+            var temp = this.state.freqNum;
+            if (temp > this.state.freqMax) {
+                temp = this.state.freqMax;
+            } else if (temp < this.state.freqMin) {
+                temp = this.state.freqMin;
+            }
+            this.setState({
+                freqVal: temp,
+                freqNum: temp
             });
         }
     }, {
@@ -807,26 +919,41 @@ var Filter = function (_React$Component5) {
     }, {
         key: "render",
         value: function render() {
+            var _this10 = this;
+
+            var filterTypes = ["lowpass", "highpass", "bandpass", "lowshelf", "highshelf", "peaking", "notch", "allpass"];
             return React.createElement(
                 "div",
                 { className: "filterDiv" },
+                React.createElement(Selector, { id: "filterSelector", values: filterTypes, handleClick: this.handleFilterType }),
                 React.createElement(
-                    "select",
-                    { value: this.state.type, onChange: this.handleFilterType },
+                    "div",
+                    { id: "filterGainDiv", className: "tooltip" },
+                    React.createElement("input", { id: "filterGainRange", type: "range", value: this.state.gainVal, min: "0", max: "1", step: ".05", onChange: this.handleGainRangeChange }),
+                    React.createElement("input", { id: "filterGainNumber", value: this.state.gainNum, type: "text", onChange: this.handleGainNumChange, onKeyPress: function onKeyPress(event) {
+                            if (event.key == "Enter") {
+                                _this10.handleGainNumSubmit();
+                            }
+                        } }),
                     React.createElement(
-                        "option",
-                        { value: "lowpass" },
-                        "Lowpass"
-                    ),
+                        "span",
+                        { id: "filterGainTip", className: "tooltiptext" },
+                        "Filter Gain"
+                    )
+                ),
+                React.createElement(
+                    "div",
+                    { id: "filterFreqDiv", className: "tooltip" },
+                    React.createElement("input", { id: "filterFreqRange", type: "range", value: this.state.freqVal, min: "0", max: "3000", step: "5", onChange: this.handleFreqRangeChange }),
+                    React.createElement("input", { id: "filterFreqNumber", value: this.state.freqNum, type: "text", onChange: this.handleFreqNumChange, onKeyPress: function onKeyPress(event) {
+                            if (event.key == "Enter") {
+                                _this10.handleFreqNumSubmit();
+                            }
+                        } }),
                     React.createElement(
-                        "option",
-                        { value: "highpass" },
-                        "Highpass"
-                    ),
-                    React.createElement(
-                        "option",
-                        { value: "bandpass" },
-                        "Bandpass"
+                        "span",
+                        { id: "filterFreqTip", className: "tooltiptext" },
+                        "Filter Frequency"
                     )
                 )
             );
@@ -842,14 +969,15 @@ var Output = function (_React$Component6) {
     function Output(props) {
         _classCallCheck(this, Output);
 
-        var _this10 = _possibleConstructorReturn(this, (Output.__proto__ || Object.getPrototypeOf(Output)).call(this, props));
+        var _this11 = _possibleConstructorReturn(this, (Output.__proto__ || Object.getPrototypeOf(Output)).call(this, props));
 
-        _this10.state = {
-            gainNode: _this10.props.audioContext.createGain()
+        _this11.state = {
+            gainNode: _this11.props.audioContext.createGain(),
+            value: .5
         };
-        _this10.handleOutput = _this10.handleOutput.bind(_this10);
-        _this10.handleChange = _this10.handleChange.bind(_this10);
-        return _this10;
+        _this11.handleOutput = _this11.handleOutput.bind(_this11);
+        _this11.handleChange = _this11.handleChange.bind(_this11);
+        return _this11;
     }
 
     _createClass(Output, [{
@@ -872,6 +1000,9 @@ var Output = function (_React$Component6) {
         key: "handleChange",
         value: function handleChange(event) {
             this.state.gainNode.gain.setValueAtTime(event.target.value, this.props.audioContext.currentTime);
+            this.setState({
+                value: event.target.value
+            });
         }
     }, {
         key: "render",
@@ -885,12 +1016,12 @@ var Output = function (_React$Component6) {
                     null,
                     "Output"
                 ),
-                React.createElement("input", { id: "gainSlider", type: "range", min: "0", max: "1", step: ".05", onChange: this.handleChange }),
+                React.createElement("input", { id: "gainSlider", value: this.state.value, type: "range", min: "0", max: "1", step: ".05", onChange: this.handleChange }),
                 React.createElement(
                     "div",
                     { className: "cordOuter",
                         onClick: this.handleOutput },
-                    React.createElement("div", { className: "cordInner", id: "Output" + "outputInner" })
+                    React.createElement("div", { className: "cordInner", id: "Output" + "inputInner" })
                 )
             );
         }
@@ -908,10 +1039,10 @@ var Cord = function (_React$Component7) {
     function Cord(props) {
         _classCallCheck(this, Cord);
 
-        var _this11 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
+        var _this12 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
 
-        _this11.handleClick = _this11.handleClick.bind(_this11);
-        return _this11;
+        _this12.handleClick = _this12.handleClick.bind(_this12);
+        return _this12;
     }
 
     _createClass(Cord, [{
@@ -972,14 +1103,14 @@ var MyButton = function (_React$Component9) {
     function MyButton(props) {
         _classCallCheck(this, MyButton);
 
-        var _this13 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
+        var _this14 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
 
-        _this13.state = {
+        _this14.state = {
             count: 0
         };
 
-        _this13.handleClick = _this13.handleClick.bind(_this13);
-        return _this13;
+        _this14.handleClick = _this14.handleClick.bind(_this14);
+        return _this14;
     }
 
     _createClass(MyButton, [{
@@ -1012,14 +1143,14 @@ var Selector = function (_React$Component10) {
     function Selector(props) {
         _classCallCheck(this, Selector);
 
-        var _this14 = _possibleConstructorReturn(this, (Selector.__proto__ || Object.getPrototypeOf(Selector)).call(this, props));
+        var _this15 = _possibleConstructorReturn(this, (Selector.__proto__ || Object.getPrototypeOf(Selector)).call(this, props));
 
-        _this14.state = {
-            val: _this14.props.values[0]
+        _this15.state = {
+            val: _this15.props.values[0]
         };
 
-        _this14.handleClick = _this14.handleClick.bind(_this14);
-        return _this14;
+        _this15.handleClick = _this15.handleClick.bind(_this15);
+        return _this15;
     }
 
     _createClass(Selector, [{
@@ -1033,7 +1164,7 @@ var Selector = function (_React$Component10) {
     }, {
         key: "render",
         value: function render() {
-            var _this15 = this;
+            var _this16 = this;
 
             return React.createElement(
                 "div",
@@ -1046,7 +1177,7 @@ var Selector = function (_React$Component10) {
                 this.props.values.map(function (el) {
                     return React.createElement(
                         "div",
-                        { key: el, className: "selectorVal", onClick: _this15.handleClick },
+                        { key: el, className: "selectorVal", onClick: _this16.handleClick },
                         el
                     );
                 })

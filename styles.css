@@ -161,14 +161,15 @@ html, body {
   top: -2.5vh;
   font-size: 4vh;
   color: #ddd;
-  -webkit-transition: -webkit-transform .6s, -webkit-filter .6s;
-  transition: -webkit-transform .6s, -webkit-filter .6s;
-  transition: transform .6s, filter .6s;
-  transition: transform .6s, filter .6s, -webkit-transform .6s, -webkit-filter .6s;
+  -webkit-transition: color .6s, -webkit-transform .6s, -webkit-filter .6s;
+  transition: color .6s, -webkit-transform .6s, -webkit-filter .6s;
+  transition: transform .6s, filter .6s, color .6s;
+  transition: transform .6s, filter .6s, color .6s, -webkit-transform .6s, -webkit-filter .6s;
   cursor: pointer;
 }
 
 #playSpace .pingBox .fa-times-circle:hover {
+  color: #660000;
   -webkit-transform: rotate(180deg);
           transform: rotate(180deg);
   -webkit-filter: drop-shadow(0 0 2px #555);
@@ -215,19 +216,19 @@ html, body {
   position: absolute;
   width: 12px;
   height: 12px;
-  top: -8%;
-  left: -4%;
-  border-radius: 50%;
-  -webkit-transition: visibility .45s, opacity .45s, -webkit-filter .6s;
-  transition: visibility .45s, opacity .45s, -webkit-filter .6s;
-  transition: filter .6s, visibility .45s, opacity .45s;
-  transition: filter .6s, visibility .45s, opacity .45s, -webkit-filter .6s;
+  top: -8px;
+  left: -4px;
+  -webkit-transition: visibility .45s, opacity .45s, color .6s, -webkit-filter .6s;
+  transition: visibility .45s, opacity .45s, color .6s, -webkit-filter .6s;
+  transition: filter .6s, visibility .45s, opacity .45s, color .6s;
+  transition: filter .6s, visibility .45s, opacity .45s, color .6s, -webkit-filter .6s;
   cursor: pointer;
 }
 
 #playSpace .moduleDiv .fa-times:hover {
   -webkit-filter: drop-shadow(0 0 2px #555);
           filter: drop-shadow(0 0 2px #555);
+  color: #660000;
 }
 
 #playSpace .moduleDiv p {
@@ -281,7 +282,7 @@ html, body {
 #playSpace #firstParam {
   position: absolute;
   top: -1vh;
-  left: 75%;
+  right: 25%;
   background-color: #024b30;
 }
 
@@ -290,17 +291,17 @@ html, body {
 }
 
 #playSpace #inputOuter {
-  bottom: -1vh;
+  top: -1vh;
   right: 75%;
 }
 
 #playSpace #outputOuter {
   bottom: -1vh;
-  right: 25%;
+  right: 50%;
 }
 
 #playSpace #outputOuter .cordInner {
-  background-color: #555;
+  background-color: #ddd;
 }
 
 .selectorDiv {
@@ -310,6 +311,7 @@ html, body {
   text-transform: capitalize;
   position: absolute;
   border-radius: 3px;
+  font-size: 12px;
 }
 
 .selectorDiv span {
@@ -344,7 +346,7 @@ html, body {
 
 .oscDiv #waveSelector {
   left: 10%;
-  top: 49px;
+  top: 51.5px;
   z-index: 100;
 }
 
@@ -430,6 +432,26 @@ html, body {
   width: 33%;
 }
 
+#filterSelector {
+  left: 29%;
+  top: 45px;
+  z-index: 1000;
+}
+
+#filterGainDiv {
+  margin-top: 50px;
+}
+
+#filterGainTip {
+  left: 53px;
+  top: 54px;
+}
+
+#filterFreqTip {
+  left: 53px;
+  top: 82px;
+}
+
 #outputDiv {
   position: absolute;
   right: 0%;
@@ -463,13 +485,13 @@ html, body {
           transform: translate(-50%, -50%);
   visibility: 1;
   opacity: 1;
-  background-color: #6f6f6f;
+  background-color: #888888;
   width: 1.2vmax;
   height: 1.2vmax;
 }
 
 #outputDiv .cordInner {
-  background-color: #555;
+  background-color: #ddd;
 }
 
 #outputDiv input[type=range] {
@@ -541,7 +563,7 @@ html, body {
   border-radius: 50%;
   padding: 0px;
   margin: 0px;
-  background-color: #ddd;
+  background-color: #555;
 }
 
 #returnSpace {
@@ -653,7 +675,7 @@ input:focus {
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color: #555 transparent transparent transparent;
+  border-color: #6f6f6f transparent transparent transparent;
 }
 
 input[type=range] {
