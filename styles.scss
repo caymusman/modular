@@ -423,13 +423,13 @@ html,body
     //---------------------------------------- FILTER MOD -------------------------------------------
 
     #filterSelector{
-        left: 29%;
-        top: 45px;
+        left: 13%;
+        top: 55px;
         z-index: 1000;
     }
 
     #filterGainDiv{
-        margin-top: 50px;
+        margin-top: 65px;
     }
 
     #filterGainTip{
@@ -777,8 +777,57 @@ input:checked + .slider:before {
         border-radius: 50%;
     }
 }
+
+
   
-  
+//------------------------------------------ DIAL -------------------------------------- 
+.dialWhole{ 
+    height: 60px;
+    width: 33%;
+    position: absolute;
+    left: 70%;
+    transform: translateX(-50%);
+    top: 28px;
+    margin-top: 5%;
+    display: flex;
+    justify-content: center;
+
+    input[type=range]{
+        width: 40px;
+        height: 40px;
+        position: relative;
+    }
+
+    #dialKnob{
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+        filter: drop-shadow(3px 3px 3px #555);
+        position: absolute;
+        left: 50%;
+
+        .dialRange{
+            left: -22px;
+            opacity: 0;
+            z-index: 6;
+          }
+        
+
+        #dialEmpty{
+            height: 100%;
+            width: 100%;
+            border-radius: 50%;
+            outline: solid 1px #ddd;
+            position: absolute;
+            left: -15px;
+            top: 12px;
+        }
+    }
+    #dialNumInput{
+        width: 30px;
+        align-self: flex-end;
+    }
+}
 
 @media only screen and (max-device-width: 480px){    
     #mainDiv{

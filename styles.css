@@ -433,13 +433,13 @@ html, body {
 }
 
 #filterSelector {
-  left: 29%;
-  top: 45px;
+  left: 13%;
+  top: 55px;
   z-index: 1000;
 }
 
 #filterGainDiv {
-  margin-top: 50px;
+  margin-top: 65px;
 }
 
 #filterGainTip {
@@ -786,6 +786,61 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+.dialWhole {
+  height: 60px;
+  width: 33%;
+  position: absolute;
+  left: 70%;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+  top: 28px;
+  margin-top: 5%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.dialWhole input[type=range] {
+  width: 40px;
+  height: 40px;
+  position: relative;
+}
+
+.dialWhole #dialKnob {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  -webkit-filter: drop-shadow(3px 3px 3px #555);
+          filter: drop-shadow(3px 3px 3px #555);
+  position: absolute;
+  left: 50%;
+}
+
+.dialWhole #dialKnob .dialRange {
+  left: -22px;
+  opacity: 0;
+  z-index: 6;
+}
+
+.dialWhole #dialKnob #dialEmpty {
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+  outline: solid 1px #ddd;
+  position: absolute;
+  left: -15px;
+  top: 12px;
+}
+
+.dialWhole #dialNumInput {
+  width: 30px;
+  -ms-flex-item-align: end;
+      align-self: flex-end;
 }
 
 @media only screen and (max-device-width: 480px) {

@@ -632,6 +632,7 @@ class Filter extends React.Component{
         this.handleFreqRangeChange=this.handleFreqRangeChange.bind(this);
         this.handleFreqNumChange=this.handleFreqNumChange.bind(this);
         this.handleFreqNumSubmit=this.handleFreqNumSubmit.bind(this);
+        this.handleDialChange=this.handleDialChange.bind(this);
     }
 
     handleFilterType(val){
@@ -713,6 +714,10 @@ class Filter extends React.Component{
         })
     }
 
+    handleDialChange(val){
+        this.state.audio.Q.value=val;
+    }
+
     componentDidMount(){
         this.props.createAudio(this.state.audio);
     }
@@ -722,6 +727,7 @@ class Filter extends React.Component{
         return(
             <div className="filterDiv">
                 <Selector id="filterSelector" values={filterTypes} handleClick={this.handleFilterType}/>
+                <Dial min={0} max={1000} onChange={this.handleDialChange}/>
                 <div id="filterGainDiv" className="tooltip">
                     <input id="filterGainRange" type="range" value={this.state.gainVal} min="0" max="1" step=".05" onChange={this.handleGainRangeChange}></input>
                     <input id="filterGainNumber" value={this.state.gainNum} type="text" onChange={this.handleGainNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleGainNumSubmit()}}}></input>
@@ -732,7 +738,6 @@ class Filter extends React.Component{
                     <input id="filterFreqNumber" value={this.state.freqNum} type="text" onChange={this.handleFreqNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleFreqNumSubmit()}}}></input>
                     <span id="filterFreqTip" className="tooltiptext">Filter Frequency</span>
                 </div>
-
             </div>
         )
     }
@@ -884,6 +889,73 @@ class Selector extends React.Component{
                 {this.props.values.map(el => {
                     return <div key={el} className="selectorVal" onClick={this.handleClick}>{el}</div>
                 })}
+            </div>
+        )
+    }
+}
+
+
+class Dial extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state={
+            value: this.props.max/2,
+            num: this.props.max/2,
+            rotPercent: "0",
+        }
+
+        this.handleChange=this.handleChange.bind(this);
+        this.handleNumChange=this.handleNumChange.bind(this);
+        this.handleNumSubmit=this.handleNumSubmit.bind(this);
+    }
+
+    handleChange(event){
+        this.setState({
+            value: event.target.value,
+            num: event.target.value,
+            rotPercent: event.target.value/this.props.max*180,
+        })
+        this.props.onChange(event.target.value);
+    }
+
+    handleNumChange(event){
+        if(isNaN(event.target.value)){
+            return;
+        }
+        this.setState({
+            num: event.target.value
+        })
+    }
+
+    handleNumSubmit(){
+        let temp = this.state.num;
+        if(temp > this.state.max){
+            temp=this.state.max;
+        }else if(temp < this.state.min){
+            temp=this.state.min
+        }
+        this.setState({
+            val: temp,
+            num: temp,
+            rotPercent: temp/this.props.max*180
+        })
+    }
+
+    render(){
+        let rotStyle= {
+            background: `conic-gradient(from ${(this.state.rotPercent/Number.POSITIVE_INFINITY) - 90}deg, #fff, #555)`,
+            transform: `rotate(${this.state.rotPercent}deg)`,   
+        };
+
+        return(
+            <div className="dialWhole">
+                <div id="dialKnob">
+                    <input className="dialRange" value={this.state.value} type="range" min={this.props.min} max={this.props.max} step="1" onChange={this.handleChange}></input>
+                    <div id="dialEmpty" style={rotStyle}></div>
+                </div>
+                <input id="dialNumInput" value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumSubmit()}}}></input>
+
             </div>
         )
     }

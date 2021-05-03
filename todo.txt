@@ -14,14 +14,9 @@ Recording out
 
 
 Reorganize Selector SCSS;
-work on Module X CSS;
 Add tooltips;
 Style with animations
 
-Reorganize selector divs;
-
-output to center;
-input to top left
 
 
 Things for the top helpbar: 
@@ -31,3 +26,7 @@ Calculator
 Mute all?
 
 Make a "No support on Mobile!" banner.
+
+Logarhythmic sliders? Like for Q.
+
+Turn Gain sliders into a class

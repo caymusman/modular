@@ -823,6 +823,7 @@ var Filter = function (_React$Component5) {
         _this9.handleFreqRangeChange = _this9.handleFreqRangeChange.bind(_this9);
         _this9.handleFreqNumChange = _this9.handleFreqNumChange.bind(_this9);
         _this9.handleFreqNumSubmit = _this9.handleFreqNumSubmit.bind(_this9);
+        _this9.handleDialChange = _this9.handleDialChange.bind(_this9);
         return _this9;
     }
 
@@ -913,6 +914,11 @@ var Filter = function (_React$Component5) {
             });
         }
     }, {
+        key: "handleDialChange",
+        value: function handleDialChange(val) {
+            this.state.audio.Q.value = val;
+        }
+    }, {
         key: "componentDidMount",
         value: function componentDidMount() {
             this.props.createAudio(this.state.audio);
@@ -927,6 +933,7 @@ var Filter = function (_React$Component5) {
                 "div",
                 { className: "filterDiv" },
                 React.createElement(Selector, { id: "filterSelector", values: filterTypes, handleClick: this.handleFilterType }),
+                React.createElement(Dial, { min: 0, max: 1000, onChange: this.handleDialChange }),
                 React.createElement(
                     "div",
                     { id: "filterGainDiv", className: "tooltip" },
@@ -1187,6 +1194,92 @@ var Selector = function (_React$Component10) {
     }]);
 
     return Selector;
+}(React.Component);
+
+var Dial = function (_React$Component11) {
+    _inherits(Dial, _React$Component11);
+
+    function Dial(props) {
+        _classCallCheck(this, Dial);
+
+        var _this17 = _possibleConstructorReturn(this, (Dial.__proto__ || Object.getPrototypeOf(Dial)).call(this, props));
+
+        _this17.state = {
+            value: _this17.props.max / 2,
+            num: _this17.props.max / 2,
+            rotPercent: "0"
+        };
+
+        _this17.handleChange = _this17.handleChange.bind(_this17);
+        _this17.handleNumChange = _this17.handleNumChange.bind(_this17);
+        _this17.handleNumSubmit = _this17.handleNumSubmit.bind(_this17);
+        return _this17;
+    }
+
+    _createClass(Dial, [{
+        key: "handleChange",
+        value: function handleChange(event) {
+            this.setState({
+                value: event.target.value,
+                num: event.target.value,
+                rotPercent: event.target.value / this.props.max * 180
+            });
+            this.props.onChange(event.target.value);
+        }
+    }, {
+        key: "handleNumChange",
+        value: function handleNumChange(event) {
+            if (isNaN(event.target.value)) {
+                return;
+            }
+            this.setState({
+                num: event.target.value
+            });
+        }
+    }, {
+        key: "handleNumSubmit",
+        value: function handleNumSubmit() {
+            var temp = this.state.num;
+            if (temp > this.state.max) {
+                temp = this.state.max;
+            } else if (temp < this.state.min) {
+                temp = this.state.min;
+            }
+            this.setState({
+                val: temp,
+                num: temp,
+                rotPercent: temp / this.props.max * 180
+            });
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            var _this18 = this;
+
+            var rotStyle = {
+                background: "conic-gradient(from " + (this.state.rotPercent / Number.POSITIVE_INFINITY - 90) + "deg, #fff, #555)",
+                transform: "rotate(" + this.state.rotPercent + "deg)"
+            };
+
+            return React.createElement(
+                "div",
+                { className: "dialWhole" },
+                React.createElement(
+                    "div",
+                    { id: "dialKnob" },
+                    React.createElement("input", { className: "dialRange", value: this.state.value, type: "range", min: this.props.min, max: this.props.max, step: "1", onChange: this.handleChange }),
+                    React.createElement("div", { id: "dialEmpty", style: rotStyle })
+                ),
+                React.createElement("input", { id: "dialNumInput", value: this.state.num, type: "text", onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {
+                        if (event.key == "Enter") {
+                            _this18.handleNumSubmit();
+                        }
+                    } })
+            );
+        }
+    }]);
+
+    return Dial;
 }(React.Component);
 
 ReactDOM.render(React.createElement(App, null), document.getElementById("App"));
