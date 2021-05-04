@@ -1232,17 +1232,17 @@ var Dial = function (_React$Component11) {
                 return;
             }
             this.setState({
-                num: event.target.value
+                num: Number(event.target.value)
             });
         }
     }, {
         key: "handleNumSubmit",
         value: function handleNumSubmit() {
             var temp = this.state.num;
-            if (temp > this.state.max) {
-                temp = this.state.max;
-            } else if (temp < this.state.min) {
-                temp = this.state.min;
+            if (temp > this.props.max) {
+                temp = this.props.max;
+            } else if (temp < this.props.min) {
+                temp = this.props.min;
             }
             this.setState({
                 val: Math.log(temp) / Math.log(this.props.max),
