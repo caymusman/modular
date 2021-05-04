@@ -838,7 +838,7 @@ input:checked + .slider:before {
 }
 
 .dialWhole #dialNumInput {
-  width: 30px;
+  width: 45px;
   -ms-flex-item-align: end;
       align-self: flex-end;
 }

@@ -9,6 +9,8 @@ Gain - check
 LFO - check
 Filter
 Panner
+Envelope?
+Delay?
 Recording out
 
 
@@ -29,4 +31,4 @@ Make a "No support on Mobile!" banner.
 
 Logarhythmic sliders? Like for Q.
 
-Turn Gain sliders into a class
+Turn Gain sliders into a class.

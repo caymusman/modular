@@ -846,7 +846,7 @@ var Filter = function (_React$Component5) {
             this.state.audio.gain.setValueAtTime(gainVal, this.props.audioContext.currentTime);
             this.setState({
                 gainVal: gainVal,
-                gainNum: gainVal
+                gainNum: Number(Number(gainVal).toFixed(2))
             });
         }
     }, {
@@ -870,7 +870,7 @@ var Filter = function (_React$Component5) {
             }
             this.setState({
                 gainVal: temp,
-                gainNum: temp
+                gainNum: Number(Number(temp).toFixed(2))
             });
         }
     }, {
@@ -885,7 +885,7 @@ var Filter = function (_React$Component5) {
             this.state.audio.frequency.setValueAtTime(freqVal, this.props.audioContext.currentTime);
             this.setState({
                 freqVal: freqVal,
-                freqNum: freqVal
+                freqNum: Number(Number(freqVal).toFixed(2))
             });
         }
     }, {
@@ -909,7 +909,7 @@ var Filter = function (_React$Component5) {
             }
             this.setState({
                 freqVal: temp,
-                freqNum: temp
+                freqNum: Number(Number(temp).toFixed(2))
             });
         }
     }, {
@@ -937,7 +937,7 @@ var Filter = function (_React$Component5) {
                     "div",
                     { id: "filterGainDiv", className: "tooltip" },
                     React.createElement("input", { id: "filterGainRange", type: "range", value: this.state.gainVal, min: "0", max: "1", step: ".05", onChange: this.handleGainRangeChange }),
-                    React.createElement("input", { id: "filterGainNumber", value: this.state.gainNum, type: "text", onChange: this.handleGainNumChange, onKeyPress: function onKeyPress(event) {
+                    React.createElement("input", { id: "filterGainNumber", value: this.state.gaiNum, type: "text", onChange: this.handleGainNumChange, onKeyPress: function onKeyPress(event) {
                             if (event.key == "Enter") {
                                 _this10.handleGainNumSubmit();
                             }
@@ -1204,9 +1204,9 @@ var Dial = function (_React$Component11) {
         var _this17 = _possibleConstructorReturn(this, (Dial.__proto__ || Object.getPrototypeOf(Dial)).call(this, props));
 
         _this17.state = {
-            value: _this17.props.max / 2,
-            num: _this17.props.max / 2,
-            rotPercent: "0"
+            value: 0,
+            num: 0,
+            rotPercent: 0
         };
 
         _this17.handleChange = _this17.handleChange.bind(_this17);
@@ -1220,10 +1220,10 @@ var Dial = function (_React$Component11) {
         value: function handleChange(event) {
             this.setState({
                 value: event.target.value,
-                num: event.target.value,
-                rotPercent: event.target.value / this.props.max * 180
+                num: Number(Math.pow(this.props.max, event.target.value).toFixed(2)),
+                rotPercent: event.target.value * 180
             });
-            this.props.onChange(event.target.value);
+            this.props.onChange(Math.pow(this.props.max, event.target.value));
         }
     }, {
         key: "handleNumChange",
@@ -1245,9 +1245,9 @@ var Dial = function (_React$Component11) {
                 temp = this.state.min;
             }
             this.setState({
-                val: temp,
-                num: temp,
-                rotPercent: temp / this.props.max * 180
+                val: Math.log(temp) / Math.log(this.props.max),
+                num: Number(Number(temp).toFixed(2)),
+                rotPercent: Math.log(temp) / Math.log(this.props.max) * 180
             });
         }
     }, {
@@ -1266,7 +1266,7 @@ var Dial = function (_React$Component11) {
                 React.createElement(
                     "div",
                     { id: "dialKnob" },
-                    React.createElement("input", { className: "dialRange", value: this.state.value, type: "range", min: this.props.min, max: this.props.max, step: "1", onChange: this.handleChange }),
+                    React.createElement("input", { className: "dialRange", value: this.state.value, type: "range", min: "0", max: "1", step: ".001", onChange: this.handleChange }),
                     React.createElement("div", { id: "dialEmpty", style: rotStyle })
                 ),
                 React.createElement("input", { id: "dialNumInput", value: this.state.num, type: "text", onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {

@@ -652,7 +652,7 @@ class Filter extends React.Component{
         this.state.audio.gain.setValueAtTime(gainVal, this.props.audioContext.currentTime);
         this.setState({
             gainVal: gainVal,
-            gainNum: gainVal
+            gainNum: Number(Number(gainVal).toFixed(2))
         });
     }
 
@@ -674,7 +674,7 @@ class Filter extends React.Component{
         }
         this.setState({
             gainVal: temp,
-            gainNum: temp
+            gainNum: Number(Number(temp).toFixed(2))
         })
     }
 
@@ -688,7 +688,7 @@ class Filter extends React.Component{
         this.state.audio.frequency.setValueAtTime(freqVal, this.props.audioContext.currentTime);
         this.setState({
             freqVal: freqVal,
-            freqNum: freqVal
+            freqNum: Number(Number(freqVal).toFixed(2))
         });
     }
 
@@ -710,7 +710,7 @@ class Filter extends React.Component{
         }
         this.setState({
             freqVal: temp,
-            freqNum: temp
+            freqNum: Number(Number(temp).toFixed(2))
         })
     }
 
@@ -730,7 +730,7 @@ class Filter extends React.Component{
                 <Dial min={0} max={1000} onChange={this.handleDialChange}/>
                 <div id="filterGainDiv" className="tooltip">
                     <input id="filterGainRange" type="range" value={this.state.gainVal} min="0" max="1" step=".05" onChange={this.handleGainRangeChange}></input>
-                    <input id="filterGainNumber" value={this.state.gainNum} type="text" onChange={this.handleGainNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleGainNumSubmit()}}}></input>
+                    <input id="filterGainNumber" value={this.state.gaiNum} type="text" onChange={this.handleGainNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleGainNumSubmit()}}}></input>
                     <span id="filterGainTip" className="tooltiptext">Filter Gain</span>
                 </div>
                 <div id="filterFreqDiv" className="tooltip">
@@ -900,9 +900,9 @@ class Dial extends React.Component{
         super(props);
 
         this.state={
-            value: this.props.max/2,
-            num: this.props.max/2,
-            rotPercent: "0",
+            value: 0,
+            num: 0,
+            rotPercent: 0,
         }
 
         this.handleChange=this.handleChange.bind(this);
@@ -913,10 +913,10 @@ class Dial extends React.Component{
     handleChange(event){
         this.setState({
             value: event.target.value,
-            num: event.target.value,
-            rotPercent: event.target.value/this.props.max*180,
+            num: Number(Math.pow(this.props.max, event.target.value).toFixed(2)),
+            rotPercent: event.target.value*180,
         })
-        this.props.onChange(event.target.value);
+        this.props.onChange(Math.pow(this.props.max, event.target.value));
     }
 
     handleNumChange(event){
@@ -936,9 +936,9 @@ class Dial extends React.Component{
             temp=this.state.min
         }
         this.setState({
-            val: temp,
-            num: temp,
-            rotPercent: temp/this.props.max*180
+            val: Math.log(temp)/Math.log(this.props.max),
+            num: Number(Number(temp).toFixed(2)),
+            rotPercent: (Math.log(temp)/Math.log(this.props.max))*180
         })
     }
 
@@ -951,7 +951,7 @@ class Dial extends React.Component{
         return(
             <div className="dialWhole">
                 <div id="dialKnob">
-                    <input className="dialRange" value={this.state.value} type="range" min={this.props.min} max={this.props.max} step="1" onChange={this.handleChange}></input>
+                    <input className="dialRange" value={this.state.value} type="range" min="0" max="1" step=".001" onChange={this.handleChange}></input>
                     <div id="dialEmpty" style={rotStyle}></div>
                 </div>
                 <input id="dialNumInput" value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumSubmit()}}}></input>
