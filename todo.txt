@@ -7,7 +7,7 @@ QOL: on disconnect, make it mute in like .2 seconds and then disconnect.
 Modules:
 Gain - check
 LFO - check
-Filter
+Filter - check
 Panner
 Envelope?
 Delay?
@@ -29,6 +29,4 @@ Mute all?
 
 Make a "No support on Mobile!" banner.
 
-Logarhythmic sliders? Like for Q.
-
-Turn Gain sliders into a class.
+Make alternate FREQSLIDER class that is logarithmic.

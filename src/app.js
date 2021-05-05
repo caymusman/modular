@@ -171,9 +171,6 @@ class App extends React.Component{
         let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
         let newCords = [...this.state.patchCords];
         newCords.forEach(el => {
-            if(el.toData.tomyKey.includes(" ")){
-                console.log(el.toData.tomyKey);
-            }
             if(el.fromData.fromModID == modID){ 
                 let in_el = document.getElementById(modID + "outputInner").getBoundingClientRect();
                 let in_x = in_el.x;
@@ -194,7 +191,6 @@ class App extends React.Component{
                 el.toData.toLocation = {x: to_xCenter, y: to_yCenter}
             }else if(el.toData.tomyKey.includes(" ") && el.toData.tomyKey.split(' ')[0] + " " + el.toData.tomyKey.split(' ')[1] == modID){
                 let newStr = el.toData.tomyKey.split(' ')[2];
-                console.log("I'M IN HERE: " + newStr);
                 let to_el = document.getElementById(el.toData.tomyKey + " inputInner").getBoundingClientRect();
                 let to_x = to_el.x;
                 let to_y = to_el.y;
@@ -594,7 +590,7 @@ class Gain extends React.Component{
     render(){
         return(
             <div className="gainDiv">
-                <input id="gainRangeInput" type="range" value={this.state.value} min="0" max="1" step=".05" onChange={this.handleGainChange}></input>
+                <input id="gainRangeInput" type="range" value={this.state.value} min="0" max="1" step=".01" onChange={this.handleGainChange}></input>
                 <input id="gainNumInput" value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumGainChange()}}}></input>
 
                 <div className="cordOuter tooltip" id="firstParam" onClick={this.handleOutput}>
@@ -626,12 +622,8 @@ class Filter extends React.Component{
         }
 
         this.handleFilterType=this.handleFilterType.bind(this);
-        this.handleGainRangeChange=this.handleGainRangeChange.bind(this);
-        this.handleGainNumChange=this.handleGainNumChange.bind(this);
-        this.handleGainNumSubmit=this.handleGainNumSubmit.bind(this);
-        this.handleFreqRangeChange=this.handleFreqRangeChange.bind(this);
-        this.handleFreqNumChange=this.handleFreqNumChange.bind(this);
-        this.handleFreqNumSubmit=this.handleFreqNumSubmit.bind(this);
+        this.setGain=this.setGain.bind(this);
+        this.setFreq=this.setFreq.bind(this);
         this.handleDialChange=this.handleDialChange.bind(this);
     }
 
@@ -642,76 +634,12 @@ class Filter extends React.Component{
         })
     }
 
-    handleGainRangeChange(event){
-        let gainVal = event.target.value;
-        if(gainVal > this.state.gainMax){
-            gainVal=this.state.gainMax;
-        }else if(gainVal < this.state.gainMin){
-            gainVal=this.state.gainMin;
-        }
-        this.state.audio.gain.setValueAtTime(gainVal, this.props.audioContext.currentTime);
-        this.setState({
-            gainVal: gainVal,
-            gainNum: Number(Number(gainVal).toFixed(2))
-        });
+    setGain(val){
+        this.state.audio.gain.setValueAtTime(val, this.props.audioContext.currentTime);
     }
 
-    handleGainNumChange(event){
-        if(isNaN(event.target.value)){
-            return;
-        }
-        this.setState({
-            gainNum: event.target.value
-        })
-    }
-
-    handleGainNumSubmit(){
-        let temp = this.state.gainNum;
-        if(temp > this.state.gainMax){
-            temp=this.state.gainMax;
-        }else if(temp < this.state.gainMin){
-            temp=this.state.gainMin
-        }
-        this.setState({
-            gainVal: temp,
-            gainNum: Number(Number(temp).toFixed(2))
-        })
-    }
-
-    handleFreqRangeChange(event){
-        let freqVal = event.target.value;
-        if(freqVal > this.state.freqMax){
-            freqVal=this.state.freqMax;
-        }else if(freqVal < this.state.freqMin){
-            freqVal=this.state.freqMin;
-        }
-        this.state.audio.frequency.setValueAtTime(freqVal, this.props.audioContext.currentTime);
-        this.setState({
-            freqVal: freqVal,
-            freqNum: Number(Number(freqVal).toFixed(2))
-        });
-    }
-
-    handleFreqNumChange(event){
-        if(isNaN(event.target.value)){
-            return;
-        }
-        this.setState({
-            freqNum: event.target.value
-        })
-    }
-
-    handleFreqNumSubmit(){
-        let temp = this.state.freqNum;
-        if(temp > this.state.freqMax){
-            temp=this.state.freqMax;
-        }else if(temp < this.state.freqMin){
-            temp=this.state.freqMin
-        }
-        this.setState({
-            freqVal: temp,
-            freqNum: Number(Number(temp).toFixed(2))
-        })
+    setFreq(val){
+        this.state.audio.frequency.value=val;
     }
 
     handleDialChange(val){
@@ -728,20 +656,14 @@ class Filter extends React.Component{
             <div className="filterDiv">
                 <Selector id="filterSelector" values={filterTypes} handleClick={this.handleFilterType}/>
                 <Dial min={0} max={1000} onChange={this.handleDialChange}/>
-                <div id="filterGainDiv" className="tooltip">
-                    <input id="filterGainRange" type="range" value={this.state.gainVal} min="0" max="1" step=".05" onChange={this.handleGainRangeChange}></input>
-                    <input id="filterGainNumber" value={this.state.gaiNum} type="text" onChange={this.handleGainNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleGainNumSubmit()}}}></input>
-                    <span id="filterGainTip" className="tooltiptext">Filter Gain</span>
-                </div>
-                <div id="filterFreqDiv" className="tooltip">
-                    <input id="filterFreqRange" type="range" value={this.state.freqVal} min="0" max="3000" step="5" onChange={this.handleFreqRangeChange}></input>
-                    <input id="filterFreqNumber" value={this.state.freqNum} type="text" onChange={this.handleFreqNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleFreqNumSubmit()}}}></input>
-                    <span id="filterFreqTip" className="tooltiptext">Filter Frequency</span>
-                </div>
+                <Slider labelName="filterGain" tooltipText="Filter Gain" min={-40} max={40} step={.01} audio={this.state.audio} audioContext={this.props.audioContext} setAudio={this.setGain}/>
+                <Slider labelName="filterFreq" tooltipText="Filter Frequency" min={0} max={3000} step={1} audio={this.state.audio} audioContext={this.props.audioContext} setAudio={this.setFreq}/>
             </div>
         )
     }
 }
+
+//props: labelName, tooltipText, min, max, step, audio, audioContext
 
 class Output extends React.Component{
     constructor(props){
@@ -913,18 +835,18 @@ class Dial extends React.Component{
     handleChange(event){
         this.setState({
             value: event.target.value,
-            num: Number(Math.pow(this.props.max, event.target.value).toFixed(2)),
+            num: Number((Math.pow(this.props.max, event.target.value)-1).toFixed(2)),
             rotPercent: event.target.value*180,
         })
-        this.props.onChange(Math.pow(this.props.max, event.target.value));
+        this.props.onChange(Math.pow(this.props.max, event.target.value) - 1);
     }
 
     handleNumChange(event){
-        if(isNaN(event.target.value)){
+        if(isNaN(event.target.value) && event.target.value!="0."){
             return;
         }
         this.setState({
-            num: Number(event.target.value)
+            num: event.target.value
         })
     }
 
@@ -957,6 +879,70 @@ class Dial extends React.Component{
                 <input id="dialNumInput" value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumSubmit()}}}></input>
 
             </div>
+        )
+    }
+
+
+}
+
+class Slider extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state={
+            num: (this.props.max + this.props.min)/2,
+            val: (this.props.max + this.props.min)/2
+        }
+
+        this.handleRangeChange=this.handleRangeChange.bind(this);
+        this.handleNumChange=this.handleNumChange.bind(this);
+        this.handleNumSubmit=this.handleNumSubmit.bind(this);
+    }
+
+    handleRangeChange(event){
+        let val = event.target.value;
+        if(val > this.props.max){
+            val=this.props.max;
+        }else if(val < this.props.min){
+            val=this.props.min;
+        }
+        this.props.setAudio(val);
+        this.setState({
+            val: val,
+            num: val
+        });
+    }
+
+    handleNumChange(event){
+        if(isNaN(event.target.value) && event.target.value!="-"){
+            return;
+        }
+        this.setState({
+            num: event.target.value
+        })
+    }
+
+    handleNumSubmit(){
+        let temp = this.state.num;
+        if(temp > this.props.max){
+            temp=this.props.max;
+        }else if(temp < this.props.min){
+            temp=this.props.min;
+        }
+        this.setState({
+            val: temp,
+            num: temp
+        })
+    }
+
+
+    render(){
+        return(
+            <div id={this.props.labelName + "Div"} className="tooltip">
+                    <input id={this.props.labelName + "Range"} type="range" value={this.state.val} min={this.props.min} max={this.props.max} step={this.props.step} onChange={this.handleRangeChange}></input>
+                    <input id={this.props.labelName + "Number"} value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumSubmit()}}}></input>
+                    <span id={this.props.labelName + "Div"} className="tooltiptext">{this.props.tooltipText}</span>
+                </div>
         )
     }
 }
