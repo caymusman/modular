@@ -357,6 +357,8 @@ class Area extends React.Component{
                 return <Filter audioContext={this.props.audioContext} createAudio={this.createAudio}/>;
             case "Panner":
                 return <Panner audioContext={this.props.audioContext} createAudio={this.createAudio}/>
+            case "ADSR":
+                return <ADSR audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             default:
                 return <div>Hahahahaha theres nothing here!</div>;
         }
@@ -407,33 +409,19 @@ class Oscillator extends React.Component{
         this.state={
             audio: this.props.audioContext.createOscillator(),
             wave: "sine",
-            val: 220,
-            num: 220,
             min: 20,
-            max: 700,
-            step: 1,
+            max: 20001,
+            mid: 440,
             LFO: false,
         }
 
-        this.handleFreqChange=this.handleFreqChange.bind(this);
+        this.setFreq=this.setFreq.bind(this);
         this.handleWaveChange=this.handleWaveChange.bind(this);
         this.handleLFOClick=this.handleLFOClick.bind(this);
-        this.handleNumChange=this.handleNumChange.bind(this);
-        this.handleNumFreqChange=this.handleNumFreqChange.bind(this);
     }
 
-    handleFreqChange(event){
-        let freq = event.target.value;
-        if(freq > this.state.max){
-            freq=this.state.max;
-        }else if(freq < this.state.min){
-            freq=this.state.min;
-        }
-        this.state.audio.frequency.setValueAtTime(freq, this.props.audioContext.currentTime);
-        this.setState({
-            num: freq,
-            val: freq
-        })
+    setFreq(val){
+        this.state.audio.frequency.setValueAtTime(Number(val), this.props.audioContext.currentTime);
     }
 
     handleWaveChange(wave){
@@ -446,53 +434,26 @@ class Oscillator extends React.Component{
     handleLFOClick(){
         if(this.state.LFO){
             this.setState({
-                max: 700,
-                val: 220,
-                num: 220,
-                min:20,
-                step: 1,
+                max: 20001,
+                min: 20,
+                mid: 440,
                 LFO: false
             })
-            this.state.audio.frequency.setValueAtTime(220, this.props.audioContext.currentTime);
+            this.state.audio.frequency.setValueAtTime(440, this.props.audioContext.currentTime);
         }else{
             this.setState({
-                val: 10,
-                num: 10,
-                max: 20,
+                max: 21,
                 min: 0,
-                step: .1,
+                mid: 10,
                 LFO: true
             })
             this.state.audio.frequency.setValueAtTime(10, this.props.audioContext.currentTime);
         }
     }
 
-    handleNumChange(event){
-        if(isNaN(event.target.value)){
-            return;
-        }
-        this.setState({
-            num: event.target.value
-        })
-    }
-
-    handleNumFreqChange(){
-        let temp = this.state.num;
-        if(temp > this.state.max){
-            temp=this.state.max
-        }else if(temp < this.state.min){
-            temp=this.state.min
-        }
-        this.setState({
-            val: temp,
-            num: temp
-        })
-        this.state.audio.frequency.setValueAtTime(temp, this.props.audioContext.currentTime);
-    }
-
     componentDidMount(){
         this.props.createAudio(this.state.audio);
-        this.state.audio.frequency.setValueAtTime(this.state.val, this.props.audioContext.currentTime);
+        this.state.audio.frequency.setValueAtTime(this.state.mid, this.props.audioContext.currentTime);
         this.state.audio.start();
     }
 
@@ -505,11 +466,7 @@ class Oscillator extends React.Component{
                      <span className="slider round"></span>
                      <span id="oscLFOTip" className="tooltiptext">LFO Mode</span>
                  </label>
-                 <div className="tooltip">
-                    <input type="range" value={this.state.val} min={this.state.min} max={this.state.max} step={this.state.step} onChange={this.handleFreqChange}></input>
-                    <span id="oscFreqTip" className="tooltiptext">Freq</span>
-                </div>
-                <input id="freqNumInput" value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumFreqChange()}}}></input>
+                <LogSlider labelName="oscFreq" tooltipText="Oscillator Frequency" min={this.state.min} max={this.state.max} mid={this.state.mid} onChange={this.setFreq}/>
                 </div>
         )
     }
@@ -648,9 +605,9 @@ class Filter extends React.Component{
         return(
             <div className="filterDiv">
                 <Selector id="filterSelector" values={filterTypes} handleClick={this.handleFilterType}/>
-                <Dial min={0} max={1000} onChange={this.handleDialChange}/>
+                <Dial min={0} max={1001} onChange={this.handleDialChange}/>
                 <Slider labelName="filterGain" tooltipText="Filter Gain" min={-40} max={40} step={.01} setAudio={this.setGain}/>
-                <Slider labelName="filterFreq" tooltipText="Filter Frequency" min={0} max={3000} step={1} setAudio={this.setFreq}/>
+                <LogSlider labelName="filterFreq" tooltipText="Filter Frequency" min={0} max={20001} mid={440} onChange={this.setFreq}/>
             </div>
         )
     }
@@ -685,7 +642,105 @@ class Panner extends React.Component{
     }
 }
 
-//props: labelName, tooltipText, min, max, step, audio, audioContext
+class ADSR extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state = {
+            audio: this.props.audioContext.createGain(),
+            rate: 3000,
+            interval: null,
+            running: false,
+            attack: .2,
+            decay: .2,
+            sustain: .6,
+            release: .3,
+        }
+        this.handleSlider=this.handleSlider.bind(this);
+        this.handleToggle=this.handleToggle.bind(this);
+        this.handleAudio=this.handleAudio.bind(this);
+        this.handleTextSubmit=this.handleTextSubmit.bind(this);
+    }
+
+    handleSlider(val){
+        this.setState({
+            rate: (1/val) * 1000
+        })
+
+        if(this.state.running){
+            clearInterval(this.state.interval);
+            this.setState({
+                interval: setInterval(this.handleAudio, (1/val)*1000)
+            })
+        }
+    }
+
+
+    handleToggle(){
+        let current = this.props.audioContext.currentTime;
+        if(!this.state.running){
+            this.setState({
+                running: true,
+                interval: setInterval(this.handleAudio, this.state.rate)
+            });
+        }else{
+            this.state.audio.gain.setTargetAtTime(.8, current + this.state.release, .5);
+            clearInterval(this.state.interval);
+            this.setState({
+                running: false
+            })
+        }
+    }
+
+    handleAudio(){
+        let current = this.props.audioContext.currentTime;
+        this.state.audio.gain.cancelScheduledValues(current);
+        this.state.audio.gain.setTargetAtTime(.90, current + this.state.attack, .5);
+        this.state.audio.gain.setTargetAtTime(this.state.sustain, current + this.state.decay, .5);
+        this.state.audio.gain.setTargetAtTime(0, current + this.state.release, .5);
+    }
+
+    handleTextSubmit(name, num){
+        switch(name){
+            case "Attack":
+                this.setState({attack: num})
+                break;
+            case "Decay":
+                this.setState({decay: num})
+                break;
+            case "Sustain":
+                this.setState({sustain: num})
+                break;
+            case "Release":
+                this.setState({release: num})
+                break;
+            default:
+                return;
+        }
+    }
+
+    componentDidMount(){
+        this.props.createAudio(this.state.audio);
+        this.state.audio.gain.setValueAtTime(.5, this.props.audioContext.currentTime);
+    }
+
+    render(){
+        return(
+            <div id="ADSRDiv">
+             <LogSlider labelName="ADSRSlider" tooltipText="LFO Rate" min={0} max={20} mid={10} onChange={this.handleSlider}></LogSlider>
+             <label id="ADSRCheck" className="switch tooltip">
+                     <input type="checkbox" onClick={this.handleToggle}></input>
+                     <span className="slider round"></span>
+                     <span id="ADSRCheckTip" className="tooltiptext">LFO Mode</span>
+                 </label>
+            <TextInput labelName="ADSRAttack" tooltipText="Attack" min={0} max={5} defaultVal={.2} onSubmit={this.handleTextSubmit}></TextInput>
+            <TextInput labelName="ADSRDecay" tooltipText="Decay" min={0} max={5} defaultVal={.2} onSubmit={this.handleTextSubmit}></TextInput>
+            <TextInput labelName="ADSRSustain" tooltipText="Sustain" min={0} max={1} defaultVal={.5} onSubmit={this.handleTextSubmit}></TextInput>
+            <TextInput labelName="ADSRRelease" tooltipText="Release" min={0} max={5} defaultVal={.3} onSubmit={this.handleTextSubmit}></TextInput>
+            </div>
+        )
+    }
+}
 
 class Output extends React.Component{
     constructor(props){
@@ -775,6 +830,7 @@ class SideButtons extends React.Component{
                 <MyButton name="Gain" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="Filter" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="Panner" handleClick={this.props.handleClick} inputOnly="false"/>
+                <MyButton name="ADSR" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="PeePee" handleClick={this.props.handleClick} inputOnly="false"/>
             </div>
         )
@@ -875,8 +931,8 @@ class Dial extends React.Component{
 
     handleNumSubmit(){
         let temp = this.state.num;
-        if(temp > this.props.max){
-            temp=this.props.max;
+        if(temp > this.props.max-1){
+            temp=this.props.max-1;
         }else if(temp < this.props.min){
             temp=this.props.min
         }
@@ -958,7 +1014,6 @@ class Slider extends React.Component{
         })
     }
 
-
     render(){
         return(
             <div id={this.props.labelName + "Div"} className="tooltip">
@@ -966,6 +1021,116 @@ class Slider extends React.Component{
                     <input id={this.props.labelName + "Number"} value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumSubmit()}}}></input>
                     <span id={this.props.labelName + "Div"} className="tooltiptext">{this.props.tooltipText}</span>
                 </div>
+        )
+    }
+}
+
+
+class LogSlider extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state={
+            val: Number(Math.log(this.props.mid)/Math.log(this.props.max)),
+            num: this.props.mid,
+        }
+
+        this.handleChange=this.handleChange.bind(this);
+        this.handleNumChange=this.handleNumChange.bind(this);
+        this.handleNumFreqChange=this.handleNumFreqChange.bind(this);
+    }
+
+    handleChange(event){
+        this.setState({
+            val: event.target.value,
+            num: Number((Math.pow(this.props.max, event.target.value)-1).toFixed(2))
+        })
+        this.props.onChange(Number((Math.pow(this.props.max, event.target.value)-1).toFixed(2)));
+    }
+
+    handleNumChange(event){
+        if(isNaN(event.target.value) && event.target.value!="0."){
+            return;
+        }
+        this.setState({
+            num: event.target.value
+        })
+    }
+
+    handleNumFreqChange(){
+        let temp = this.state.num;
+        if(temp > this.props.max-1){
+            temp=this.props.max - 1;
+        }else if(temp < this.props.min){
+            temp=this.props.min
+        }
+        this.setState({
+            val: Math.log(temp)/Math.log(this.props.max),
+            num: Number(Number(temp).toFixed(2)),
+        })
+        this.props.onChange(Number(Number(temp).toFixed(2)));
+    }
+
+    componentDidUpdate(prevProps){
+        if(prevProps.mid !== this.props.mid){
+            this.setState({          
+                val: Number(Math.log(this.props.mid)/Math.log(this.props.max)),
+                num: this.props.mid,
+            });
+        }
+    }
+
+    render(){
+
+        return(
+            <div className={this.props.labelName + "logSliderWhole"} className="tooltip">
+                <input className={this.props.labelName + "freqNumRange"} value={this.state.val} type="range" min={0} max={1} step=".001" onChange={this.handleChange}></input>
+                <input id={this.props.labelName + "freqNumInput"} value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumFreqChange()}}}></input>
+                <span id={this.props.labelName + "logSliderFreqTip"} className="tooltiptext">{this.props.tooltipText}</span>
+            </div>
+        )
+    }
+}
+
+class TextInput extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state={
+            val: this.props.defaultVal
+        }
+
+        this.handleChange=this.handleChange.bind(this);
+        this.handleNumSubmit=this.handleNumSubmit.bind(this);
+    }
+
+    handleChange(event){
+        if(isNaN(event.target.value) && event.target.value!="0."){
+            return;
+        }
+        this.setState({
+            val: event.target.value
+        })
+    }
+
+    handleNumSubmit(){
+        let temp = this.state.val;
+        if(temp > this.props.max){
+            temp=this.props.max;
+            this.setState({val: this.props.max})
+        }else if(temp<this.props.min){
+            temp=this.props.min;
+            this.setState({val: this.props.min})
+        }
+        this.props.onSubmit(this.props.tooltipText, Number(temp));
+    }
+
+    render(){
+        return(
+            <label id={this.props.labelName + "inputLabel"} className="tooltip">
+                <input value={this.state.val} type="text" onChange={this.handleChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumSubmit()}}}></input>
+                <span id={this.props.labelName + "Tip"} className="tooltiptext">{this.props.tooltipText}</span>
+            </label>
         )
     }
 }

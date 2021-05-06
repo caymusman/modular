@@ -22,11 +22,17 @@ Style with animations
 
 
 Things for the top helpbar: 
-Notes as frequencies dropdown!
+Notes as frequencies dropdown!  Seconding this as of May 6th!
 Metronome
 Calculator
 Mute all?
 
 Make a "No support on Mobile!" banner.
 
-Make alternate FREQSLIDER class that is logarithmic.
+
+Make detune param on Oscillators
+
+
+
+Known issues:
+ADSR Clipping.

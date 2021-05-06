@@ -472,6 +472,8 @@ var Area = function (_React$Component2) {
                     return React.createElement(Filter, { audioContext: this.props.audioContext, createAudio: this.createAudio });
                 case "Panner":
                     return React.createElement(Panner, { audioContext: this.props.audioContext, createAudio: this.createAudio });
+                case "ADSR":
+                    return React.createElement(ADSR, { audioContext: this.props.audioContext, createAudio: this.createAudio });
                 default:
                     return React.createElement(
                         "div",
@@ -531,36 +533,22 @@ var Oscillator = function (_React$Component3) {
         _this5.state = {
             audio: _this5.props.audioContext.createOscillator(),
             wave: "sine",
-            val: 220,
-            num: 220,
             min: 20,
-            max: 700,
-            step: 1,
+            max: 20001,
+            mid: 440,
             LFO: false
         };
 
-        _this5.handleFreqChange = _this5.handleFreqChange.bind(_this5);
+        _this5.setFreq = _this5.setFreq.bind(_this5);
         _this5.handleWaveChange = _this5.handleWaveChange.bind(_this5);
         _this5.handleLFOClick = _this5.handleLFOClick.bind(_this5);
-        _this5.handleNumChange = _this5.handleNumChange.bind(_this5);
-        _this5.handleNumFreqChange = _this5.handleNumFreqChange.bind(_this5);
         return _this5;
     }
 
     _createClass(Oscillator, [{
-        key: "handleFreqChange",
-        value: function handleFreqChange(event) {
-            var freq = event.target.value;
-            if (freq > this.state.max) {
-                freq = this.state.max;
-            } else if (freq < this.state.min) {
-                freq = this.state.min;
-            }
-            this.state.audio.frequency.setValueAtTime(freq, this.props.audioContext.currentTime);
-            this.setState({
-                num: freq,
-                val: freq
-            });
+        key: "setFreq",
+        value: function setFreq(val) {
+            this.state.audio.frequency.setValueAtTime(Number(val), this.props.audioContext.currentTime);
         }
     }, {
         key: "handleWaveChange",
@@ -575,63 +563,32 @@ var Oscillator = function (_React$Component3) {
         value: function handleLFOClick() {
             if (this.state.LFO) {
                 this.setState({
-                    max: 700,
-                    val: 220,
-                    num: 220,
+                    max: 20001,
                     min: 20,
-                    step: 1,
+                    mid: 440,
                     LFO: false
                 });
-                this.state.audio.frequency.setValueAtTime(220, this.props.audioContext.currentTime);
+                this.state.audio.frequency.setValueAtTime(440, this.props.audioContext.currentTime);
             } else {
                 this.setState({
-                    val: 10,
-                    num: 10,
-                    max: 20,
+                    max: 21,
                     min: 0,
-                    step: .1,
+                    mid: 10,
                     LFO: true
                 });
                 this.state.audio.frequency.setValueAtTime(10, this.props.audioContext.currentTime);
             }
         }
     }, {
-        key: "handleNumChange",
-        value: function handleNumChange(event) {
-            if (isNaN(event.target.value)) {
-                return;
-            }
-            this.setState({
-                num: event.target.value
-            });
-        }
-    }, {
-        key: "handleNumFreqChange",
-        value: function handleNumFreqChange() {
-            var temp = this.state.num;
-            if (temp > this.state.max) {
-                temp = this.state.max;
-            } else if (temp < this.state.min) {
-                temp = this.state.min;
-            }
-            this.setState({
-                val: temp,
-                num: temp
-            });
-            this.state.audio.frequency.setValueAtTime(temp, this.props.audioContext.currentTime);
-        }
-    }, {
         key: "componentDidMount",
         value: function componentDidMount() {
             this.props.createAudio(this.state.audio);
-            this.state.audio.frequency.setValueAtTime(this.state.val, this.props.audioContext.currentTime);
+            this.state.audio.frequency.setValueAtTime(this.state.mid, this.props.audioContext.currentTime);
             this.state.audio.start();
         }
     }, {
         key: "render",
         value: function render() {
-            var _this6 = this;
-
             return React.createElement(
                 "div",
                 { className: "oscDiv" },
@@ -647,21 +604,7 @@ var Oscillator = function (_React$Component3) {
                         "LFO Mode"
                     )
                 ),
-                React.createElement(
-                    "div",
-                    { className: "tooltip" },
-                    React.createElement("input", { type: "range", value: this.state.val, min: this.state.min, max: this.state.max, step: this.state.step, onChange: this.handleFreqChange }),
-                    React.createElement(
-                        "span",
-                        { id: "oscFreqTip", className: "tooltiptext" },
-                        "Freq"
-                    )
-                ),
-                React.createElement("input", { id: "freqNumInput", value: this.state.num, type: "text", onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {
-                        if (event.key == "Enter") {
-                            _this6.handleNumFreqChange();
-                        }
-                    } })
+                React.createElement(LogSlider, { labelName: "oscFreq", tooltipText: "Oscillator Frequency", min: this.state.min, max: this.state.max, mid: this.state.mid, onChange: this.setFreq })
             );
         }
     }]);
@@ -675,21 +618,21 @@ var Gain = function (_React$Component4) {
     function Gain(props) {
         _classCallCheck(this, Gain);
 
-        var _this7 = _possibleConstructorReturn(this, (Gain.__proto__ || Object.getPrototypeOf(Gain)).call(this, props));
+        var _this6 = _possibleConstructorReturn(this, (Gain.__proto__ || Object.getPrototypeOf(Gain)).call(this, props));
 
-        _this7.state = {
-            audio: _this7.props.audioContext.createGain(),
+        _this6.state = {
+            audio: _this6.props.audioContext.createGain(),
             value: .5,
             num: .5,
             max: 1,
             min: 0
         };
 
-        _this7.handleGainChange = _this7.handleGainChange.bind(_this7);
-        _this7.handleNumChange = _this7.handleNumChange.bind(_this7);
-        _this7.handleNumGainChange = _this7.handleNumGainChange.bind(_this7);
-        _this7.handleOutput = _this7.handleOutput.bind(_this7);
-        return _this7;
+        _this6.handleGainChange = _this6.handleGainChange.bind(_this6);
+        _this6.handleNumChange = _this6.handleNumChange.bind(_this6);
+        _this6.handleNumGainChange = _this6.handleNumGainChange.bind(_this6);
+        _this6.handleOutput = _this6.handleOutput.bind(_this6);
+        return _this6;
     }
 
     _createClass(Gain, [{
@@ -756,7 +699,7 @@ var Gain = function (_React$Component4) {
     }, {
         key: "render",
         value: function render() {
-            var _this8 = this;
+            var _this7 = this;
 
             return React.createElement(
                 "div",
@@ -764,7 +707,7 @@ var Gain = function (_React$Component4) {
                 React.createElement("input", { id: "gainRangeInput", type: "range", value: this.state.value, min: "0", max: "1", step: ".01", onChange: this.handleGainChange }),
                 React.createElement("input", { id: "gainNumInput", value: this.state.num, type: "text", onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {
                         if (event.key == "Enter") {
-                            _this8.handleNumGainChange();
+                            _this7.handleNumGainChange();
                         }
                     } }),
                 React.createElement(
@@ -798,18 +741,18 @@ var Filter = function (_React$Component5) {
     function Filter(props) {
         _classCallCheck(this, Filter);
 
-        var _this9 = _possibleConstructorReturn(this, (Filter.__proto__ || Object.getPrototypeOf(Filter)).call(this, props));
+        var _this8 = _possibleConstructorReturn(this, (Filter.__proto__ || Object.getPrototypeOf(Filter)).call(this, props));
 
-        _this9.state = {
-            audio: _this9.props.audioContext.createBiquadFilter(),
+        _this8.state = {
+            audio: _this8.props.audioContext.createBiquadFilter(),
             type: "lowpass"
         };
 
-        _this9.handleFilterType = _this9.handleFilterType.bind(_this9);
-        _this9.setGain = _this9.setGain.bind(_this9);
-        _this9.setFreq = _this9.setFreq.bind(_this9);
-        _this9.handleDialChange = _this9.handleDialChange.bind(_this9);
-        return _this9;
+        _this8.handleFilterType = _this8.handleFilterType.bind(_this8);
+        _this8.setGain = _this8.setGain.bind(_this8);
+        _this8.setFreq = _this8.setFreq.bind(_this8);
+        _this8.handleDialChange = _this8.handleDialChange.bind(_this8);
+        return _this8;
     }
 
     _createClass(Filter, [{
@@ -848,9 +791,9 @@ var Filter = function (_React$Component5) {
                 "div",
                 { className: "filterDiv" },
                 React.createElement(Selector, { id: "filterSelector", values: filterTypes, handleClick: this.handleFilterType }),
-                React.createElement(Dial, { min: 0, max: 1000, onChange: this.handleDialChange }),
+                React.createElement(Dial, { min: 0, max: 1001, onChange: this.handleDialChange }),
                 React.createElement(Slider, { labelName: "filterGain", tooltipText: "Filter Gain", min: -40, max: 40, step: .01, setAudio: this.setGain }),
-                React.createElement(Slider, { labelName: "filterFreq", tooltipText: "Filter Frequency", min: 0, max: 3000, step: 1, setAudio: this.setFreq })
+                React.createElement(LogSlider, { labelName: "filterFreq", tooltipText: "Filter Frequency", min: 0, max: 20001, mid: 440, onChange: this.setFreq })
             );
         }
     }]);
@@ -864,15 +807,15 @@ var Panner = function (_React$Component6) {
     function Panner(props) {
         _classCallCheck(this, Panner);
 
-        var _this10 = _possibleConstructorReturn(this, (Panner.__proto__ || Object.getPrototypeOf(Panner)).call(this, props));
+        var _this9 = _possibleConstructorReturn(this, (Panner.__proto__ || Object.getPrototypeOf(Panner)).call(this, props));
 
-        _this10.state = {
-            audio: _this10.props.audioContext.createStereoPanner(),
+        _this9.state = {
+            audio: _this9.props.audioContext.createStereoPanner(),
             val: 0
         };
 
-        _this10.handlePan = _this10.handlePan.bind(_this10);
-        return _this10;
+        _this9.handlePan = _this9.handlePan.bind(_this9);
+        return _this9;
     }
 
     _createClass(Panner, [{
@@ -899,10 +842,128 @@ var Panner = function (_React$Component6) {
     return Panner;
 }(React.Component);
 
-//props: labelName, tooltipText, min, max, step, audio, audioContext
+var ADSR = function (_React$Component7) {
+    _inherits(ADSR, _React$Component7);
 
-var Output = function (_React$Component7) {
-    _inherits(Output, _React$Component7);
+    function ADSR(props) {
+        _classCallCheck(this, ADSR);
+
+        var _this10 = _possibleConstructorReturn(this, (ADSR.__proto__ || Object.getPrototypeOf(ADSR)).call(this, props));
+
+        _this10.state = {
+            audio: _this10.props.audioContext.createGain(),
+            rate: 3000,
+            interval: null,
+            running: false,
+            attack: .2,
+            decay: .2,
+            sustain: .6,
+            release: .3
+        };
+        _this10.handleSlider = _this10.handleSlider.bind(_this10);
+        _this10.handleToggle = _this10.handleToggle.bind(_this10);
+        _this10.handleAudio = _this10.handleAudio.bind(_this10);
+        _this10.handleTextSubmit = _this10.handleTextSubmit.bind(_this10);
+        return _this10;
+    }
+
+    _createClass(ADSR, [{
+        key: "handleSlider",
+        value: function handleSlider(val) {
+            this.setState({
+                rate: 1 / val * 1000
+            });
+
+            if (this.state.running) {
+                clearInterval(this.state.interval);
+                this.setState({
+                    interval: setInterval(this.handleAudio, 1 / val * 1000)
+                });
+            }
+        }
+    }, {
+        key: "handleToggle",
+        value: function handleToggle() {
+            var current = this.props.audioContext.currentTime;
+            if (!this.state.running) {
+                this.setState({
+                    running: true,
+                    interval: setInterval(this.handleAudio, this.state.rate)
+                });
+            } else {
+                this.state.audio.gain.setTargetAtTime(.8, current + this.state.release, .5);
+                clearInterval(this.state.interval);
+                this.setState({
+                    running: false
+                });
+            }
+        }
+    }, {
+        key: "handleAudio",
+        value: function handleAudio() {
+            var current = this.props.audioContext.currentTime;
+            this.state.audio.gain.cancelScheduledValues(current);
+            this.state.audio.gain.setTargetAtTime(.90, current + this.state.attack, .5);
+            this.state.audio.gain.setTargetAtTime(this.state.sustain, current + this.state.decay, .5);
+            this.state.audio.gain.setTargetAtTime(0, current + this.state.release, .5);
+        }
+    }, {
+        key: "handleTextSubmit",
+        value: function handleTextSubmit(name, num) {
+            switch (name) {
+                case "Attack":
+                    this.setState({ attack: num });
+                    break;
+                case "Decay":
+                    this.setState({ decay: num });
+                    break;
+                case "Sustain":
+                    this.setState({ sustain: num });
+                    break;
+                case "Release":
+                    this.setState({ release: num });
+                    break;
+                default:
+                    return;
+            }
+        }
+    }, {
+        key: "componentDidMount",
+        value: function componentDidMount() {
+            this.props.createAudio(this.state.audio);
+            this.state.audio.gain.setValueAtTime(.5, this.props.audioContext.currentTime);
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            return React.createElement(
+                "div",
+                { id: "ADSRDiv" },
+                React.createElement(LogSlider, { labelName: "ADSRSlider", tooltipText: "LFO Rate", min: 0, max: 20, mid: 10, onChange: this.handleSlider }),
+                React.createElement(
+                    "label",
+                    { id: "ADSRCheck", className: "switch tooltip" },
+                    React.createElement("input", { type: "checkbox", onClick: this.handleToggle }),
+                    React.createElement("span", { className: "slider round" }),
+                    React.createElement(
+                        "span",
+                        { id: "ADSRCheckTip", className: "tooltiptext" },
+                        "LFO Mode"
+                    )
+                ),
+                React.createElement(TextInput, { labelName: "ADSRAttack", tooltipText: "Attack", min: 0, max: 5, defaultVal: .2, onSubmit: this.handleTextSubmit }),
+                React.createElement(TextInput, { labelName: "ADSRDecay", tooltipText: "Decay", min: 0, max: 5, defaultVal: .2, onSubmit: this.handleTextSubmit }),
+                React.createElement(TextInput, { labelName: "ADSRSustain", tooltipText: "Sustain", min: 0, max: 1, defaultVal: .5, onSubmit: this.handleTextSubmit }),
+                React.createElement(TextInput, { labelName: "ADSRRelease", tooltipText: "Release", min: 0, max: 5, defaultVal: .3, onSubmit: this.handleTextSubmit })
+            );
+        }
+    }]);
+
+    return ADSR;
+}(React.Component);
+
+var Output = function (_React$Component8) {
+    _inherits(Output, _React$Component8);
 
     function Output(props) {
         _classCallCheck(this, Output);
@@ -971,8 +1032,8 @@ var Output = function (_React$Component7) {
 //patchcords with delete capability
 
 
-var Cord = function (_React$Component8) {
-    _inherits(Cord, _React$Component8);
+var Cord = function (_React$Component9) {
+    _inherits(Cord, _React$Component9);
 
     function Cord(props) {
         _classCallCheck(this, Cord);
@@ -1006,8 +1067,8 @@ var Cord = function (_React$Component8) {
 //sidebar with buttons for creation
 
 
-var SideButtons = function (_React$Component9) {
-    _inherits(SideButtons, _React$Component9);
+var SideButtons = function (_React$Component10) {
+    _inherits(SideButtons, _React$Component10);
 
     function SideButtons(props) {
         _classCallCheck(this, SideButtons);
@@ -1025,6 +1086,7 @@ var SideButtons = function (_React$Component9) {
                 React.createElement(MyButton, { name: "Gain", handleClick: this.props.handleClick, inputOnly: "false" }),
                 React.createElement(MyButton, { name: "Filter", handleClick: this.props.handleClick, inputOnly: "false" }),
                 React.createElement(MyButton, { name: "Panner", handleClick: this.props.handleClick, inputOnly: "false" }),
+                React.createElement(MyButton, { name: "ADSR", handleClick: this.props.handleClick, inputOnly: "false" }),
                 React.createElement(MyButton, { name: "PeePee", handleClick: this.props.handleClick, inputOnly: "false" })
             );
         }
@@ -1036,8 +1098,8 @@ var SideButtons = function (_React$Component9) {
 //buttons in side area that create modules for the playspace
 
 
-var MyButton = function (_React$Component10) {
-    _inherits(MyButton, _React$Component10);
+var MyButton = function (_React$Component11) {
+    _inherits(MyButton, _React$Component11);
 
     function MyButton(props) {
         _classCallCheck(this, MyButton);
@@ -1076,8 +1138,8 @@ var MyButton = function (_React$Component10) {
     return MyButton;
 }(React.Component);
 
-var Selector = function (_React$Component11) {
-    _inherits(Selector, _React$Component11);
+var Selector = function (_React$Component12) {
+    _inherits(Selector, _React$Component12);
 
     function Selector(props) {
         _classCallCheck(this, Selector);
@@ -1127,8 +1189,8 @@ var Selector = function (_React$Component11) {
     return Selector;
 }(React.Component);
 
-var Dial = function (_React$Component12) {
-    _inherits(Dial, _React$Component12);
+var Dial = function (_React$Component13) {
+    _inherits(Dial, _React$Component13);
 
     function Dial(props) {
         _classCallCheck(this, Dial);
@@ -1171,8 +1233,8 @@ var Dial = function (_React$Component12) {
         key: "handleNumSubmit",
         value: function handleNumSubmit() {
             var temp = this.state.num;
-            if (temp > this.props.max) {
-                temp = this.props.max;
+            if (temp > this.props.max - 1) {
+                temp = this.props.max - 1;
             } else if (temp < this.props.min) {
                 temp = this.props.min;
             }
@@ -1213,8 +1275,8 @@ var Dial = function (_React$Component12) {
     return Dial;
 }(React.Component);
 
-var Slider = function (_React$Component13) {
-    _inherits(Slider, _React$Component13);
+var Slider = function (_React$Component14) {
+    _inherits(Slider, _React$Component14);
 
     function Slider(props) {
         _classCallCheck(this, Slider);
@@ -1295,6 +1357,160 @@ var Slider = function (_React$Component13) {
     }]);
 
     return Slider;
+}(React.Component);
+
+var LogSlider = function (_React$Component15) {
+    _inherits(LogSlider, _React$Component15);
+
+    function LogSlider(props) {
+        _classCallCheck(this, LogSlider);
+
+        var _this21 = _possibleConstructorReturn(this, (LogSlider.__proto__ || Object.getPrototypeOf(LogSlider)).call(this, props));
+
+        _this21.state = {
+            val: Number(Math.log(_this21.props.mid) / Math.log(_this21.props.max)),
+            num: _this21.props.mid
+        };
+
+        _this21.handleChange = _this21.handleChange.bind(_this21);
+        _this21.handleNumChange = _this21.handleNumChange.bind(_this21);
+        _this21.handleNumFreqChange = _this21.handleNumFreqChange.bind(_this21);
+        return _this21;
+    }
+
+    _createClass(LogSlider, [{
+        key: "handleChange",
+        value: function handleChange(event) {
+            this.setState({
+                val: event.target.value,
+                num: Number((Math.pow(this.props.max, event.target.value) - 1).toFixed(2))
+            });
+            this.props.onChange(Number((Math.pow(this.props.max, event.target.value) - 1).toFixed(2)));
+        }
+    }, {
+        key: "handleNumChange",
+        value: function handleNumChange(event) {
+            if (isNaN(event.target.value) && event.target.value != "0.") {
+                return;
+            }
+            this.setState({
+                num: event.target.value
+            });
+        }
+    }, {
+        key: "handleNumFreqChange",
+        value: function handleNumFreqChange() {
+            var temp = this.state.num;
+            if (temp > this.props.max - 1) {
+                temp = this.props.max - 1;
+            } else if (temp < this.props.min) {
+                temp = this.props.min;
+            }
+            this.setState({
+                val: Math.log(temp) / Math.log(this.props.max),
+                num: Number(Number(temp).toFixed(2))
+            });
+            this.props.onChange(Number(Number(temp).toFixed(2)));
+        }
+    }, {
+        key: "componentDidUpdate",
+        value: function componentDidUpdate(prevProps) {
+            if (prevProps.mid !== this.props.mid) {
+                this.setState({
+                    val: Number(Math.log(this.props.mid) / Math.log(this.props.max)),
+                    num: this.props.mid
+                });
+            }
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            var _this22 = this;
+
+            return React.createElement(
+                "div",
+                _defineProperty({ className: this.props.labelName + "logSliderWhole" }, "className", "tooltip"),
+                React.createElement("input", { className: this.props.labelName + "freqNumRange", value: this.state.val, type: "range", min: 0, max: 1, step: ".001", onChange: this.handleChange }),
+                React.createElement("input", { id: this.props.labelName + "freqNumInput", value: this.state.num, type: "text", onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {
+                        if (event.key == "Enter") {
+                            _this22.handleNumFreqChange();
+                        }
+                    } }),
+                React.createElement(
+                    "span",
+                    { id: this.props.labelName + "logSliderFreqTip", className: "tooltiptext" },
+                    this.props.tooltipText
+                )
+            );
+        }
+    }]);
+
+    return LogSlider;
+}(React.Component);
+
+var TextInput = function (_React$Component16) {
+    _inherits(TextInput, _React$Component16);
+
+    function TextInput(props) {
+        _classCallCheck(this, TextInput);
+
+        var _this23 = _possibleConstructorReturn(this, (TextInput.__proto__ || Object.getPrototypeOf(TextInput)).call(this, props));
+
+        _this23.state = {
+            val: _this23.props.defaultVal
+        };
+
+        _this23.handleChange = _this23.handleChange.bind(_this23);
+        _this23.handleNumSubmit = _this23.handleNumSubmit.bind(_this23);
+        return _this23;
+    }
+
+    _createClass(TextInput, [{
+        key: "handleChange",
+        value: function handleChange(event) {
+            if (isNaN(event.target.value) && event.target.value != "0.") {
+                return;
+            }
+            this.setState({
+                val: event.target.value
+            });
+        }
+    }, {
+        key: "handleNumSubmit",
+        value: function handleNumSubmit() {
+            var temp = this.state.val;
+            if (temp > this.props.max) {
+                temp = this.props.max;
+                this.setState({ val: this.props.max });
+            } else if (temp < this.props.min) {
+                temp = this.props.min;
+                this.setState({ val: this.props.min });
+            }
+            this.props.onSubmit(this.props.tooltipText, Number(temp));
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            var _this24 = this;
+
+            return React.createElement(
+                "label",
+                { id: this.props.labelName + "inputLabel", className: "tooltip" },
+                React.createElement("input", { value: this.state.val, type: "text", onChange: this.handleChange, onKeyPress: function onKeyPress(event) {
+                        if (event.key == "Enter") {
+                            _this24.handleNumSubmit();
+                        }
+                    } }),
+                React.createElement(
+                    "span",
+                    { id: this.props.labelName + "Tip", className: "tooltiptext" },
+                    this.props.tooltipText
+                )
+            );
+        }
+    }]);
+
+    return TextInput;
 }(React.Component);
 
 ReactDOM.render(React.createElement(App, null), document.getElementById("App"));
