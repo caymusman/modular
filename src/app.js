@@ -355,6 +355,8 @@ class Area extends React.Component{
                 return <Gain audioContext={this.props.audioContext} createAudio={this.createAudio} parent={this.props.myKey} handleOutput={this.props.handleOutput}/>
             case "Filter":
                 return <Filter audioContext={this.props.audioContext} createAudio={this.createAudio}/>;
+            case "Panner":
+                return <Panner audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             default:
                 return <div>Hahahahaha theres nothing here!</div>;
         }
@@ -610,15 +612,6 @@ class Filter extends React.Component{
         this.state={
             audio: this.props.audioContext.createBiquadFilter(),
             type: "lowpass",
-            gainNum: .5,
-            gainVal: .5,
-            gainMax: 1,
-            gainMin: 0,
-            freqNum: 440,
-            freqVal: 440,
-            freqMax: 3000,
-            freqMin: 0
-
         }
 
         this.handleFilterType=this.handleFilterType.bind(this);
@@ -656,8 +649,37 @@ class Filter extends React.Component{
             <div className="filterDiv">
                 <Selector id="filterSelector" values={filterTypes} handleClick={this.handleFilterType}/>
                 <Dial min={0} max={1000} onChange={this.handleDialChange}/>
-                <Slider labelName="filterGain" tooltipText="Filter Gain" min={-40} max={40} step={.01} audio={this.state.audio} audioContext={this.props.audioContext} setAudio={this.setGain}/>
-                <Slider labelName="filterFreq" tooltipText="Filter Frequency" min={0} max={3000} step={1} audio={this.state.audio} audioContext={this.props.audioContext} setAudio={this.setFreq}/>
+                <Slider labelName="filterGain" tooltipText="Filter Gain" min={-40} max={40} step={.01} setAudio={this.setGain}/>
+                <Slider labelName="filterFreq" tooltipText="Filter Frequency" min={0} max={3000} step={1} setAudio={this.setFreq}/>
+            </div>
+        )
+    }
+}
+
+class Panner extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state={
+            audio: this.props.audioContext.createStereoPanner(),
+            val: 0
+        }
+
+        this.handlePan=this.handlePan.bind(this);
+    }
+
+    handlePan(val){
+        this.state.audio.pan.value=val;
+    }
+
+    componentDidMount(){
+        this.props.createAudio(this.state.audio);
+    }
+
+    render(){
+        return(
+            <div>
+                <Slider labelName="panPan" tooltipText="Pan" min={-1} max={1} step={.001} setAudio={this.handlePan}></Slider>
             </div>
         )
     }
@@ -752,6 +774,7 @@ class SideButtons extends React.Component{
                 <MyButton name="Oscillator" handleClick={this.props.handleClick} inputOnly="true"/>
                 <MyButton name="Gain" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="Filter" handleClick={this.props.handleClick} inputOnly="false"/>
+                <MyButton name="Panner" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="PeePee" handleClick={this.props.handleClick} inputOnly="false"/>
             </div>
         )

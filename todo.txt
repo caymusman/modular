@@ -9,7 +9,7 @@ Gain - check
 LFO - check
 Filter - check
 Panner
-Envelope?
+Envelope?  A gain mod that starts at 0, but can set when it linearramps to value. Can make it scheduled.
 Delay?
 Recording out
 
