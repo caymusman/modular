@@ -901,10 +901,12 @@ var ADSR = function (_React$Component7) {
         key: "handleAudio",
         value: function handleAudio() {
             var current = this.props.audioContext.currentTime;
+            console.log("Begin");
             this.state.audio.gain.cancelScheduledValues(current);
-            this.state.audio.gain.setTargetAtTime(.90, current + this.state.attack, .5);
-            this.state.audio.gain.setTargetAtTime(this.state.sustain, current + this.state.decay, .5);
-            this.state.audio.gain.setTargetAtTime(0, current + this.state.release, .5);
+            this.state.audio.gain.setTargetAtTime(.90, current + this.state.attack, this.state.attack);
+            this.state.audio.gain.setTargetAtTime(this.state.sustain, current + this.state.attack + this.state.decay, this.state.decay);
+            this.state.audio.gain.setTargetAtTime(.01, current + this.state.attack + +this.state.decay + this.state.release, this.state.release);
+            console.log("End");
         }
     }, {
         key: "handleTextSubmit",
