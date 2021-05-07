@@ -350,7 +350,7 @@ class Area extends React.Component{
     renderFilling(){
         switch(this.props.filling){
             case "Oscillator":
-                return <Oscillator audioContext={this.props.audioContext} createAudio={this.createAudio}/>;
+                return <Oscillator audioContext={this.props.audioContext} createAudio={this.createAudio} parent={this.props.myKey} handleOutput={this.props.handleOutput}/>;
             case "Gain":
                 return <Gain audioContext={this.props.audioContext} createAudio={this.createAudio} parent={this.props.myKey} handleOutput={this.props.handleOutput}/>
             case "Filter":
@@ -413,11 +413,14 @@ class Oscillator extends React.Component{
             max: 20001,
             mid: 440,
             LFO: false,
+            modulatorGain: this.props.audioContext.createGain()
         }
 
         this.setFreq=this.setFreq.bind(this);
         this.handleWaveChange=this.handleWaveChange.bind(this);
         this.handleLFOClick=this.handleLFOClick.bind(this);
+        this.handleOutput=this.handleOutput.bind(this);
+        this.setModDepth=this.setModDepth.bind(this);
     }
 
     setFreq(val){
@@ -451,9 +454,29 @@ class Oscillator extends React.Component{
         }
     }
 
+    handleOutput(event){
+        let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
+        let el = event.target.getBoundingClientRect();
+        let x = el.x;
+        let y = el.y;
+        let bottom = el.bottom;
+        let right = el.right;
+        let xCenter = ((right - x) / 2 + x) - (largerDim * .04);
+        let yCenter = ((bottom - y) / 2 + y) - (largerDim * .04);
+        
+        this.props.handleOutput({tomyKey: this.props.parent+ " param",
+                                 toLocation: {x: xCenter, y: yCenter},
+                                audio: this.state.modulatorGain});
+        }
+
+    setModDepth(val){
+        this.state.modulatorGain.gain.setValueAtTime(val, this.props.audioContext.currentTime);
+    }
+
     componentDidMount(){
         this.props.createAudio(this.state.audio);
         this.state.audio.frequency.setValueAtTime(this.state.mid, this.props.audioContext.currentTime);
+        this.state.modulatorGain.connect(this.state.audio.frequency);
         this.state.audio.start();
     }
 
@@ -467,7 +490,13 @@ class Oscillator extends React.Component{
                      <span id="oscLFOTip" className="tooltiptext">LFO Mode</span>
                  </label>
                 <LogSlider labelName="oscFreq" tooltipText="Oscillator Frequency" min={this.state.min} max={this.state.max} mid={this.state.mid} onChange={this.setFreq}/>
+                <div className="cordOuter tooltip" id="firstParam" onClick={this.handleOutput}>
+                    <div className="cordInner" id={this.props.parent + " param" + " inputInner"}>
+                    <span id="oscDetuneParamTip" className="tooltiptext"><span className="paramSpan">param: </span>frequency</span>
+                    </div>
                 </div>
+                <Slider labelName="oscModGain" tooltipText="Mod Depth" min={0} max={300} mid={150} setAudio={this.setModDepth}/>
+            </div>
         )
     }
 }
@@ -554,7 +583,7 @@ class Gain extends React.Component{
 
                 <div className="cordOuter tooltip" id="firstParam" onClick={this.handleOutput}>
                     <div className="cordInner" id={this.props.parent + " param" + " inputInner"}>
-                    <span id="gainGainParamTip" className="tooltiptext"><span className="paramSpan">param: </span>Gain</span>
+                    <span id="gainGainParamTip" className="tooltiptext"><span className="paramSpan">param: </span>gain</span>
                     </div>
                 </div>
             </div>

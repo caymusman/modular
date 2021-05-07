@@ -465,7 +465,7 @@ var Area = function (_React$Component2) {
         value: function renderFilling() {
             switch (this.props.filling) {
                 case "Oscillator":
-                    return React.createElement(Oscillator, { audioContext: this.props.audioContext, createAudio: this.createAudio });
+                    return React.createElement(Oscillator, { audioContext: this.props.audioContext, createAudio: this.createAudio, parent: this.props.myKey, handleOutput: this.props.handleOutput });
                 case "Gain":
                     return React.createElement(Gain, { audioContext: this.props.audioContext, createAudio: this.createAudio, parent: this.props.myKey, handleOutput: this.props.handleOutput });
                 case "Filter":
@@ -536,12 +536,15 @@ var Oscillator = function (_React$Component3) {
             min: 20,
             max: 20001,
             mid: 440,
-            LFO: false
+            LFO: false,
+            modulatorGain: _this5.props.audioContext.createGain()
         };
 
         _this5.setFreq = _this5.setFreq.bind(_this5);
         _this5.handleWaveChange = _this5.handleWaveChange.bind(_this5);
         _this5.handleLFOClick = _this5.handleLFOClick.bind(_this5);
+        _this5.handleOutput = _this5.handleOutput.bind(_this5);
+        _this5.setModDepth = _this5.setModDepth.bind(_this5);
         return _this5;
     }
 
@@ -580,10 +583,32 @@ var Oscillator = function (_React$Component3) {
             }
         }
     }, {
+        key: "handleOutput",
+        value: function handleOutput(event) {
+            var largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
+            var el = event.target.getBoundingClientRect();
+            var x = el.x;
+            var y = el.y;
+            var bottom = el.bottom;
+            var right = el.right;
+            var xCenter = (right - x) / 2 + x - largerDim * .04;
+            var yCenter = (bottom - y) / 2 + y - largerDim * .04;
+
+            this.props.handleOutput({ tomyKey: this.props.parent + " param",
+                toLocation: { x: xCenter, y: yCenter },
+                audio: this.state.modulatorGain });
+        }
+    }, {
+        key: "setModDepth",
+        value: function setModDepth(val) {
+            this.state.modulatorGain.gain.setValueAtTime(val, this.props.audioContext.currentTime);
+        }
+    }, {
         key: "componentDidMount",
         value: function componentDidMount() {
             this.props.createAudio(this.state.audio);
             this.state.audio.frequency.setValueAtTime(this.state.mid, this.props.audioContext.currentTime);
+            this.state.modulatorGain.connect(this.state.audio.frequency);
             this.state.audio.start();
         }
     }, {
@@ -604,7 +629,26 @@ var Oscillator = function (_React$Component3) {
                         "LFO Mode"
                     )
                 ),
-                React.createElement(LogSlider, { labelName: "oscFreq", tooltipText: "Oscillator Frequency", min: this.state.min, max: this.state.max, mid: this.state.mid, onChange: this.setFreq })
+                React.createElement(LogSlider, { labelName: "oscFreq", tooltipText: "Oscillator Frequency", min: this.state.min, max: this.state.max, mid: this.state.mid, onChange: this.setFreq }),
+                React.createElement(
+                    "div",
+                    { className: "cordOuter tooltip", id: "firstParam", onClick: this.handleOutput },
+                    React.createElement(
+                        "div",
+                        { className: "cordInner", id: this.props.parent + " param" + " inputInner" },
+                        React.createElement(
+                            "span",
+                            { id: "oscDetuneParamTip", className: "tooltiptext" },
+                            React.createElement(
+                                "span",
+                                { className: "paramSpan" },
+                                "param: "
+                            ),
+                            "frequency"
+                        )
+                    )
+                ),
+                React.createElement(Slider, { labelName: "oscModGain", tooltipText: "Mod Depth", min: 0, max: 300, mid: 150, setAudio: this.setModDepth })
             );
         }
     }]);
@@ -724,7 +768,7 @@ var Gain = function (_React$Component4) {
                                 { className: "paramSpan" },
                                 "param: "
                             ),
-                            "Gain"
+                            "gain"
                         )
                     )
                 )
