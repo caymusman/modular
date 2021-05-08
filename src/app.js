@@ -359,6 +359,8 @@ class Area extends React.Component{
                 return <Panner audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             case "ADSR":
                 return <ADSR audioContext={this.props.audioContext} createAudio={this.createAudio}/>
+            case "Delay":
+                return <Delay audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             default:
                 return <div>Hahahahaha theres nothing here!</div>;
         }
@@ -671,6 +673,35 @@ class Panner extends React.Component{
     }
 }
 
+class Delay extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state={
+            audio: this.props.audioContext.createDelay(),
+            val: 0
+        }
+
+        this.handleDelayTime=this.handleDelayTime.bind(this);
+    }
+
+    handleDelayTime(val){
+        this.state.audio.delayTime.setValueAtTime(val, this.props.audioContext.currentTime);
+    }
+
+    componentDidMount(){
+        this.props.createAudio(this.state.audio);
+    }
+
+    render(){
+        return(
+            <div>
+                <Slider labelName="delayDelayTime" tooltipText="Delay Time (s)" min={0} max={5} step={.01} setAudio={this.handleDelayTime}></Slider>
+            </div>
+        )
+    }
+}
+
 class ADSR extends React.Component{
     constructor(props){
         super(props);
@@ -862,6 +893,7 @@ class SideButtons extends React.Component{
                 <MyButton name="Filter" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="Panner" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="ADSR" handleClick={this.props.handleClick} inputOnly="false"/>
+                <MyButton name="Delay" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="PeePee" handleClick={this.props.handleClick} inputOnly="false"/>
             </div>
         )
