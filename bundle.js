@@ -985,7 +985,7 @@ var ADSR = function (_React$Component7) {
             return React.createElement(
                 "div",
                 { id: "ADSRDiv" },
-                React.createElement(LogSlider, { labelName: "ADSRSlider", tooltipText: "LFO Rate", min: 0, max: 20, mid: 10, onChange: this.handleSlider }),
+                React.createElement(LogSlider, { labelName: "ADSRSlider", tooltipText: "LFO Rate", min: 0, max: 21, mid: 10, onChange: this.handleSlider }),
                 React.createElement(
                     "label",
                     { id: "ADSRCheck", className: "switch tooltip" },
@@ -1453,7 +1453,7 @@ var LogSlider = function (_React$Component15) {
                 temp = this.props.min;
             }
             this.setState({
-                val: Math.log(temp) / Math.log(this.props.max),
+                val: Math.log(Number(temp) + 1) / Math.log(this.props.max - 1),
                 num: Number(Number(temp).toFixed(2))
             });
             this.props.onChange(Number(Number(temp).toFixed(2)));
@@ -1476,7 +1476,7 @@ var LogSlider = function (_React$Component15) {
             return React.createElement(
                 "div",
                 _defineProperty({ className: this.props.labelName + "logSliderWhole" }, "className", "tooltip"),
-                React.createElement("input", { className: this.props.labelName + "freqNumRange", value: this.state.val, type: "range", min: 0, max: 1, step: ".001", onChange: this.handleChange }),
+                React.createElement("input", { className: this.props.labelName + "freqNumRange", value: this.state.val, type: "range", min: Number(Math.log(this.props.min + 1) / Math.log(this.props.max)), max: 1, step: "any", onChange: this.handleChange }),
                 React.createElement("input", { id: this.props.labelName + "freqNumInput", value: this.state.num, type: "text", onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {
                         if (event.key == "Enter") {
                             _this22.handleNumFreqChange();

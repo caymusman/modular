@@ -8,10 +8,12 @@ Modules:
 Gain - check
 LFO - check
 Filter - check
-Panner
-Envelope?  A gain mod that starts at 0, but can set when it linearramps to value. Can make it scheduled.
+Panner - check
+Envelope - check
 Delay?
 Recording out
+Audio in?
+Clips?
 
 
 
@@ -29,10 +31,9 @@ Mute all?
 
 Make a "No support on Mobile!" banner.
 
-
-Make detune param on Oscillators
+Add button to ADSR
 
 
 
 Known issues:
-ADSR Clipping.
+ADSR Clipping in FF.

@@ -758,7 +758,7 @@ class ADSR extends React.Component{
     render(){
         return(
             <div id="ADSRDiv">
-             <LogSlider labelName="ADSRSlider" tooltipText="LFO Rate" min={0} max={20} mid={10} onChange={this.handleSlider}></LogSlider>
+             <LogSlider labelName="ADSRSlider" tooltipText="LFO Rate" min={0} max={21} mid={10} onChange={this.handleSlider}></LogSlider>
              <label id="ADSRCheck" className="switch tooltip">
                      <input type="checkbox" onClick={this.handleToggle}></input>
                      <span className="slider round"></span>
@@ -1096,7 +1096,7 @@ class LogSlider extends React.Component{
             temp=this.props.min
         }
         this.setState({
-            val: Math.log(temp)/Math.log(this.props.max),
+            val: Math.log(Number(temp)+1)/Math.log(this.props.max-1),
             num: Number(Number(temp).toFixed(2)),
         })
         this.props.onChange(Number(Number(temp).toFixed(2)));
@@ -1115,7 +1115,7 @@ class LogSlider extends React.Component{
 
         return(
             <div className={this.props.labelName + "logSliderWhole"} className="tooltip">
-                <input className={this.props.labelName + "freqNumRange"} value={this.state.val} type="range" min={0} max={1} step=".001" onChange={this.handleChange}></input>
+                <input className={this.props.labelName + "freqNumRange"} value={this.state.val} type="range" min={Number(Math.log(this.props.min+1)/Math.log(this.props.max))} max={1} step="any" onChange={this.handleChange}></input>
                 <input id={this.props.labelName + "freqNumInput"} value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumFreqChange()}}}></input>
                 <span id={this.props.labelName + "logSliderFreqTip"} className="tooltiptext">{this.props.tooltipText}</span>
             </div>
