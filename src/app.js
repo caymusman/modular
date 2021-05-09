@@ -361,6 +361,8 @@ class Area extends React.Component{
                 return <ADSR audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             case "Delay":
                 return <Delay audioContext={this.props.audioContext} createAudio={this.createAudio}/>
+            case "Distortion":
+                return <Distortion audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             default:
                 return <div>Hahahahaha theres nothing here!</div>;
         }
@@ -678,7 +680,7 @@ class Delay extends React.Component{
         super(props);
 
         this.state={
-            audio: this.props.audioContext.createDelay(),
+            audio: this.props.audioContext.createDelay(5.0),
             val: 0
         }
 
@@ -697,6 +699,56 @@ class Delay extends React.Component{
         return(
             <div>
                 <Slider labelName="delayDelayTime" tooltipText="Delay Time (s)" min={0} max={5} step={.01} setAudio={this.handleDelayTime}></Slider>
+            </div>
+        )
+    }
+}
+
+
+class Distortion extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state={
+            audio: this.props.audioContext.createWaveShaper(),
+            val: 0
+        }
+
+        this.handleCurve=this.handleCurve.bind(this);
+        this.makeCurve=this.makeCurve.bind(this);
+        this.handleOversample=this.handleOversample.bind(this);
+    }
+
+    makeCurve(num){
+        let temp = num;
+        let n_samples = 44100;
+        let curve = new Float32Array(n_samples);
+        let deg = Math.PI / 180;
+        let x;
+        for (let i = 0 ; i < n_samples; ++i ) {
+            x = i * 2 / n_samples - 1;
+            curve[i] = ( 3 + temp ) * x * 20 * deg / ( Math.PI + temp * Math.abs(x) );
+        }
+        return curve;
+    }
+
+    handleCurve(val){
+        this.state.audio.curve = this.makeCurve(val);
+    }
+
+    handleOversample(val){
+        this.state.audio.oversample=val;
+    }
+
+    componentDidMount(){
+        this.props.createAudio(this.state.audio);
+    }
+
+    render(){
+        return(
+            <div>
+                <Slider labelName="distortionCurve" tooltipText="Distortion Curve" min={50} max={800} step={.1} setAudio={this.handleCurve}></Slider>
+                <Selector id="distortionSelector" values={["none", "2x", "4x"]} handleClick={this.handleOversample}/>
             </div>
         )
     }
@@ -894,6 +946,7 @@ class SideButtons extends React.Component{
                 <MyButton name="Panner" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="ADSR" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="Delay" handleClick={this.props.handleClick} inputOnly="false"/>
+                <MyButton name="Distortion" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="PeePee" handleClick={this.props.handleClick} inputOnly="false"/>
             </div>
         )

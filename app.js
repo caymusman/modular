@@ -475,6 +475,8 @@ var Area = function (_React$Component2) {
                     return React.createElement(ADSR, { audioContext: this.props.audioContext, createAudio: this.createAudio });
                 case "Delay":
                     return React.createElement(Delay, { audioContext: this.props.audioContext, createAudio: this.createAudio });
+                case "Distortion":
+                    return React.createElement(Distortion, { audioContext: this.props.audioContext, createAudio: this.createAudio });
                 default:
                     return React.createElement(
                         "div",
@@ -896,7 +898,7 @@ var Delay = function (_React$Component7) {
         var _this10 = _possibleConstructorReturn(this, (Delay.__proto__ || Object.getPrototypeOf(Delay)).call(this, props));
 
         _this10.state = {
-            audio: _this10.props.audioContext.createDelay(),
+            audio: _this10.props.audioContext.createDelay(5.0),
             val: 0
         };
 
@@ -928,16 +930,79 @@ var Delay = function (_React$Component7) {
     return Delay;
 }(React.Component);
 
-var ADSR = function (_React$Component8) {
-    _inherits(ADSR, _React$Component8);
+var Distortion = function (_React$Component8) {
+    _inherits(Distortion, _React$Component8);
+
+    function Distortion(props) {
+        _classCallCheck(this, Distortion);
+
+        var _this11 = _possibleConstructorReturn(this, (Distortion.__proto__ || Object.getPrototypeOf(Distortion)).call(this, props));
+
+        _this11.state = {
+            audio: _this11.props.audioContext.createWaveShaper(),
+            val: 0
+        };
+
+        _this11.handleCurve = _this11.handleCurve.bind(_this11);
+        _this11.makeCurve = _this11.makeCurve.bind(_this11);
+        _this11.handleOversample = _this11.handleOversample.bind(_this11);
+        return _this11;
+    }
+
+    _createClass(Distortion, [{
+        key: "makeCurve",
+        value: function makeCurve(num) {
+            var temp = num;
+            var n_samples = 44100;
+            var curve = new Float32Array(n_samples);
+            var deg = Math.PI / 180;
+            var x = void 0;
+            for (var i = 0; i < n_samples; ++i) {
+                x = i * 2 / n_samples - 1;
+                curve[i] = (3 + temp) * x * 20 * deg / (Math.PI + temp * Math.abs(x));
+            }
+            return curve;
+        }
+    }, {
+        key: "handleCurve",
+        value: function handleCurve(val) {
+            this.state.audio.curve = this.makeCurve(val);
+        }
+    }, {
+        key: "handleOversample",
+        value: function handleOversample(val) {
+            this.state.audio.oversample = val;
+        }
+    }, {
+        key: "componentDidMount",
+        value: function componentDidMount() {
+            this.props.createAudio(this.state.audio);
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            return React.createElement(
+                "div",
+                null,
+                React.createElement(Slider, { labelName: "distortionCurve", tooltipText: "Distortion Curve", min: 50, max: 800, step: .1, setAudio: this.handleCurve }),
+                React.createElement(Selector, { id: "distortionSelector", values: ["none", "2x", "4x"], handleClick: this.handleOversample })
+            );
+        }
+    }]);
+
+    return Distortion;
+}(React.Component);
+
+var ADSR = function (_React$Component9) {
+    _inherits(ADSR, _React$Component9);
 
     function ADSR(props) {
         _classCallCheck(this, ADSR);
 
-        var _this11 = _possibleConstructorReturn(this, (ADSR.__proto__ || Object.getPrototypeOf(ADSR)).call(this, props));
+        var _this12 = _possibleConstructorReturn(this, (ADSR.__proto__ || Object.getPrototypeOf(ADSR)).call(this, props));
 
-        _this11.state = {
-            audio: _this11.props.audioContext.createGain(),
+        _this12.state = {
+            audio: _this12.props.audioContext.createGain(),
             rate: 3000,
             interval: null,
             running: false,
@@ -946,11 +1011,11 @@ var ADSR = function (_React$Component8) {
             sustain: .6,
             release: .3
         };
-        _this11.handleSlider = _this11.handleSlider.bind(_this11);
-        _this11.handleToggle = _this11.handleToggle.bind(_this11);
-        _this11.handleAudio = _this11.handleAudio.bind(_this11);
-        _this11.handleTextSubmit = _this11.handleTextSubmit.bind(_this11);
-        return _this11;
+        _this12.handleSlider = _this12.handleSlider.bind(_this12);
+        _this12.handleToggle = _this12.handleToggle.bind(_this12);
+        _this12.handleAudio = _this12.handleAudio.bind(_this12);
+        _this12.handleTextSubmit = _this12.handleTextSubmit.bind(_this12);
+        return _this12;
     }
 
     _createClass(ADSR, [{
@@ -1050,21 +1115,21 @@ var ADSR = function (_React$Component8) {
     return ADSR;
 }(React.Component);
 
-var Output = function (_React$Component9) {
-    _inherits(Output, _React$Component9);
+var Output = function (_React$Component10) {
+    _inherits(Output, _React$Component10);
 
     function Output(props) {
         _classCallCheck(this, Output);
 
-        var _this12 = _possibleConstructorReturn(this, (Output.__proto__ || Object.getPrototypeOf(Output)).call(this, props));
+        var _this13 = _possibleConstructorReturn(this, (Output.__proto__ || Object.getPrototypeOf(Output)).call(this, props));
 
-        _this12.state = {
-            gainNode: _this12.props.audioContext.createGain(),
+        _this13.state = {
+            gainNode: _this13.props.audioContext.createGain(),
             value: .5
         };
-        _this12.handleOutput = _this12.handleOutput.bind(_this12);
-        _this12.handleChange = _this12.handleChange.bind(_this12);
-        return _this12;
+        _this13.handleOutput = _this13.handleOutput.bind(_this13);
+        _this13.handleChange = _this13.handleChange.bind(_this13);
+        return _this13;
     }
 
     _createClass(Output, [{
@@ -1120,16 +1185,16 @@ var Output = function (_React$Component9) {
 //patchcords with delete capability
 
 
-var Cord = function (_React$Component10) {
-    _inherits(Cord, _React$Component10);
+var Cord = function (_React$Component11) {
+    _inherits(Cord, _React$Component11);
 
     function Cord(props) {
         _classCallCheck(this, Cord);
 
-        var _this13 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
+        var _this14 = _possibleConstructorReturn(this, (Cord.__proto__ || Object.getPrototypeOf(Cord)).call(this, props));
 
-        _this13.handleClick = _this13.handleClick.bind(_this13);
-        return _this13;
+        _this14.handleClick = _this14.handleClick.bind(_this14);
+        return _this14;
     }
 
     _createClass(Cord, [{
@@ -1155,8 +1220,8 @@ var Cord = function (_React$Component10) {
 //sidebar with buttons for creation
 
 
-var SideButtons = function (_React$Component11) {
-    _inherits(SideButtons, _React$Component11);
+var SideButtons = function (_React$Component12) {
+    _inherits(SideButtons, _React$Component12);
 
     function SideButtons(props) {
         _classCallCheck(this, SideButtons);
@@ -1176,6 +1241,7 @@ var SideButtons = function (_React$Component11) {
                 React.createElement(MyButton, { name: "Panner", handleClick: this.props.handleClick, inputOnly: "false" }),
                 React.createElement(MyButton, { name: "ADSR", handleClick: this.props.handleClick, inputOnly: "false" }),
                 React.createElement(MyButton, { name: "Delay", handleClick: this.props.handleClick, inputOnly: "false" }),
+                React.createElement(MyButton, { name: "Distortion", handleClick: this.props.handleClick, inputOnly: "false" }),
                 React.createElement(MyButton, { name: "PeePee", handleClick: this.props.handleClick, inputOnly: "false" })
             );
         }
@@ -1187,20 +1253,20 @@ var SideButtons = function (_React$Component11) {
 //buttons in side area that create modules for the playspace
 
 
-var MyButton = function (_React$Component12) {
-    _inherits(MyButton, _React$Component12);
+var MyButton = function (_React$Component13) {
+    _inherits(MyButton, _React$Component13);
 
     function MyButton(props) {
         _classCallCheck(this, MyButton);
 
-        var _this15 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
+        var _this16 = _possibleConstructorReturn(this, (MyButton.__proto__ || Object.getPrototypeOf(MyButton)).call(this, props));
 
-        _this15.state = {
+        _this16.state = {
             count: 0
         };
 
-        _this15.handleClick = _this15.handleClick.bind(_this15);
-        return _this15;
+        _this16.handleClick = _this16.handleClick.bind(_this16);
+        return _this16;
     }
 
     _createClass(MyButton, [{
@@ -1227,20 +1293,20 @@ var MyButton = function (_React$Component12) {
     return MyButton;
 }(React.Component);
 
-var Selector = function (_React$Component13) {
-    _inherits(Selector, _React$Component13);
+var Selector = function (_React$Component14) {
+    _inherits(Selector, _React$Component14);
 
     function Selector(props) {
         _classCallCheck(this, Selector);
 
-        var _this16 = _possibleConstructorReturn(this, (Selector.__proto__ || Object.getPrototypeOf(Selector)).call(this, props));
+        var _this17 = _possibleConstructorReturn(this, (Selector.__proto__ || Object.getPrototypeOf(Selector)).call(this, props));
 
-        _this16.state = {
-            val: _this16.props.values[0]
+        _this17.state = {
+            val: _this17.props.values[0]
         };
 
-        _this16.handleClick = _this16.handleClick.bind(_this16);
-        return _this16;
+        _this17.handleClick = _this17.handleClick.bind(_this17);
+        return _this17;
     }
 
     _createClass(Selector, [{
@@ -1254,7 +1320,7 @@ var Selector = function (_React$Component13) {
     }, {
         key: "render",
         value: function render() {
-            var _this17 = this;
+            var _this18 = this;
 
             return React.createElement(
                 "div",
@@ -1267,7 +1333,7 @@ var Selector = function (_React$Component13) {
                 this.props.values.map(function (el) {
                     return React.createElement(
                         "div",
-                        { key: el, className: "selectorVal", onClick: _this17.handleClick },
+                        { key: el, className: "selectorVal", onClick: _this18.handleClick },
                         el
                     );
                 })
@@ -1278,24 +1344,24 @@ var Selector = function (_React$Component13) {
     return Selector;
 }(React.Component);
 
-var Dial = function (_React$Component14) {
-    _inherits(Dial, _React$Component14);
+var Dial = function (_React$Component15) {
+    _inherits(Dial, _React$Component15);
 
     function Dial(props) {
         _classCallCheck(this, Dial);
 
-        var _this18 = _possibleConstructorReturn(this, (Dial.__proto__ || Object.getPrototypeOf(Dial)).call(this, props));
+        var _this19 = _possibleConstructorReturn(this, (Dial.__proto__ || Object.getPrototypeOf(Dial)).call(this, props));
 
-        _this18.state = {
+        _this19.state = {
             value: 0,
             num: 0,
             rotPercent: 0
         };
 
-        _this18.handleChange = _this18.handleChange.bind(_this18);
-        _this18.handleNumChange = _this18.handleNumChange.bind(_this18);
-        _this18.handleNumSubmit = _this18.handleNumSubmit.bind(_this18);
-        return _this18;
+        _this19.handleChange = _this19.handleChange.bind(_this19);
+        _this19.handleNumChange = _this19.handleNumChange.bind(_this19);
+        _this19.handleNumSubmit = _this19.handleNumSubmit.bind(_this19);
+        return _this19;
     }
 
     _createClass(Dial, [{
@@ -1336,7 +1402,7 @@ var Dial = function (_React$Component14) {
     }, {
         key: "render",
         value: function render() {
-            var _this19 = this;
+            var _this20 = this;
 
             var rotStyle = {
                 background: "conic-gradient(from " + (this.state.rotPercent / Number.POSITIVE_INFINITY - 90) + "deg, #fff, #555)",
@@ -1354,7 +1420,7 @@ var Dial = function (_React$Component14) {
                 ),
                 React.createElement("input", { id: "dialNumInput", value: this.state.num, type: "text", onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {
                         if (event.key == "Enter") {
-                            _this19.handleNumSubmit();
+                            _this20.handleNumSubmit();
                         }
                     } })
             );
@@ -1364,23 +1430,23 @@ var Dial = function (_React$Component14) {
     return Dial;
 }(React.Component);
 
-var Slider = function (_React$Component15) {
-    _inherits(Slider, _React$Component15);
+var Slider = function (_React$Component16) {
+    _inherits(Slider, _React$Component16);
 
     function Slider(props) {
         _classCallCheck(this, Slider);
 
-        var _this20 = _possibleConstructorReturn(this, (Slider.__proto__ || Object.getPrototypeOf(Slider)).call(this, props));
+        var _this21 = _possibleConstructorReturn(this, (Slider.__proto__ || Object.getPrototypeOf(Slider)).call(this, props));
 
-        _this20.state = {
-            num: (_this20.props.max + _this20.props.min) / 2,
-            val: (_this20.props.max + _this20.props.min) / 2
+        _this21.state = {
+            num: (_this21.props.max + _this21.props.min) / 2,
+            val: (_this21.props.max + _this21.props.min) / 2
         };
 
-        _this20.handleRangeChange = _this20.handleRangeChange.bind(_this20);
-        _this20.handleNumChange = _this20.handleNumChange.bind(_this20);
-        _this20.handleNumSubmit = _this20.handleNumSubmit.bind(_this20);
-        return _this20;
+        _this21.handleRangeChange = _this21.handleRangeChange.bind(_this21);
+        _this21.handleNumChange = _this21.handleNumChange.bind(_this21);
+        _this21.handleNumSubmit = _this21.handleNumSubmit.bind(_this21);
+        return _this21;
     }
 
     _createClass(Slider, [{
@@ -1425,7 +1491,7 @@ var Slider = function (_React$Component15) {
     }, {
         key: "render",
         value: function render() {
-            var _this21 = this;
+            var _this22 = this;
 
             return React.createElement(
                 "div",
@@ -1433,7 +1499,7 @@ var Slider = function (_React$Component15) {
                 React.createElement("input", { id: this.props.labelName + "Range", type: "range", value: this.state.val, min: this.props.min, max: this.props.max, step: this.props.step, onChange: this.handleRangeChange }),
                 React.createElement("input", { id: this.props.labelName + "Number", value: this.state.num, type: "text", onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {
                         if (event.key == "Enter") {
-                            _this21.handleNumSubmit();
+                            _this22.handleNumSubmit();
                         }
                     } }),
                 React.createElement(
@@ -1448,23 +1514,23 @@ var Slider = function (_React$Component15) {
     return Slider;
 }(React.Component);
 
-var LogSlider = function (_React$Component16) {
-    _inherits(LogSlider, _React$Component16);
+var LogSlider = function (_React$Component17) {
+    _inherits(LogSlider, _React$Component17);
 
     function LogSlider(props) {
         _classCallCheck(this, LogSlider);
 
-        var _this22 = _possibleConstructorReturn(this, (LogSlider.__proto__ || Object.getPrototypeOf(LogSlider)).call(this, props));
+        var _this23 = _possibleConstructorReturn(this, (LogSlider.__proto__ || Object.getPrototypeOf(LogSlider)).call(this, props));
 
-        _this22.state = {
-            val: Number(Math.log(_this22.props.mid) / Math.log(_this22.props.max)),
-            num: _this22.props.mid
+        _this23.state = {
+            val: Number(Math.log(_this23.props.mid) / Math.log(_this23.props.max)),
+            num: _this23.props.mid
         };
 
-        _this22.handleChange = _this22.handleChange.bind(_this22);
-        _this22.handleNumChange = _this22.handleNumChange.bind(_this22);
-        _this22.handleNumFreqChange = _this22.handleNumFreqChange.bind(_this22);
-        return _this22;
+        _this23.handleChange = _this23.handleChange.bind(_this23);
+        _this23.handleNumChange = _this23.handleNumChange.bind(_this23);
+        _this23.handleNumFreqChange = _this23.handleNumFreqChange.bind(_this23);
+        return _this23;
     }
 
     _createClass(LogSlider, [{
@@ -1514,7 +1580,7 @@ var LogSlider = function (_React$Component16) {
     }, {
         key: "render",
         value: function render() {
-            var _this23 = this;
+            var _this24 = this;
 
             return React.createElement(
                 "div",
@@ -1522,7 +1588,7 @@ var LogSlider = function (_React$Component16) {
                 React.createElement("input", { className: this.props.labelName + "freqNumRange", value: this.state.val, type: "range", min: Number(Math.log(this.props.min + 1) / Math.log(this.props.max)), max: 1, step: "any", onChange: this.handleChange }),
                 React.createElement("input", { id: this.props.labelName + "freqNumInput", value: this.state.num, type: "text", onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {
                         if (event.key == "Enter") {
-                            _this23.handleNumFreqChange();
+                            _this24.handleNumFreqChange();
                         }
                     } }),
                 React.createElement(
@@ -1537,21 +1603,21 @@ var LogSlider = function (_React$Component16) {
     return LogSlider;
 }(React.Component);
 
-var TextInput = function (_React$Component17) {
-    _inherits(TextInput, _React$Component17);
+var TextInput = function (_React$Component18) {
+    _inherits(TextInput, _React$Component18);
 
     function TextInput(props) {
         _classCallCheck(this, TextInput);
 
-        var _this24 = _possibleConstructorReturn(this, (TextInput.__proto__ || Object.getPrototypeOf(TextInput)).call(this, props));
+        var _this25 = _possibleConstructorReturn(this, (TextInput.__proto__ || Object.getPrototypeOf(TextInput)).call(this, props));
 
-        _this24.state = {
-            val: _this24.props.defaultVal
+        _this25.state = {
+            val: _this25.props.defaultVal
         };
 
-        _this24.handleChange = _this24.handleChange.bind(_this24);
-        _this24.handleNumSubmit = _this24.handleNumSubmit.bind(_this24);
-        return _this24;
+        _this25.handleChange = _this25.handleChange.bind(_this25);
+        _this25.handleNumSubmit = _this25.handleNumSubmit.bind(_this25);
+        return _this25;
     }
 
     _createClass(TextInput, [{
@@ -1580,14 +1646,14 @@ var TextInput = function (_React$Component17) {
     }, {
         key: "render",
         value: function render() {
-            var _this25 = this;
+            var _this26 = this;
 
             return React.createElement(
                 "label",
                 { id: this.props.labelName + "inputLabel", className: "tooltip" },
                 React.createElement("input", { value: this.state.val, type: "text", onChange: this.handleChange, onKeyPress: function onKeyPress(event) {
                         if (event.key == "Enter") {
-                            _this25.handleNumSubmit();
+                            _this26.handleNumSubmit();
                         }
                     } }),
                 React.createElement(
