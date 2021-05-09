@@ -363,6 +363,8 @@ class Area extends React.Component{
                 return <Delay audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             case "Distortion":
                 return <Distortion audioContext={this.props.audioContext} createAudio={this.createAudio}/>
+            case "Reverb":
+                return <Reverb audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             default:
                 return <div>Hahahahaha theres nothing here!</div>;
         }
@@ -681,7 +683,6 @@ class Delay extends React.Component{
 
         this.state={
             audio: this.props.audioContext.createDelay(5.0),
-            val: 0
         }
 
         this.handleDelayTime=this.handleDelayTime.bind(this);
@@ -711,7 +712,6 @@ class Distortion extends React.Component{
 
         this.state={
             audio: this.props.audioContext.createWaveShaper(),
-            val: 0
         }
 
         this.handleCurve=this.handleCurve.bind(this);
@@ -750,6 +750,32 @@ class Distortion extends React.Component{
                 <Slider labelName="distortionCurve" tooltipText="Distortion Curve" min={50} max={800} step={.1} setAudio={this.handleCurve}></Slider>
                 <Selector id="distortionSelector" values={["none", "2x", "4x"]} handleClick={this.handleOversample}/>
             </div>
+        )
+    }
+}
+
+class Reverb extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state={
+            audio: this.props.audioContext.createConvolver(),
+        }
+    }
+
+    componentDidMount(){
+        fetch("media/applause.wav")
+            .then(res => res.arrayBuffer())
+            .then(buffer => this.props.audioContext.decodeAudioData(buffer))
+            .then(final => this.state.audio.buffer=final);
+        this.props.createAudio(this.state.audio);
+        this.setState({ready: true});
+    }
+
+    render(){
+        console.log(this.state.audio.buffer);
+        return(
+            <div>Nothing</div>
         )
     }
 }
@@ -947,6 +973,7 @@ class SideButtons extends React.Component{
                 <MyButton name="ADSR" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="Delay" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="Distortion" handleClick={this.props.handleClick} inputOnly="false"/>
+                <MyButton name="Reverb" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="PeePee" handleClick={this.props.handleClick} inputOnly="false"/>
             </div>
         )
