@@ -32,6 +32,8 @@ Mute all?
 Make a "No support on Mobile!" banner.
 
 Add button to ADSR
+Add different options for reverb. (Selector)
+Work on CSS!!!!!!
 
 
 

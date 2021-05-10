@@ -115,9 +115,6 @@ html,body
         z-index: 200;
         display: flex;
         flex-direction: column;
-        border-style: inset;
-        border-color: $cancelRed;
-        border-radius: 3px;
         filter: drop-shadow(0 0 10px $dark);
         
 
@@ -138,10 +135,7 @@ html,body
             margin: auto;
             color: $light;
             font-size: 120%;
-            text-decoration: underline;
-            text-decoration-color: $cancelRed;
             font-style: oblique;
-            text-transform: lowercase;
         }
 
         .fa-times-circle{
@@ -327,7 +321,7 @@ html,body
 
         #waveSelector{
             left: 10%;
-            top: 51.5px;
+            top: 50.5px;
             z-index: 100;
         }
 
@@ -406,11 +400,6 @@ html,body
 
     //---------------------------------------- GAIN MOD --------------------------------------------
 
-    #gainGainParamTip{
-        right: -27.5px;
-        bottom: 140%;
-    }
-
     #gainRangeInput{
         margin-top: 3.5%;
     }
@@ -440,6 +429,40 @@ html,body
     #filterFreqTip{
         left: 53px;
         top: 82px;
+    }
+
+    //---------------------------------------- ADSR MOD -------------------------------------------
+
+    #ADSRCheck{
+        margin-top: 5px;
+    }
+
+    #ADSRSliderlogSliderWhole{
+        margin-top: 13px;
+    }
+
+    //---------------------------------------- DISTORTION MOD -------------------------------------------
+
+    #distortionCurveDiv{
+        margin-bottom: 30px;
+        margin-top: 15px;
+    }
+
+    #distortionSelector{
+        transform: translate(53px, -25px);
+        z-index: 6;
+    }
+
+
+    //---------------------------------------- REVERB MOD -------------------------------------------
+
+    #reverbDiv{
+        height: 30px;
+    }
+
+    #reverbSelector{
+        transform: translate(53px, 4px);
+        z-index: 6;
     }
 
     //---------------------------------------- OUTPUT MODULE ----------------------------------------
@@ -475,8 +498,8 @@ html,body
             visibility: 1;
             opacity: 1;
             background-color: lighten($dark, 20%);
-            width: 1.2vmax;
-            height: 1.2vmax;
+            width: 14px;
+            height: 14px;
 
         }
 
@@ -520,8 +543,8 @@ html,body
     visibility: 0;
     opacity: 0;
     position: absolute;
-    width: 2vh;
-    height: 2vh;
+    width: 15px;
+    height: 15px;
     background-color: lighten($dark, 20%);
     border-radius: 50%;
     transition: transform .6s, filter .3s, visibility .3s, opacity .3s;
@@ -601,6 +624,8 @@ input[type=text] {
   text-align: center;
   background: $light;
   color: $dark;
+  width: 29%;
+  border-radius: 3px;
 }
  
 input, input:focus{
@@ -631,6 +656,7 @@ input:focus{
     /* Position the tooltip */
     position: absolute;
     z-index: 1;
+    transform: translate(55px, -80px);
 
     .paramSpan{
         color: white;
@@ -648,13 +674,60 @@ input:focus{
     }
 
     #oscFreqTip{
-        right: 25%;
-        bottom: 47%;
+        transform: translate(55px, -80px);
     }
 
     #oscLFOTip{
-        right: -10px;
-        bottom: 140%;
+        right: 45px;
+        top: 47px;
+    }
+
+    #oscModGainSpan{
+        transform: translate(55px, -66px);
+    }
+
+    #oscDetuneParamTip{
+        transform: translate(-28px, -48px);
+    }
+
+    #gainGainParamTip{
+        transform: translate(-30px, -32px);
+    }
+
+    #Qdialtip{
+        transform: translate(-35px, -22px);
+    }
+
+    #filterGainSpan{
+        transform: translate(55px, -65px);
+    }
+
+    #panPanSpan{
+        transform: translate(55px, -67px);
+    }
+
+    #ADSRSliderlogSliderFreqTip{
+        transform: translate(55px, -65px);
+    }
+
+    #ADSRCheckTip{
+        transform: translate(-4px, -50px);
+    }
+
+    #ADSRAttackTip{
+        transform: translate(28px, -45px);
+    }
+
+    #ADSRDecayTip{
+        transform: translate(83px, -45px);
+    }
+
+    #ADSRSustainTip{
+        transform: translate(28px, -45px);
+    }
+
+    #ADSRReleaseTip{
+        transform: translate(83px, -45px);
     }
 }
 
@@ -695,7 +768,6 @@ input:focus{
     background: $light;
     cursor: pointer;
     -webkit-appearance: none;
-    margin-top: -6%;
     height: 12px;
             width: 12px;
   }

@@ -165,6 +165,9 @@ var App = function (_React$Component) {
                 } else if (this.state.cordCombos[fromMod].includes(info.tomyKey)) {
                     this.myAlert("You've already patched this cable!");
                     this.handlePatchExit();
+                } else if (info.tomyKey.includes(fromMod)) {
+                    this.myAlert("Hahaha thats a new one. Nice try.");
+                    this.handlePatchExit();
                 } else {
                     lastEl[toData] = info;
                     var newCombo = Object.assign({}, this.state.cordCombos);
@@ -841,7 +844,7 @@ var Filter = function (_React$Component5) {
                 "div",
                 { className: "filterDiv" },
                 React.createElement(Selector, { id: "filterSelector", values: filterTypes, handleClick: this.handleFilterType }),
-                React.createElement(Dial, { min: 0, max: 1001, onChange: this.handleDialChange }),
+                React.createElement(Dial, { min: 0, max: 1001, name: "Q", onChange: this.handleDialChange }),
                 React.createElement(Slider, { labelName: "filterGain", tooltipText: "Filter Gain", min: -40, max: 40, step: .01, setAudio: this.setGain }),
                 React.createElement(LogSlider, { labelName: "filterFreq", tooltipText: "Filter Frequency", min: 0, max: 20001, mid: 440, onChange: this.setFreq })
             );
@@ -1005,23 +1008,45 @@ var Reverb = function (_React$Component9) {
         _this12.state = {
             audio: _this12.props.audioContext.createConvolver()
         };
+
+        _this12.updateBuffer = _this12.updateBuffer.bind(_this12);
+        _this12.handleSelector = _this12.handleSelector.bind(_this12);
         return _this12;
     }
 
     _createClass(Reverb, [{
-        key: "componentDidMount",
-        value: function componentDidMount() {
+        key: "updateBuffer",
+        value: function updateBuffer(path) {
             var _this13 = this;
 
-            fetch("media/applause.wav").then(function (res) {
+            fetch(path).then(function (res) {
                 return res.arrayBuffer();
             }).then(function (buffer) {
                 return _this13.props.audioContext.decodeAudioData(buffer);
             }).then(function (final) {
                 return _this13.state.audio.buffer = final;
             });
+        }
+    }, {
+        key: "handleSelector",
+        value: function handleSelector(value) {
+            switch (value) {
+                case "Small":
+                    this.updateBuffer("media/short.wav");
+                    break;
+                case "Medium":
+                    this.updateBuffer("media/medium.wav");
+                    break;
+                case "Big":
+                    this.updateBuffer("media/long.wav");
+                    break;
+            }
+        }
+    }, {
+        key: "componentDidMount",
+        value: function componentDidMount() {
+            this.updateBuffer("media/short.wav");
             this.props.createAudio(this.state.audio);
-            this.setState({ ready: true });
         }
     }, {
         key: "render",
@@ -1029,8 +1054,8 @@ var Reverb = function (_React$Component9) {
             console.log(this.state.audio.buffer);
             return React.createElement(
                 "div",
-                null,
-                "Nothing"
+                { id: "reverbDiv" },
+                React.createElement(Selector, { id: "reverbSelector", values: ["Small", "Medium", "Large"], handleClick: this.handleSelector })
             );
         }
     }]);
@@ -1149,8 +1174,10 @@ var ADSR = function (_React$Component10) {
                         "LFO Mode"
                     )
                 ),
+                React.createElement("br", null),
                 React.createElement(TextInput, { labelName: "ADSRAttack", tooltipText: "Attack", min: 0, max: 5, defaultVal: .2, onSubmit: this.handleTextSubmit }),
                 React.createElement(TextInput, { labelName: "ADSRDecay", tooltipText: "Decay", min: 0, max: 5, defaultVal: .2, onSubmit: this.handleTextSubmit }),
+                React.createElement("br", null),
                 React.createElement(TextInput, { labelName: "ADSRSustain", tooltipText: "Sustain", min: 0, max: 1, defaultVal: .5, onSubmit: this.handleTextSubmit }),
                 React.createElement(TextInput, { labelName: "ADSRRelease", tooltipText: "Release", min: 0, max: 5, defaultVal: .3, onSubmit: this.handleTextSubmit })
             );
@@ -1460,7 +1487,12 @@ var Dial = function (_React$Component16) {
                 { className: "dialWhole" },
                 React.createElement(
                     "div",
-                    { id: "dialKnob" },
+                    { id: "dialKnob", className: "tooltip" },
+                    React.createElement(
+                        "span",
+                        { id: this.props.name + "dialtip", className: "tooltiptext" },
+                        this.props.name
+                    ),
                     React.createElement("input", { className: "dialRange", value: this.state.value, type: "range", min: "0", max: "1", step: ".001", onChange: this.handleChange }),
                     React.createElement("div", { id: "dialEmpty", style: rotStyle })
                 ),
@@ -1550,7 +1582,7 @@ var Slider = function (_React$Component17) {
                     } }),
                 React.createElement(
                     "span",
-                    { id: this.props.labelName + "Div", className: "tooltiptext" },
+                    { id: this.props.labelName + "Span", className: "tooltiptext" },
                     this.props.tooltipText
                 )
             );
@@ -1630,7 +1662,7 @@ var LogSlider = function (_React$Component18) {
 
             return React.createElement(
                 "div",
-                _defineProperty({ className: this.props.labelName + "logSliderWhole" }, "className", "tooltip"),
+                { id: this.props.labelName + "logSliderWhole", className: "tooltip" },
                 React.createElement("input", { className: this.props.labelName + "freqNumRange", value: this.state.val, type: "range", min: Number(Math.log(this.props.min + 1) / Math.log(this.props.max)), max: 1, step: "any", onChange: this.handleChange }),
                 React.createElement("input", { id: this.props.labelName + "freqNumInput", value: this.state.num, type: "text", onChange: this.handleNumChange, onKeyPress: function onKeyPress(event) {
                         if (event.key == "Enter") {

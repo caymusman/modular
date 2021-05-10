@@ -120,6 +120,9 @@ class App extends React.Component{
             }else if(this.state.cordCombos[fromMod].includes(info.tomyKey)){
                 this.myAlert("You've already patched this cable!");
                 this.handlePatchExit();
+            }else if(info.tomyKey.includes(fromMod)){
+                this.myAlert("Hahaha thats a new one. Nice try.");
+                this.handlePatchExit();
             }else{
                 lastEl[toData]=info;
                 let newCombo = {...this.state.cordCombos};
@@ -640,7 +643,7 @@ class Filter extends React.Component{
         return(
             <div className="filterDiv">
                 <Selector id="filterSelector" values={filterTypes} handleClick={this.handleFilterType}/>
-                <Dial min={0} max={1001} onChange={this.handleDialChange}/>
+                <Dial min={0} max={1001} name="Q" onChange={this.handleDialChange}/>
                 <Slider labelName="filterGain" tooltipText="Filter Gain" min={-40} max={40} step={.01} setAudio={this.setGain}/>
                 <LogSlider labelName="filterFreq" tooltipText="Filter Frequency" min={0} max={20001} mid={440} onChange={this.setFreq}/>
             </div>
@@ -761,21 +764,43 @@ class Reverb extends React.Component{
         this.state={
             audio: this.props.audioContext.createConvolver(),
         }
+
+        this.updateBuffer=this.updateBuffer.bind(this);
+        this.handleSelector=this.handleSelector.bind(this);
     }
 
-    componentDidMount(){
-        fetch("media/applause.wav")
+    updateBuffer(path){
+        fetch(path)
             .then(res => res.arrayBuffer())
             .then(buffer => this.props.audioContext.decodeAudioData(buffer))
             .then(final => this.state.audio.buffer=final);
+    }
+
+    handleSelector(value){
+        switch(value){
+            case "Small":
+                this.updateBuffer("media/short.wav");
+                break;
+            case "Medium":
+                this.updateBuffer("media/medium.wav");
+                break;
+            case "Big":
+                this.updateBuffer("media/long.wav");
+                break;
+        }
+    }
+
+    componentDidMount(){
+        this.updateBuffer("media/short.wav");
         this.props.createAudio(this.state.audio);
-        this.setState({ready: true});
     }
 
     render(){
         console.log(this.state.audio.buffer);
         return(
-            <div>Nothing</div>
+            <div id="reverbDiv">
+                <Selector id="reverbSelector" values={["Small", "Medium", "Large"]} handleClick={this.handleSelector}/>
+                </div>
         )
     }
 }
@@ -873,8 +898,10 @@ class ADSR extends React.Component{
                      <span className="slider round"></span>
                      <span id="ADSRCheckTip" className="tooltiptext">LFO Mode</span>
                  </label>
+                 <br></br>
             <TextInput labelName="ADSRAttack" tooltipText="Attack" min={0} max={5} defaultVal={.2} onSubmit={this.handleTextSubmit}></TextInput>
             <TextInput labelName="ADSRDecay" tooltipText="Decay" min={0} max={5} defaultVal={.2} onSubmit={this.handleTextSubmit}></TextInput>
+            <br></br>
             <TextInput labelName="ADSRSustain" tooltipText="Sustain" min={0} max={1} defaultVal={.5} onSubmit={this.handleTextSubmit}></TextInput>
             <TextInput labelName="ADSRRelease" tooltipText="Release" min={0} max={5} defaultVal={.3} onSubmit={this.handleTextSubmit}></TextInput>
             </div>
@@ -1094,7 +1121,8 @@ class Dial extends React.Component{
 
         return(
             <div className="dialWhole">
-                <div id="dialKnob">
+                <div id="dialKnob" className="tooltip">
+                    <span id={this.props.name + "dialtip"} className="tooltiptext">{this.props.name}</span>
                     <input className="dialRange" value={this.state.value} type="range" min="0" max="1" step=".001" onChange={this.handleChange}></input>
                     <div id="dialEmpty" style={rotStyle}></div>
                 </div>
@@ -1162,7 +1190,7 @@ class Slider extends React.Component{
             <div id={this.props.labelName + "Div"} className="tooltip">
                     <input id={this.props.labelName + "Range"} type="range" value={this.state.val} min={this.props.min} max={this.props.max} step={this.props.step} onChange={this.handleRangeChange}></input>
                     <input id={this.props.labelName + "Number"} value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumSubmit()}}}></input>
-                    <span id={this.props.labelName + "Div"} className="tooltiptext">{this.props.tooltipText}</span>
+                    <span id={this.props.labelName + "Span"} className="tooltiptext">{this.props.tooltipText}</span>
                 </div>
         )
     }
@@ -1226,7 +1254,7 @@ class LogSlider extends React.Component{
     render(){
 
         return(
-            <div className={this.props.labelName + "logSliderWhole"} className="tooltip">
+            <div id={this.props.labelName + "logSliderWhole"} className="tooltip">
                 <input className={this.props.labelName + "freqNumRange"} value={this.state.val} type="range" min={Number(Math.log(this.props.min+1)/Math.log(this.props.max))} max={1} step="any" onChange={this.handleChange}></input>
                 <input id={this.props.labelName + "freqNumInput"} value={this.state.num} type="text" onChange={this.handleNumChange} onKeyPress={event => {if(event.key == "Enter"){this.handleNumFreqChange()}}}></input>
                 <span id={this.props.labelName + "logSliderFreqTip"} className="tooltiptext">{this.props.tooltipText}</span>
