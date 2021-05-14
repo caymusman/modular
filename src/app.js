@@ -13,7 +13,8 @@ class App extends React.Component{
             cordCombos: {},
             alert: false,
             pingText: "",
-            audioContext: new AudioContext()
+            audioContext: new AudioContext(),
+            audioIn: false
         }
         this.handleClick=this.handleClick.bind(this);
         this.handleClose=this.handleClose.bind(this);
@@ -33,6 +34,9 @@ class App extends React.Component{
         if(this.state.outputMode){
             this.handlePatchExit();
         }
+        if(childKey.split(" ")[0] == "AudioInput"){
+            this.setState({audioIn: true});
+        }
         let newCombos = {...this.state.cordCombos, [childKey]: []};
         this.setState((state) => ({
             list: new Map([...state.list, [childKey, {myKey: childKey,
@@ -47,6 +51,10 @@ class App extends React.Component{
     handleClose(childKey){
         let newMap = new Map(this.state.list);
         newMap.delete(childKey);
+
+        if(childKey.split(" ")[0] == "AudioInput"){
+            this.setState({audioIn: false});
+        }
 
         //need to delete all patchcords attached to it, and disconnect all audio streams.
         let newCords = [...this.state.patchCords];
@@ -241,7 +249,9 @@ class App extends React.Component{
                 <div id="sidebar">
                     <SideButtons 
                                 id="sideButtons" 
-                                handleClick={this.handleClick}/> 
+                                handleClick={this.handleClick}
+                                audioIn={this.state.audioIn}
+                                /> 
                 </div>
                 <div id="playSpace">
                     <svg id="patchCords">{cords}</svg>
@@ -368,6 +378,8 @@ class Area extends React.Component{
                 return <Distortion audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             case "Reverb":
                 return <Reverb audioContext={this.props.audioContext} createAudio={this.createAudio}/>
+            case "AudioInput":
+                return <AudioInput audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             default:
                 return <div>Hahahahaha theres nothing here!</div>;
         }
@@ -909,6 +921,42 @@ class ADSR extends React.Component{
     }
 }
 
+class AudioInput extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state = {
+            outputGain: this.props.audioContext.createGain()
+        }
+
+        this.setGain=this.setGain.bind(this);
+    }
+
+    setGain(val){
+        this.state.outputGain.gain.setValueAtTime(val, this.props.audioContext.currentTime);
+    }
+
+    componentDidMount(){
+        if(navigator.mediaDevices){
+            navigator.mediaDevices.getUserMedia({audio: true})
+            .then(stream => {
+                let audio = this.props.audioContext.createMediaStreamSource(stream);
+                audio.connect(this.state.outputGain);
+                this.state.outputGain.gain.setValueAtTime(.5, this.props.audioContext.currentTime);
+                this.props.createAudio(this.state.outputGain);
+            }).catch(err => {console.log("When setting up media devices, I caught: \n" + err)});
+        }else{
+            console.log("Media Devices are not supported!");
+        }
+    }
+
+    render(){
+        return(
+            <Slider labelName="audioInGain" tooltipText="Gain" min={0} max={1} step={.01} mid={.5} setAudio={this.setGain}/>
+        )
+    }
+}
+
 class Output extends React.Component{
     constructor(props){
         super(props);
@@ -1001,7 +1049,7 @@ class SideButtons extends React.Component{
                 <MyButton name="Delay" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="Distortion" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="Reverb" handleClick={this.props.handleClick} inputOnly="false"/>
-                <MyButton name="PeePee" handleClick={this.props.handleClick} inputOnly="false"/>
+                <MyButton name="AudioInput" handleClick={this.props.handleClick} inputOnly="true" audioIn={this.props.audioIn}/>
             </div>
         )
         
@@ -1021,6 +1069,9 @@ class MyButton extends React.Component{
     }
 
     handleClick(){
+        if(this.props.audioIn){
+            return;
+        }
         this.props.handleClick(this.props.name + " " + this.state.count, this.props.name, this.props.inputOnly)
         this.setState((state) => ({
             count: state.count + 1
