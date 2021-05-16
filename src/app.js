@@ -380,6 +380,8 @@ class Area extends React.Component{
                 return <Reverb audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             case "AudioInput":
                 return <AudioInput audioContext={this.props.audioContext} createAudio={this.createAudio}/>
+            case "Recorder":
+                return <Recorder audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             default:
                 return <div>Hahahahaha theres nothing here!</div>;
         }
@@ -1008,6 +1010,32 @@ class Output extends React.Component{
     }
 }
 
+class Recorder extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state={
+            audio: this.props.audioContext.createGain(),
+            destination: this.props.audioContext.createMediaStreamDestination(),
+            mediaRecorder: null,
+        }
+    }
+
+    componentDidMount(){
+        this.state.audio.connect(this.state.destination);
+        this.setState({
+            mediaRecorder: new MediaRecorder(this.state.destination.stream)
+        })
+        this.props.createAudio(this.state.audio);
+    }
+
+    render(){
+        return(
+            <div>TestMediaStream</div>
+        )
+    }
+}
+
 //patchcords with delete capability
 class Cord extends React.Component{
     constructor(props){
@@ -1050,6 +1078,7 @@ class SideButtons extends React.Component{
                 <MyButton name="Distortion" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="Reverb" handleClick={this.props.handleClick} inputOnly="false"/>
                 <MyButton name="AudioInput" handleClick={this.props.handleClick} inputOnly="true" audioIn={this.props.audioIn}/>
+                <MyButton name="Recorder" handleClick={this.props.handleClick} inputOnly="false"/>
             </div>
         )
         
