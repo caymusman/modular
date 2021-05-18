@@ -27,6 +27,7 @@ class App extends React.Component{
         this.handleComboDelete=this.handleComboDelete.bind(this);
         this.handlePingExit=this.handlePingExit.bind(this);
         this.myAlert=this.myAlert.bind(this);
+        this.handleResize=this.handleResize.bind(this);
     }
 
     //Passed to SideButtons to control which buttons are added to PlaySpace
@@ -218,6 +219,28 @@ class App extends React.Component{
         }))
     }
 
+    handleResize(){
+        let largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
+        let newCords = [...this.state.patchCords];
+        newCords.forEach(el => {
+            let fromID = el.fromData.fromModID;
+            let in_el = document.getElementById(fromID + "outputInner").getBoundingClientRect();
+            let in_xCenter = ((in_el.right - in_el.x) / 2 + in_el.x) - (largerDim * .04);
+            let in_yCenter = ((in_el.bottom - in_el.y) / 2 + in_el.y) - (largerDim * .04);
+            el.fromData.fromLocation = {x: in_xCenter, y: in_yCenter}
+
+            let toID = el.toData.tomyKey;
+            let out_el = document.getElementById(toID + "inputInner").getBoundingClientRect();
+            let out_xCenter = ((out_el.right - out_el.x) / 2 + out_el.x) - (largerDim * .04);
+            let out_yCenter = ((out_el.bottom - out_el.y) / 2 + out_el.y) - (largerDim * .04);
+            el.toData.toLocation = {x: out_xCenter, y: out_yCenter}
+        })
+
+        this.setState({
+            patchCords: newCords
+        })
+    }
+
     myAlert(ping){
         this.setState({
             alert: true,
@@ -230,6 +253,10 @@ class App extends React.Component{
             alert: false,
             pingText: ""
         })
+    }
+
+    componentDidMount(){
+        window.addEventListener('resize', this.handleResize);
     }
 
 
@@ -861,7 +888,7 @@ class ADSR extends React.Component{
                 interval: setInterval(this.handleAudio, this.state.rate)
             });
         }else{
-            this.state.audio.gain.setTargetAtTime(.8, current + this.state.release, .5);
+            this.state.audio.gain.setTargetAtTime(0, current + this.state.release, .5);
             clearInterval(this.state.interval);
             this.setState({
                 running: false
@@ -871,12 +898,10 @@ class ADSR extends React.Component{
 
     handleAudio(){
         let current = this.props.audioContext.currentTime;
-        console.log("Begin");
         this.state.audio.gain.cancelScheduledValues(current);
         this.state.audio.gain.setTargetAtTime(.90, current + this.state.attack, this.state.attack);
         this.state.audio.gain.setTargetAtTime(this.state.sustain, current + this.state.attack + this.state.decay, this.state.decay);
-        this.state.audio.gain.setTargetAtTime(.01, current + this.state.attack + + this.state.decay + this.state.release, this.state.release);
-        console.log("End");
+        this.state.audio.gain.setTargetAtTime(.001, current + this.state.attack + + this.state.decay + this.state.release, this.state.release);
     }
 
     handleTextSubmit(name, num){
@@ -900,7 +925,7 @@ class ADSR extends React.Component{
 
     componentDidMount(){
         this.props.createAudio(this.state.audio);
-        this.state.audio.gain.setValueAtTime(.5, this.props.audioContext.currentTime);
+        this.state.audio.gain.setValueAtTime(0, this.props.audioContext.currentTime);
     }
 
     render(){
@@ -912,6 +937,7 @@ class ADSR extends React.Component{
                      <span className="slider round"></span>
                      <span id="ADSRCheckTip" className="tooltiptext">LFO Mode</span>
                  </label>
+                 <button id="ADSRButton" onClick={this.handleAudio}>Pulse</button>
                  <br></br>
             <TextInput labelName="ADSRAttack" tooltipText="Attack" min={0} max={5} defaultVal={.2} onSubmit={this.handleTextSubmit}></TextInput>
             <TextInput labelName="ADSRDecay" tooltipText="Decay" min={0} max={5} defaultVal={.2} onSubmit={this.handleTextSubmit}></TextInput>
@@ -1020,7 +1046,7 @@ class Recorder extends React.Component{
             mediaRecorder: null,
             playing: false,
             finished: false,
-            href: null
+            href: null,
         }
 
         this.handlePlay=this.handlePlay.bind(this);
@@ -1029,7 +1055,7 @@ class Recorder extends React.Component{
 
     handlePlay(){
         if(this.state.playing){
-            this.state.audio.gain.exponentialRampToValueAtTime(0.01, this.props.audioContext.currentTime + .1);
+            this.state.audio.gain.setTargetAtTime(0, this.props.audioContext.currentTime + .02, .02);
             setTimeout(() => {
                 this.state.mediaRecorder.stop();
                 this.setState({
@@ -1037,20 +1063,18 @@ class Recorder extends React.Component{
                 })
             }, 100);
         }else{
-            this.state.audio.gain.exponentialRampToValueAtTime(1, this.props.audioContext.currentTime + .1);
-            setTimeout(() => {
-                this.state.mediaRecorder.start();
-                this.setState({
-                    playing: true,
-                    finished: false
-                })
-            }, 100);  
+            this.state.audio.gain.setTargetAtTime(1, this.props.audioContext.currentTime + .04, .04);
+            this.state.mediaRecorder.start();
+            this.setState({
+                playing: true,
+                finished: false
+            })
         }
         console.log(this.chunks);
     }
 
     handleFinish(){
-        this.state.audio.gain.exponentialRampToValueAtTime(0.01, this.props.audioContext.currentTime + .1);
+        this.state.audio.gain.setTargetAtTime(0, this.props.audioContext.currentTime + .02, .02);
         setTimeout(() => {
             this.state.mediaRecorder.stop();
         }, 100);
@@ -1069,6 +1093,7 @@ class Recorder extends React.Component{
 
     componentDidMount(){
         this.state.audio.connect(this.state.destination);
+        this.state.audio.gain.setValueAtTime(0, this.props.audioContext.currentTime);
         let mr = new MediaRecorder(this.state.destination.stream);
         mr.mimeType = 'audio/weba';
         mr.audioChannels = 2;

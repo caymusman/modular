@@ -46,6 +46,7 @@ var App = function (_React$Component) {
         _this.handleComboDelete = _this.handleComboDelete.bind(_this);
         _this.handlePingExit = _this.handlePingExit.bind(_this);
         _this.myAlert = _this.myAlert.bind(_this);
+        _this.handleResize = _this.handleResize.bind(_this);
         return _this;
     }
 
@@ -275,6 +276,29 @@ var App = function (_React$Component) {
             });
         }
     }, {
+        key: "handleResize",
+        value: function handleResize() {
+            var largerDim = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
+            var newCords = [].concat(_toConsumableArray(this.state.patchCords));
+            newCords.forEach(function (el) {
+                var fromID = el.fromData.fromModID;
+                var in_el = document.getElementById(fromID + "outputInner").getBoundingClientRect();
+                var in_xCenter = (in_el.right - in_el.x) / 2 + in_el.x - largerDim * .04;
+                var in_yCenter = (in_el.bottom - in_el.y) / 2 + in_el.y - largerDim * .04;
+                el.fromData.fromLocation = { x: in_xCenter, y: in_yCenter };
+
+                var toID = el.toData.tomyKey;
+                var out_el = document.getElementById(toID + "inputInner").getBoundingClientRect();
+                var out_xCenter = (out_el.right - out_el.x) / 2 + out_el.x - largerDim * .04;
+                var out_yCenter = (out_el.bottom - out_el.y) / 2 + out_el.y - largerDim * .04;
+                el.toData.toLocation = { x: out_xCenter, y: out_yCenter };
+            });
+
+            this.setState({
+                patchCords: newCords
+            });
+        }
+    }, {
         key: "myAlert",
         value: function myAlert(ping) {
             this.setState({
@@ -289,6 +313,11 @@ var App = function (_React$Component) {
                 alert: false,
                 pingText: ""
             });
+        }
+    }, {
+        key: "componentDidMount",
+        value: function componentDidMount() {
+            window.addEventListener('resize', this.handleResize);
         }
     }, {
         key: "render",
@@ -1126,7 +1155,7 @@ var ADSR = function (_React$Component10) {
                     interval: setInterval(this.handleAudio, this.state.rate)
                 });
             } else {
-                this.state.audio.gain.setTargetAtTime(.8, current + this.state.release, .5);
+                this.state.audio.gain.setTargetAtTime(0, current + this.state.release, .5);
                 clearInterval(this.state.interval);
                 this.setState({
                     running: false
@@ -1137,12 +1166,10 @@ var ADSR = function (_React$Component10) {
         key: "handleAudio",
         value: function handleAudio() {
             var current = this.props.audioContext.currentTime;
-            console.log("Begin");
             this.state.audio.gain.cancelScheduledValues(current);
             this.state.audio.gain.setTargetAtTime(.90, current + this.state.attack, this.state.attack);
             this.state.audio.gain.setTargetAtTime(this.state.sustain, current + this.state.attack + this.state.decay, this.state.decay);
-            this.state.audio.gain.setTargetAtTime(.01, current + this.state.attack + +this.state.decay + this.state.release, this.state.release);
-            console.log("End");
+            this.state.audio.gain.setTargetAtTime(.001, current + this.state.attack + +this.state.decay + this.state.release, this.state.release);
         }
     }, {
         key: "handleTextSubmit",
@@ -1168,7 +1195,7 @@ var ADSR = function (_React$Component10) {
         key: "componentDidMount",
         value: function componentDidMount() {
             this.props.createAudio(this.state.audio);
-            this.state.audio.gain.setValueAtTime(.5, this.props.audioContext.currentTime);
+            this.state.audio.gain.setValueAtTime(0, this.props.audioContext.currentTime);
         }
     }, {
         key: "render",
@@ -1187,6 +1214,11 @@ var ADSR = function (_React$Component10) {
                         { id: "ADSRCheckTip", className: "tooltiptext" },
                         "LFO Mode"
                     )
+                ),
+                React.createElement(
+                    "button",
+                    { id: "ADSRButton", onClick: this.handleAudio },
+                    "Pulse"
                 ),
                 React.createElement("br", null),
                 React.createElement(TextInput, { labelName: "ADSRAttack", tooltipText: "Attack", min: 0, max: 5, defaultVal: .2, onSubmit: this.handleTextSubmit }),
@@ -1345,7 +1377,7 @@ var Recorder = function (_React$Component13) {
             var _this19 = this;
 
             if (this.state.playing) {
-                this.state.audio.gain.exponentialRampToValueAtTime(0.01, this.props.audioContext.currentTime + .1);
+                this.state.audio.gain.setTargetAtTime(0, this.props.audioContext.currentTime + .02, .02);
                 setTimeout(function () {
                     _this19.state.mediaRecorder.stop();
                     _this19.setState({
@@ -1353,14 +1385,12 @@ var Recorder = function (_React$Component13) {
                     });
                 }, 100);
             } else {
-                this.state.audio.gain.exponentialRampToValueAtTime(1, this.props.audioContext.currentTime + .1);
-                setTimeout(function () {
-                    _this19.state.mediaRecorder.start();
-                    _this19.setState({
-                        playing: true,
-                        finished: false
-                    });
-                }, 100);
+                this.state.audio.gain.setTargetAtTime(1, this.props.audioContext.currentTime + .04, .04);
+                this.state.mediaRecorder.start();
+                this.setState({
+                    playing: true,
+                    finished: false
+                });
             }
             console.log(this.chunks);
         }
@@ -1369,7 +1399,7 @@ var Recorder = function (_React$Component13) {
         value: function handleFinish() {
             var _this20 = this;
 
-            this.state.audio.gain.exponentialRampToValueAtTime(0.01, this.props.audioContext.currentTime + .1);
+            this.state.audio.gain.setTargetAtTime(0, this.props.audioContext.currentTime + .02, .02);
             setTimeout(function () {
                 _this20.state.mediaRecorder.stop();
             }, 100);
@@ -1390,6 +1420,7 @@ var Recorder = function (_React$Component13) {
             var _this21 = this;
 
             this.state.audio.connect(this.state.destination);
+            this.state.audio.gain.setValueAtTime(0, this.props.audioContext.currentTime);
             var mr = new MediaRecorder(this.state.destination.stream);
             mr.mimeType = 'audio/weba';
             mr.audioChannels = 2;

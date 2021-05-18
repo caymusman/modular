@@ -1,39 +1,20 @@
 Make side menu change when size is too small.
 
-resizing issues!
-
-QOL: on disconnect, make it mute in like .2 seconds and then disconnect.
-
-Modules:
-Gain - check
-LFO - check
-Filter - check
-Panner - check
-Envelope - check
-Delay?
-Recording out
-Audio in?
-Clips?
-
-
-
-Reorganize Selector SCSS;
-Add tooltips;
-Style with animations
 
 
 
 Things for the top helpbar: 
-Notes as frequencies dropdown!  Seconding this as of May 6th!
+Notes as frequencies dropdown!  Seconding this as of May 6th! Thirding as of May 18th!
 Metronome
 Calculator
 Mute all?
 
 Make a "No support on Mobile!" banner.
-
 Add button to ADSR
-Add different options for reverb. (Selector)
-Work on CSS!!!!!!
+resizing issues!
+
+Add Params
+Add Bypasses
 
 
 
