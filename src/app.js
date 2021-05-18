@@ -1018,20 +1018,78 @@ class Recorder extends React.Component{
             audio: this.props.audioContext.createGain(),
             destination: this.props.audioContext.createMediaStreamDestination(),
             mediaRecorder: null,
+            playing: false,
+            finished: false,
+            href: null
+        }
+
+        this.handlePlay=this.handlePlay.bind(this);
+        this.handleFinish=this.handleFinish.bind(this);
+    }
+
+    handlePlay(){
+        if(this.state.playing){
+            this.state.audio.gain.exponentialRampToValueAtTime(0.01, this.props.audioContext.currentTime + .1);
+            setTimeout(() => {
+                this.state.mediaRecorder.stop();
+                this.setState({
+                    playing: false,
+                })
+            }, 100);
+        }else{
+            this.state.audio.gain.exponentialRampToValueAtTime(1, this.props.audioContext.currentTime + .1);
+            setTimeout(() => {
+                this.state.mediaRecorder.start();
+                this.setState({
+                    playing: true,
+                    finished: false
+                })
+            }, 100);  
+        }
+        console.log(this.chunks);
+    }
+
+    handleFinish(){
+        this.state.audio.gain.exponentialRampToValueAtTime(0.01, this.props.audioContext.currentTime + .1);
+        setTimeout(() => {
+            this.state.mediaRecorder.stop();
+        }, 100);
+        if(!this.state.finished){
+            setTimeout(() => {
+                let blob = new Blob(this.chunks, {"type": "audio/weba"});
+                this.setState({
+                    href: URL.createObjectURL(blob),
+                    playing: false,
+                    finished: true
+         })
+            }, 510);
+            
         }
     }
 
     componentDidMount(){
         this.state.audio.connect(this.state.destination);
+        let mr = new MediaRecorder(this.state.destination.stream);
+        mr.mimeType = 'audio/weba';
+        mr.audioChannels = 2;
+        this.chunks = [];
+        mr.ondataavailable = event => {
+            this.chunks.push(event.data);
+        }
         this.setState({
-            mediaRecorder: new MediaRecorder(this.state.destination.stream)
+            mediaRecorder: mr
         })
         this.props.createAudio(this.state.audio);
     }
 
     render(){
         return(
-            <div>TestMediaStream</div>
+            <div id="RecorderDiv">
+                <button id="recorderPlay" onClick={this.handlePlay}>{this.state.playing ? "Pause" : "Record"}</button>
+                <button id="recorderFinish" onClick={this.handleFinish}>Finish</button>
+                <a href={this.state.href} download="recordedAudio.weba"> Download Here</a>
+            
+            </div>
         )
     }
 }
