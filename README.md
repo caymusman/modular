@@ -5,8 +5,8 @@ A draggable, customizable modular synth created with React and the WebAudio API.
 
 
 
-ToDo:
-Add more input Params for automation
-Add bypasses
-Add top Toolchain
-Bugfix ADSR in FF
+ToDo:\
+Add more input Params for automation\
+Add bypasses\
+Add top Toolchain\
+Bugfix ADSR in FF\
