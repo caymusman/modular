@@ -102,3 +102,9 @@ dist
 
 # TernJS port file
 .tern-port
+
+styles.css.map
+.DS_Store
+.vscode
+.styles.css.map
+app.js
