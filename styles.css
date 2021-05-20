@@ -79,6 +79,7 @@ html, body {
   margin: auto;
   padding: 0px;
   border: none;
+  border-radius: 0px;
 }
 
 #sidebar .addBtn:hover {
@@ -430,16 +431,17 @@ html, body {
   margin-top: 65px;
 }
 
-#filterGainTip {
-  left: 53px;
-  top: 54px;
-}
+/*
+    #filterGainTip{
+        left: 53px;
+        top: 54px;
+    }
 
-#filterFreqTip {
-  left: 53px;
-  top: 82px;
-}
-
+    #filterFreqTip{
+        left: 53px;
+        top: 82px;
+    }
+    */
 #ADSRCheck {
   margin-top: 5px;
 }
@@ -686,80 +688,80 @@ input:focus {
   text-decoration: underline;
 }
 
-.tooltip:hover .tooltiptext {
-  display: block;
-  z-index: 2000;
-  visibility: visible;
-}
-
-.tooltip #oscFreqTip {
+#oscFreqTip {
   -webkit-transform: translate(55px, -80px);
           transform: translate(55px, -80px);
 }
 
-.tooltip #oscLFOTip {
+#oscLFOTip {
   right: 45px;
   top: 47px;
 }
 
-.tooltip #oscModGainSpan {
-  -webkit-transform: translate(55px, -66px);
-          transform: translate(55px, -66px);
+#oscModGainSpan {
+  -webkit-transform: translate(46px, -66px);
+          transform: translate(46px, -66px);
 }
 
-.tooltip #oscDetuneParamTip {
+#oscDetuneParamTip {
   -webkit-transform: translate(-28px, -48px);
           transform: translate(-28px, -48px);
 }
 
-.tooltip #gainGainParamTip {
+#gainGainParamTip {
   -webkit-transform: translate(-30px, -32px);
           transform: translate(-30px, -32px);
 }
 
-.tooltip #Qdialtip {
+#Qdialtip {
   -webkit-transform: translate(-35px, -22px);
           transform: translate(-35px, -22px);
 }
 
-.tooltip #filterGainSpan {
+#filterGainSpan {
   -webkit-transform: translate(55px, -65px);
           transform: translate(55px, -65px);
 }
 
-.tooltip #panPanSpan {
+#panPanSpan {
   -webkit-transform: translate(55px, -67px);
           transform: translate(55px, -67px);
 }
 
-.tooltip #ADSRSliderlogSliderFreqTip {
+#ADSRSliderlogSliderFreqTip {
   -webkit-transform: translate(55px, -65px);
           transform: translate(55px, -65px);
 }
 
-.tooltip #ADSRCheckTip {
+#ADSRCheckTip {
   -webkit-transform: translate(-4px, -50px);
           transform: translate(-4px, -50px);
 }
 
-.tooltip #ADSRAttackTip {
+#ADSRAttackTip {
   -webkit-transform: translate(28px, -45px);
           transform: translate(28px, -45px);
 }
 
-.tooltip #ADSRDecayTip {
+#ADSRDecayTip {
   -webkit-transform: translate(83px, -45px);
           transform: translate(83px, -45px);
 }
 
-.tooltip #ADSRSustainTip {
+#ADSRSustainTip {
   -webkit-transform: translate(28px, -45px);
           transform: translate(28px, -45px);
 }
 
-.tooltip #ADSRReleaseTip {
+#ADSRReleaseTip {
   -webkit-transform: translate(83px, -45px);
           transform: translate(83px, -45px);
+}
+
+.tooltip:hover .tooltiptext {
+  display: block;
+  z-index: 2000;
+  visibility: visible;
 }
 
 .tooltiptext::after {

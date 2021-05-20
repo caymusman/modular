@@ -77,6 +77,7 @@ html,body
         margin: auto;
         padding: 0px;
         border: none;
+        border-radius: 0px;
 
         &:hover{
             background-color: $dark;
@@ -421,6 +422,7 @@ html,body
         margin-top: 65px;
     }
 
+    /*
     #filterGainTip{
         left: 53px;
         top: 54px;
@@ -430,6 +432,7 @@ html,body
         left: 53px;
         top: 82px;
     }
+    */
 
     //---------------------------------------- ADSR MOD -------------------------------------------
 
@@ -683,15 +686,6 @@ input:focus{
     }
   }
 
-.tooltip{
-    &:hover{
-        .tooltiptext {
-            display: block;
-            z-index: 2000;
-            visibility: visible;
-          }
-    }
-
     #oscFreqTip{
         transform: translate(55px, -80px);
     }
@@ -702,7 +696,7 @@ input:focus{
     }
 
     #oscModGainSpan{
-        transform: translate(55px, -66px);
+        transform: translate(46px, -66px);
     }
 
     #oscDetuneParamTip{
@@ -748,7 +742,19 @@ input:focus{
     #ADSRReleaseTip{
         transform: translate(83px, -45px);
     }
+
+.tooltip{
+    &:hover{
+        .tooltiptext {
+            display: block;
+            z-index: 2000;
+            visibility: visible;
+          }
+    }
 }
+
+
+    
 
 .tooltiptext::after {
     content: " ";
@@ -925,7 +931,6 @@ input:checked + .slider:before {
 }
 
 //------------------------------------ BUTTON ---------------------------
-
 button{
     background-color: $dark;
     width: 40%;
@@ -944,6 +949,7 @@ button{
         background-color: darken($dark, 10%);
     }
 }
+
 @media only screen and (max-device-width: 480px){    
     #mainDiv{
         visibility: 0;
