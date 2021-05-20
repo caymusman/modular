@@ -441,6 +441,10 @@ html,body
         margin-top: 13px;
     }
 
+    #ADSRButton{
+        transform: translateY(1px);
+    }
+
     //---------------------------------------- DISTORTION MOD -------------------------------------------
 
     #distortionCurveDiv{
@@ -461,8 +465,23 @@ html,body
     }
 
     #reverbSelector{
-        transform: translate(53px, 4px);
+        
+        transform: translate(45px, 4px);
         z-index: 6;
+    }
+
+
+    //---------------------------------------- RECORD MOD -------------------------------------------
+
+    #RecorderDiv{
+    
+        a{
+            color: $light;
+            &:link{
+                color: $dark;
+            }
+
+        }
     }
 
     //---------------------------------------- OUTPUT MODULE ----------------------------------------
@@ -656,7 +675,7 @@ input:focus{
     /* Position the tooltip */
     position: absolute;
     z-index: 1;
-    transform: translate(55px, -80px);
+    transform: translate(45px, -80px);
 
     .paramSpan{
         color: white;
@@ -905,6 +924,26 @@ input:checked + .slider:before {
     }
 }
 
+//------------------------------------ BUTTON ---------------------------
+
+button{
+    background-color: $dark;
+    width: 40%;
+    text-transform: capitalize;
+    font-size: 12px;
+    cursor: pointer;
+    color: $light;
+    outline: none;
+    border: none;
+    margin: 5px;
+    margin-top: 2px;
+    padding: 3px 5px 3px 5px;
+    border-radius: 3px;
+
+    &:active{
+        background-color: darken($dark, 10%);
+    }
+}
 @media only screen and (max-device-width: 480px){    
     #mainDiv{
         visibility: 0;

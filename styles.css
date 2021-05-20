@@ -448,6 +448,11 @@ html, body {
   margin-top: 13px;
 }
 
+#ADSRButton {
+  -webkit-transform: translateY(1px);
+          transform: translateY(1px);
+}
+
 #distortionCurveDiv {
   margin-bottom: 30px;
   margin-top: 15px;
@@ -464,9 +469,17 @@ html, body {
 }
 
 #reverbSelector {
-  -webkit-transform: translate(53px, 4px);
-          transform: translate(53px, 4px);
+  -webkit-transform: translate(45px, 4px);
+          transform: translate(45px, 4px);
   z-index: 6;
+}
+
+#RecorderDiv a {
+  color: #ddd;
+}
+
+#RecorderDiv a:link {
+  color: #555;
 }
 
 #outputDiv {
@@ -664,8 +677,8 @@ input:focus {
   /* Position the tooltip */
   position: absolute;
   z-index: 1;
-  -webkit-transform: translate(55px, -80px);
-          transform: translate(55px, -80px);
+  -webkit-transform: translate(45px, -80px);
+          transform: translate(45px, -80px);
 }
 
 .tooltiptext .paramSpan {
@@ -925,6 +938,25 @@ input:checked + .slider:before {
   width: 45px;
   -ms-flex-item-align: end;
       align-self: flex-end;
+}
+
+button {
+  background-color: #555;
+  width: 40%;
+  text-transform: capitalize;
+  font-size: 12px;
+  cursor: pointer;
+  color: #ddd;
+  outline: none;
+  border: none;
+  margin: 5px;
+  margin-top: 2px;
+  padding: 3px 5px 3px 5px;
+  border-radius: 3px;
+}
+
+button:active {
+  background-color: #3c3c3c;
 }
 
 @media only screen and (max-device-width: 480px) {
