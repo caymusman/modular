@@ -10,3 +10,4 @@ Add more input Params for automation\
 Add bypasses\
 Add top Toolchain\
 Bugfix ADSR in FF\
+Tooltips in FF
