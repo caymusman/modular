@@ -313,6 +313,7 @@ class App extends React.Component{
                                                         handleOutput={this.handleOutput}
                                                         inputOnly={inputOnly}
                                                         audioContext={this.state.audioContext}
+                                                        alert={this.myAlert}
                                                         />
                                     </div></Draggable>
                     })}
@@ -406,7 +407,7 @@ class Area extends React.Component{
             case "Reverb":
                 return <Reverb audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             case "AudioInput":
-                return <AudioInput audioContext={this.props.audioContext} createAudio={this.createAudio}/>
+                return <AudioInput alert={this.props.alert} handleClose={this.handleClose} audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             case "Recorder":
                 return <Recorder audioContext={this.props.audioContext} createAudio={this.createAudio}/>
             default:
@@ -533,12 +534,14 @@ class Oscillator extends React.Component{
     render(){
         return(
             <div className="oscDiv">
-                <Selector id="waveSelector" values={["sine", "sawtooth", "triangle"]} handleClick={this.handleWaveChange} />
-                <label id="oscSlider" className="switch tooltip">
-                     <input type="checkbox" onClick={this.handleLFOClick}></input>
-                     <span className="slider round"></span>
-                     <span id="oscLFOTip" className="tooltiptext">LFO Mode</span>
-                 </label>
+                <div id="oscBoxOne">
+                    <Selector id="waveSelector" values={["sine", "sawtooth", "triangle"]} handleClick={this.handleWaveChange} />
+                    <label id="oscSlider" className="switch tooltip">
+                        <input type="checkbox" onClick={this.handleLFOClick}></input>
+                        <span className="slider round"></span>
+                        <span id="oscLFOTip" className="tooltiptext">LFO Mode</span>
+                    </label>
+                </div>
                 <LogSlider labelName="oscFreq" tooltipText="Oscillator Frequency" min={this.state.min} max={this.state.max} mid={this.state.mid} onChange={this.setFreq}/>
                 <div className="cordOuter tooltip" id="firstParam" onClick={this.handleOutput}>
                     <div className="cordInner" id={this.props.parent + " param" + " inputInner"}>
@@ -683,8 +686,10 @@ class Filter extends React.Component{
         let filterTypes=["lowpass", "highpass", "bandpass", "lowshelf", "highshelf", "peaking", "notch", "allpass"];
         return(
             <div className="filterDiv">
-                <Selector id="filterSelector" values={filterTypes} handleClick={this.handleFilterType}/>
-                <Dial min={0} max={1001} name="Q" onChange={this.handleDialChange}/>
+                <div id="filterBoxOne">
+                    <Selector id="filterSelector" values={filterTypes} handleClick={this.handleFilterType}/>
+                    <Dial min={0} max={1001} name="Q" onChange={this.handleDialChange}/>
+                </div>
                 <Slider labelName="filterGain" tooltipText="Filter Gain" min={-40} max={40} step={.01} setAudio={this.setGain}/>
                 <LogSlider labelName="filterFreq" tooltipText="Filter Frequency" min={0} max={20001} mid={440} onChange={this.setFreq}/>
             </div>
@@ -837,7 +842,6 @@ class Reverb extends React.Component{
     }
 
     render(){
-        console.log(this.state.audio.buffer);
         return(
             <div id="reverbDiv">
                 <Selector id="reverbSelector" values={["Small", "Medium", "Large"]} handleClick={this.handleSelector}/>
@@ -972,9 +976,15 @@ class AudioInput extends React.Component{
                 audio.connect(this.state.outputGain);
                 this.state.outputGain.gain.setValueAtTime(.5, this.props.audioContext.currentTime);
                 this.props.createAudio(this.state.outputGain);
-            }).catch(err => {console.log("When setting up media devices, I caught: \n" + err)});
+            }).catch(err => {
+                console.log("When setting up media devices, I caught: \n" + err); 
+                this.props.handleClose();
+                this.props.alert("You denied audio permissions. Allow permissions to create this module.")
+            });
         }else{
             console.log("Media Devices are not supported!");
+            this.props.handleClose();
+            this.props.alert("Media Devices are not supported.")
         }
     }
 
@@ -1025,7 +1035,9 @@ class Output extends React.Component{
         return(
             <div id="outputDiv">
                 <p>Output</p>
-                <input id="gainSlider" value={this.state.value} type="range" min="0" max="1" step=".05" onChange={this.handleChange}></input>
+                <div id="outputCenter">
+                    <input id="gainSlider" value={this.state.value} type="range" min="0" max="1" step=".05" onChange={this.handleChange}></input>
+                </div>
                 <div className="cordOuter"
                         onClick={this.handleOutput}>
                             <div className="cordInner" id={"Output" + "inputInner"}>
@@ -1220,9 +1232,11 @@ class Selector extends React.Component{
         return(
             <div id={this.props.id} className="selectorDiv">
                 <span>{this.state.val}</span>
-                {this.props.values.map(el => {
+                <div id="selectorContent">
+                    {this.props.values.map(el => {
                     return <div key={el} className="selectorVal" onClick={this.handleClick}>{el}</div>
-                })}
+                    })}
+                </div>
             </div>
         )
     }

@@ -137,13 +137,15 @@ html,body
             color: $light;
             font-size: 120%;
             font-style: oblique;
+            width: 80%;
+            text-align: center;
         }
 
         .fa-times-circle{
             position: absolute;
-            right: -2vh;
-            top: -2.5vh;
-            font-size: 4vh;
+            right: -1vmax;
+            top: -1.2vmax;
+            font-size: 2vmax;
             color: $light;
             transition: transform .6s, filter .6s, color .6s;
             cursor: pointer;
@@ -281,7 +283,8 @@ html,body
         color: $light;
         background: $dark;
         text-transform: capitalize;
-        position: absolute;
+        position: relative;
+        display: inline-block;
         border-radius: 3px;
         font-size: 12px;
     
@@ -289,10 +292,15 @@ html,body
             display: block;
             padding: 3px;
         }
+
+        #selectorContent{
+            width: 100%;
+            display:none;
+            position: absolute;
+        }
     
         .selectorVal{
-            position: relative;
-            display: none;
+            display: block;
             background: $dark;
             padding: 3px;
     
@@ -303,10 +311,11 @@ html,body
         }
     
         &:hover{
+            border-radius: 3px 3px 0px 0px;
             span{
                 color: $mainPurple;
             }
-            .selectorVal{
+            #selectorContent{
                 display: block;
             }
         }
@@ -315,14 +324,14 @@ html,body
  // ------------------------------------- OSCILLATOR DIV --------------------------------
     .oscDiv{
 
-        #oscSlider{
-            right: -20%;
-            margin-top: 5%;
+        #oscBoxOne{
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            margin-bottom: 10px;
         }
 
         #waveSelector{
-            left: 10%;
-            top: 50.5px;
             z-index: 100;
         }
 
@@ -412,14 +421,13 @@ html,body
 
     //---------------------------------------- FILTER MOD -------------------------------------------
 
-    #filterSelector{
-        left: 13%;
-        top: 55px;
-        z-index: 1000;
+    #filterBoxOne{
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
     }
-
-    #filterGainDiv{
-        margin-top: 65px;
+    #filterSelector{
+        z-index: 1000;
     }
 
     /*
@@ -451,25 +459,18 @@ html,body
     //---------------------------------------- DISTORTION MOD -------------------------------------------
 
     #distortionCurveDiv{
-        margin-bottom: 30px;
+        margin-bottom: 5px;
         margin-top: 15px;
     }
 
     #distortionSelector{
-        transform: translate(53px, -25px);
         z-index: 6;
     }
 
 
     //---------------------------------------- REVERB MOD -------------------------------------------
 
-    #reverbDiv{
-        height: 30px;
-    }
-
     #reverbSelector{
-        
-        transform: translate(45px, 4px);
         z-index: 6;
     }
 
@@ -493,8 +494,8 @@ html,body
         position: absolute;
         right: 0%;
         bottom: 0%;
-        width: 6vmax;
-        height: 12vmax;
+        width: 86.4px;
+        height: 172.8px;
         background-color:$light;
         filter: drop-shadow(0 0 10px $dark);
         text-align: center;
@@ -529,34 +530,40 @@ html,body
             background-color: $light;
         }
 
-        input[type=range] {
+        #outputCenter{
+            height: 80%;
+            width: 100%;
             position: relative;
-            transform: rotate(270deg);
-            top: 25%;
-            right: 2.5%;
-            width: 100%;
-            height: .5vw;
-          }
-          input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 100%;
-          }
-          input[type=range]::-webkit-slider-thumb {
-            border: 2px solid lighten($dark, 10%);
-            border-radius: 50%;
-            margin-top: -4.5%;
-            height: 12px;
-            width: 12px;
-          }
-          input[type=range]::-moz-range-track {
-            width: 100%;
-            height: 100%;
-          }
-          input[type=range]::-moz-range-thumb {
-            height: .7vw;
-            width: .7vw;
-            margin-top: -6%;
-          }
+
+            input[type=range] {
+                position: relative;
+                transform: rotate(270deg);
+                top: 30%;
+                right: 2.5%;
+                width: 100%;
+                height: 5%;
+              }
+              input[type=range]::-webkit-slider-runnable-track {
+                width: 100%;
+                height: 100%;
+              }
+              input[type=range]::-webkit-slider-thumb {
+                border: 2px solid lighten($dark, 10%);
+                border-radius: 50%;
+                margin-top: -4.5%;
+                height: 12px;
+                width: 12px;
+              }
+              input[type=range]::-moz-range-track {
+                width: 100%;
+                height: 100%;
+              }
+              input[type=range]::-moz-range-thumb {
+                margin-top: -6%;
+                height: 10px;
+                width: 10px;
+              }
+        }
 }
 
 //---------------------------------------- CORD DOCKS ----------------------------------------
@@ -708,7 +715,7 @@ input:focus{
     }
 
     #Qdialtip{
-        transform: translate(-35px, -22px);
+        transform: translate(-11px, -32px);
     }
 
     #filterGainSpan{
@@ -775,6 +782,7 @@ input:focus{
     -webkit-appearance: none;
     position: relative;
     border-radius: 6.5px;
+    width: 80%;
   }
   input[type=range]:focus {
     outline: none;
@@ -823,8 +831,6 @@ input:focus{
     display: inline-block;
     width: 60px;
     height: 22px;
-    margin-left: 4%;
-    margin-bottom: 6%;
 }
 
 .switch input {
@@ -886,13 +892,9 @@ input:checked + .slider:before {
 .dialWhole{ 
     height: 60px;
     width: 33%;
-    position: absolute;
-    left: 70%;
-    transform: translateX(-50%);
-    top: 28px;
-    margin-top: 5%;
     display: flex;
     justify-content: center;
+    flex-direction: column;
 
     input[type=range]{
         width: 40px;
@@ -905,28 +907,27 @@ input:checked + .slider:before {
         width: 30px;
         border-radius: 50%;
         filter: drop-shadow(3px 3px 3px #555);
-        position: absolute;
-        left: 50%;
+        position: relative;
 
         .dialRange{
-            left: -22px;
             opacity: 0;
             z-index: 6;
           }
         
 
         #dialEmpty{
-            height: 100%;
-            width: 100%;
+            height: 30px;
+            width: 30px;
             border-radius: 50%;
             position: absolute;
-            left: -15px;
-            top: 12px;
+            left: 9px;
+            top: 0px;
         }
     }
+
     #dialNumInput{
+        height: 30%;
         width: 45px;
-        align-self: flex-end;
     }
 }
 

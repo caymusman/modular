@@ -147,13 +147,15 @@ html, body {
   color: #ddd;
   font-size: 120%;
   font-style: oblique;
+  width: 80%;
+  text-align: center;
 }
 
 #playSpace .pingBox .fa-times-circle {
   position: absolute;
-  right: -2vh;
-  top: -2.5vh;
-  font-size: 4vh;
+  right: -1vmax;
+  top: -1.2vmax;
+  font-size: 2vmax;
   color: #ddd;
   -webkit-transition: color .6s, -webkit-transform .6s, -webkit-filter .6s;
   transition: color .6s, -webkit-transform .6s, -webkit-filter .6s;
@@ -303,7 +305,8 @@ html, body {
   color: #ddd;
   background: #555;
   text-transform: capitalize;
-  position: absolute;
+  position: relative;
+  display: inline-block;
   border-radius: 3px;
   font-size: 12px;
 }
@@ -313,9 +316,14 @@ html, body {
   padding: 3px;
 }
 
-.selectorDiv .selectorVal {
-  position: relative;
+.selectorDiv #selectorContent {
+  width: 100%;
   display: none;
+  position: absolute;
+}
+
+.selectorDiv .selectorVal {
+  display: block;
   background: #555;
   padding: 3px;
 }
@@ -325,22 +333,32 @@ html, body {
   cursor: pointer;
 }
 
+.selectorDiv:hover {
+  border-radius: 3px 3px 0px 0px;
+}
+
 .selectorDiv:hover span {
   color: #b6a8b5;
 }
 
-.selectorDiv:hover .selectorVal {
+.selectorDiv:hover #selectorContent {
   display: block;
 }
 
-.oscDiv #oscSlider {
-  right: -20%;
-  margin-top: 5%;
+.oscDiv #oscBoxOne {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
+  margin-bottom: 10px;
 }
 
 .oscDiv #waveSelector {
-  left: 10%;
-  top: 50.5px;
   z-index: 100;
 }
 
@@ -421,14 +439,20 @@ html, body {
   width: 33%;
 }
 
-#filterSelector {
-  left: 13%;
-  top: 55px;
-  z-index: 1000;
+#filterBoxOne {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
 }
 
-#filterGainDiv {
-  margin-top: 65px;
+#filterSelector {
+  z-index: 1000;
 }
 
 /*
@@ -456,23 +480,15 @@ html, body {
 }
 
 #distortionCurveDiv {
-  margin-bottom: 30px;
+  margin-bottom: 5px;
   margin-top: 15px;
 }
 
 #distortionSelector {
-  -webkit-transform: translate(53px, -25px);
-          transform: translate(53px, -25px);
   z-index: 6;
 }
 
-#reverbDiv {
-  height: 30px;
-}
-
 #reverbSelector {
-  -webkit-transform: translate(45px, 4px);
-          transform: translate(45px, 4px);
   z-index: 6;
 }
 
@@ -488,8 +504,8 @@ html, body {
   position: absolute;
   right: 0%;
   bottom: 0%;
-  width: 6vmax;
-  height: 12vmax;
+  width: 86.4px;
+  height: 172.8px;
   background-color: #ddd;
   -webkit-filter: drop-shadow(0 0 10px #555);
           filter: drop-shadow(0 0 10px #555);
@@ -526,22 +542,28 @@ html, body {
   background-color: #ddd;
 }
 
-#outputDiv input[type=range] {
+#outputDiv #outputCenter {
+  height: 80%;
+  width: 100%;
+  position: relative;
+}
+
+#outputDiv #outputCenter input[type=range] {
   position: relative;
   -webkit-transform: rotate(270deg);
           transform: rotate(270deg);
-  top: 25%;
+  top: 30%;
   right: 2.5%;
   width: 100%;
-  height: .5vw;
+  height: 5%;
 }
 
-#outputDiv input[type=range]::-webkit-slider-runnable-track {
+#outputDiv #outputCenter input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
   height: 100%;
 }
 
-#outputDiv input[type=range]::-webkit-slider-thumb {
+#outputDiv #outputCenter input[type=range]::-webkit-slider-thumb {
   border: 2px solid #6f6f6f;
   border-radius: 50%;
   margin-top: -4.5%;
@@ -549,15 +571,15 @@ html, body {
   width: 12px;
 }
 
-#outputDiv input[type=range]::-moz-range-track {
+#outputDiv #outputCenter input[type=range]::-moz-range-track {
   width: 100%;
   height: 100%;
 }
 
-#outputDiv input[type=range]::-moz-range-thumb {
-  height: .7vw;
-  width: .7vw;
+#outputDiv #outputCenter input[type=range]::-moz-range-thumb {
   margin-top: -6%;
+  height: 10px;
+  width: 10px;
 }
 
 .cordOuter {
@@ -714,8 +736,8 @@ input:focus {
 }
 
 #Qdialtip {
-  -webkit-transform: translate(-35px, -22px);
-          transform: translate(-35px, -22px);
+  -webkit-transform: translate(-11px, -32px);
+          transform: translate(-11px, -32px);
 }
 
 #filterGainSpan {
@@ -780,6 +802,7 @@ input[type=range] {
   -webkit-appearance: none;
   position: relative;
   border-radius: 6.5px;
+  width: 80%;
 }
 
 input[type=range]:focus {
@@ -831,8 +854,6 @@ input[type=range]::-moz-range-thumb {
   display: inline-block;
   width: 60px;
   height: 22px;
-  margin-left: 4%;
-  margin-bottom: 6%;
 }
 
 .switch input {
@@ -891,18 +912,16 @@ input:checked + .slider:before {
 .dialWhole {
   height: 60px;
   width: 33%;
-  position: absolute;
-  left: 70%;
-  -webkit-transform: translateX(-50%);
-          transform: translateX(-50%);
-  top: 28px;
-  margin-top: 5%;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
 }
 
 .dialWhole input[type=range] {
@@ -917,29 +936,26 @@ input:checked + .slider:before {
   border-radius: 50%;
   -webkit-filter: drop-shadow(3px 3px 3px #555);
           filter: drop-shadow(3px 3px 3px #555);
-  position: absolute;
-  left: 50%;
+  position: relative;
 }
 
 .dialWhole #dialKnob .dialRange {
-  left: -22px;
   opacity: 0;
   z-index: 6;
 }
 
 .dialWhole #dialKnob #dialEmpty {
-  height: 100%;
-  width: 100%;
+  height: 30px;
+  width: 30px;
   border-radius: 50%;
   position: absolute;
-  left: -15px;
-  top: 12px;
+  left: 9px;
+  top: 0px;
 }
 
 .dialWhole #dialNumInput {
+  height: 30%;
   width: 45px;
-  -ms-flex-item-align: end;
-      align-self: flex-end;
 }
 
 button {
