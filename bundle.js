@@ -1213,22 +1213,25 @@ var ADSR = function (_React$Component10) {
                 { id: "ADSRDiv" },
                 React.createElement(LogSlider, { labelName: "ADSRSlider", tooltipText: "LFO Rate", min: 0, max: 21, mid: 10, onChange: this.handleSlider }),
                 React.createElement(
-                    "label",
-                    { id: "ADSRCheck", className: "switch tooltip" },
-                    React.createElement("input", { type: "checkbox", onClick: this.handleToggle }),
-                    React.createElement("span", { className: "slider round" }),
+                    "div",
+                    { id: "ADSRBox" },
                     React.createElement(
-                        "span",
-                        { id: "ADSRCheckTip", className: "tooltiptext" },
-                        "LFO Mode"
+                        "label",
+                        { id: "ADSRCheck", className: "switch tooltip" },
+                        React.createElement("input", { type: "checkbox", onClick: this.handleToggle }),
+                        React.createElement("span", { className: "slider round" }),
+                        React.createElement(
+                            "span",
+                            { id: "ADSRCheckTip", className: "tooltiptext" },
+                            "LFO Mode"
+                        )
+                    ),
+                    React.createElement(
+                        "button",
+                        { id: "ADSRButton", onClick: this.handleAudio },
+                        "Pulse"
                     )
                 ),
-                React.createElement(
-                    "button",
-                    { id: "ADSRButton", onClick: this.handleAudio },
-                    "Pulse"
-                ),
-                React.createElement("br", null),
                 React.createElement(TextInput, { labelName: "ADSRAttack", tooltipText: "Attack", min: 0, max: 5, defaultVal: .2, onSubmit: this.handleTextSubmit }),
                 React.createElement(TextInput, { labelName: "ADSRDecay", tooltipText: "Decay", min: 0, max: 5, defaultVal: .2, onSubmit: this.handleTextSubmit }),
                 React.createElement("br", null),

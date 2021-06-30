@@ -936,13 +936,14 @@ class ADSR extends React.Component{
         return(
             <div id="ADSRDiv">
              <LogSlider labelName="ADSRSlider" tooltipText="LFO Rate" min={0} max={21} mid={10} onChange={this.handleSlider}></LogSlider>
-             <label id="ADSRCheck" className="switch tooltip">
-                     <input type="checkbox" onClick={this.handleToggle}></input>
-                     <span className="slider round"></span>
-                     <span id="ADSRCheckTip" className="tooltiptext">LFO Mode</span>
-                 </label>
-                 <button id="ADSRButton" onClick={this.handleAudio}>Pulse</button>
-                 <br></br>
+             <div id="ADSRBox">
+                <label id="ADSRCheck" className="switch tooltip">
+                        <input type="checkbox" onClick={this.handleToggle}></input>
+                        <span className="slider round"></span>
+                        <span id="ADSRCheckTip" className="tooltiptext">LFO Mode</span>
+                </label>
+                <button id="ADSRButton" onClick={this.handleAudio}>Pulse</button>
+            </div>  
             <TextInput labelName="ADSRAttack" tooltipText="Attack" min={0} max={5} defaultVal={.2} onSubmit={this.handleTextSubmit}></TextInput>
             <TextInput labelName="ADSRDecay" tooltipText="Decay" min={0} max={5} defaultVal={.2} onSubmit={this.handleTextSubmit}></TextInput>
             <br></br>
