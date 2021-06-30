@@ -453,18 +453,6 @@ html,body
         z-index: 1000;
     }
 
-    /*
-    #filterGainTip{
-        left: 53px;
-        top: 54px;
-    }
-
-    #filterFreqTip{
-        left: 53px;
-        top: 82px;
-    }
-    */
-
     //---------------------------------------- ADSR MOD -------------------------------------------
 
     #ADSRDiv{
@@ -499,6 +487,14 @@ html,body
 
     }
 
+    //---------------------------------------- DELAY MOD -------------------------------------------
+
+    #delayDiv{
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
     //---------------------------------------- DISTORTION MOD -------------------------------------------
 
     #distortionCurveDiv{
@@ -508,6 +504,7 @@ html,body
 
     #distortionSelector{
         z-index: 6;
+        margin-bottom: 10px;
     }
 
 
@@ -515,19 +512,27 @@ html,body
 
     #reverbSelector{
         z-index: 6;
+        margin: 5px 0px;
     }
 
 
     //---------------------------------------- RECORD MOD -------------------------------------------
 
     #RecorderDiv{
+
+        #recorderButtons{
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            margin-bottom: 5px;
+        }
     
         a{
             color: $light;
             &:link{
                 color: $dark;
             }
-
+            margin-bottom: 3px;
         }
     }
 
@@ -792,6 +797,23 @@ input:focus{
 
     #ADSRCheckTip{
         transform: translate(-4px, -3px);
+    }
+
+    //Delay
+
+    #delayDelayTimeSpan{
+        transform: translate(51px, 5px);
+    }
+
+    //Distortion
+    #distortionCurveSpan{
+        transform: translate(51px, 5px);
+    }
+
+    //AudioInput
+
+    #audioInGainSpan{
+        transform: translate(50px, 5px);
     }
 
 .tooltip{

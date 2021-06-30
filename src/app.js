@@ -749,7 +749,7 @@ class Delay extends React.Component{
 
     render(){
         return(
-            <div>
+            <div id="delayDiv">
                 <Slider labelName="delayDelayTime" tooltipText="Delay Time (s)" min={0} max={5} step={.01} setAudio={this.handleDelayTime}></Slider>
             </div>
         )
@@ -1126,8 +1126,10 @@ class Recorder extends React.Component{
     render(){
         return(
             <div id="RecorderDiv">
-                <button id="recorderPlay" onClick={this.handlePlay}>{this.state.playing ? "Pause" : "Record"}</button>
-                <button id="recorderFinish" onClick={this.handleFinish}>Finish</button>
+                <div id="recorderButtons">
+                    <button id="recorderPlay" onClick={this.handlePlay}>{this.state.playing ? "Pause" : "Record"}</button>
+                    <button id="recorderFinish" onClick={this.handleFinish}>Finish</button>
+                </div>
                 <a href={this.state.href} download="recordedAudio.weba"> Download Here</a>
             
             </div>

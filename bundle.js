@@ -982,7 +982,7 @@ var Delay = function (_React$Component7) {
         value: function render() {
             return React.createElement(
                 "div",
-                null,
+                { id: "delayDiv" },
                 React.createElement(Slider, { labelName: "delayDelayTime", tooltipText: "Delay Time (s)", min: 0, max: 5, step: .01, setAudio: this.handleDelayTime })
             );
         }
@@ -1466,14 +1466,18 @@ var Recorder = function (_React$Component13) {
                 "div",
                 { id: "RecorderDiv" },
                 React.createElement(
-                    "button",
-                    { id: "recorderPlay", onClick: this.handlePlay },
-                    this.state.playing ? "Pause" : "Record"
-                ),
-                React.createElement(
-                    "button",
-                    { id: "recorderFinish", onClick: this.handleFinish },
-                    "Finish"
+                    "div",
+                    { id: "recorderButtons" },
+                    React.createElement(
+                        "button",
+                        { id: "recorderPlay", onClick: this.handlePlay },
+                        this.state.playing ? "Pause" : "Record"
+                    ),
+                    React.createElement(
+                        "button",
+                        { id: "recorderFinish", onClick: this.handleFinish },
+                        "Finish"
+                    )
                 ),
                 React.createElement(
                     "a",
