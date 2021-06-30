@@ -545,7 +545,9 @@ class Oscillator extends React.Component{
                 <LogSlider labelName="oscFreq" tooltipText="Oscillator Frequency" min={this.state.min} max={this.state.max} mid={this.state.mid} onChange={this.setFreq}/>
                 <div className="cordOuter tooltip" id="firstParam" onClick={this.handleOutput}>
                     <div className="cordInner" id={this.props.parent + " param" + " inputInner"}>
-                    <span id="oscDetuneParamTip" className="tooltiptext"><span className="paramSpan">param: </span>frequency</span>
+                    <div id="ttWrapper">
+                        <span id="oscDetuneParamTip" className="tooltiptext"><span className="paramSpan">param: </span>frequency</span>
+                    </div>
                     </div>
                 </div>
                 <Slider labelName="oscModGain" tooltipText="Mod Depth" min={0} max={300} mid={150} setAudio={this.setModDepth}/>
@@ -935,20 +937,21 @@ class ADSR extends React.Component{
     render(){
         return(
             <div id="ADSRDiv">
-             <LogSlider labelName="ADSRSlider" tooltipText="LFO Rate" min={0} max={21} mid={10} onChange={this.handleSlider}></LogSlider>
-             <div id="ADSRBox">
-                <label id="ADSRCheck" className="switch tooltip">
-                        <input type="checkbox" onClick={this.handleToggle}></input>
-                        <span className="slider round"></span>
-                        <span id="ADSRCheckTip" className="tooltiptext">LFO Mode</span>
-                </label>
-                <button id="ADSRButton" onClick={this.handleAudio}>Pulse</button>
-            </div>  
-            <TextInput labelName="ADSRAttack" tooltipText="Attack" min={0} max={5} defaultVal={.2} onSubmit={this.handleTextSubmit}></TextInput>
-            <TextInput labelName="ADSRDecay" tooltipText="Decay" min={0} max={5} defaultVal={.2} onSubmit={this.handleTextSubmit}></TextInput>
-            <br></br>
-            <TextInput labelName="ADSRSustain" tooltipText="Sustain" min={0} max={1} defaultVal={.5} onSubmit={this.handleTextSubmit}></TextInput>
-            <TextInput labelName="ADSRRelease" tooltipText="Release" min={0} max={5} defaultVal={.3} onSubmit={this.handleTextSubmit}></TextInput>
+                <LogSlider labelName="ADSRSlider" tooltipText="LFO Rate" min={0} max={21} mid={10} onChange={this.handleSlider}></LogSlider>
+                <div id="ADSRBox">
+                    <label id="ADSRCheck" className="switch tooltip">
+                            <input type="checkbox" onClick={this.handleToggle}></input>
+                            <span className="slider round"></span>
+                            <span id="ADSRCheckTip" className="tooltiptext">LFO Mode</span>
+                    </label>
+                    <button id="ADSRButton" onClick={this.handleAudio}>Pulse</button>
+                </div>  
+                <div id="ADSRControls">
+                    <TextInput labelName="ADSRAttack" tooltipText="Attack" min={0} max={5} defaultVal={.2} onSubmit={this.handleTextSubmit}></TextInput>
+                    <TextInput labelName="ADSRDecay" tooltipText="Decay" min={0} max={5} defaultVal={.2} onSubmit={this.handleTextSubmit}></TextInput>
+                    <TextInput labelName="ADSRSustain" tooltipText="Sustain" min={0} max={1} defaultVal={.5} onSubmit={this.handleTextSubmit}></TextInput>
+                    <TextInput labelName="ADSRRelease" tooltipText="Release" min={0} max={5} defaultVal={.3} onSubmit={this.handleTextSubmit}></TextInput>
+                </div>
             </div>
         )
     }

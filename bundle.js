@@ -694,14 +694,18 @@ var Oscillator = function (_React$Component3) {
                         "div",
                         { className: "cordInner", id: this.props.parent + " param" + " inputInner" },
                         React.createElement(
-                            "span",
-                            { id: "oscDetuneParamTip", className: "tooltiptext" },
+                            "div",
+                            { id: "ttWrapper" },
                             React.createElement(
                                 "span",
-                                { className: "paramSpan" },
-                                "param: "
-                            ),
-                            "frequency"
+                                { id: "oscDetuneParamTip", className: "tooltiptext" },
+                                React.createElement(
+                                    "span",
+                                    { className: "paramSpan" },
+                                    "param: "
+                                ),
+                                "frequency"
+                            )
                         )
                     )
                 ),
@@ -1232,11 +1236,14 @@ var ADSR = function (_React$Component10) {
                         "Pulse"
                     )
                 ),
-                React.createElement(TextInput, { labelName: "ADSRAttack", tooltipText: "Attack", min: 0, max: 5, defaultVal: .2, onSubmit: this.handleTextSubmit }),
-                React.createElement(TextInput, { labelName: "ADSRDecay", tooltipText: "Decay", min: 0, max: 5, defaultVal: .2, onSubmit: this.handleTextSubmit }),
-                React.createElement("br", null),
-                React.createElement(TextInput, { labelName: "ADSRSustain", tooltipText: "Sustain", min: 0, max: 1, defaultVal: .5, onSubmit: this.handleTextSubmit }),
-                React.createElement(TextInput, { labelName: "ADSRRelease", tooltipText: "Release", min: 0, max: 5, defaultVal: .3, onSubmit: this.handleTextSubmit })
+                React.createElement(
+                    "div",
+                    { id: "ADSRControls" },
+                    React.createElement(TextInput, { labelName: "ADSRAttack", tooltipText: "Attack", min: 0, max: 5, defaultVal: .2, onSubmit: this.handleTextSubmit }),
+                    React.createElement(TextInput, { labelName: "ADSRDecay", tooltipText: "Decay", min: 0, max: 5, defaultVal: .2, onSubmit: this.handleTextSubmit }),
+                    React.createElement(TextInput, { labelName: "ADSRSustain", tooltipText: "Sustain", min: 0, max: 1, defaultVal: .5, onSubmit: this.handleTextSubmit }),
+                    React.createElement(TextInput, { labelName: "ADSRRelease", tooltipText: "Release", min: 0, max: 5, defaultVal: .3, onSubmit: this.handleTextSubmit })
+                )
             );
         }
     }]);

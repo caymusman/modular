@@ -467,15 +467,36 @@ html,body
 
     //---------------------------------------- ADSR MOD -------------------------------------------
 
+    #ADSRDiv{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
     #ADSRSliderlogSliderWhole{
         margin-top: 13px;
     }
 
     #ADSRBox{
+        width: 100%;
         display: flex;
         align-items: center;
         justify-content: space-evenly;
         margin: 5px 0px;
+    }
+
+    #ADSRControls{
+        width: 75%;
+        height: 30%;
+        display: grid;
+        grid: 50% 50% / 50% 50%;
+
+        label{
+            input{
+                width: 75%;
+            }
+        }
+
     }
 
     //---------------------------------------- DISTORTION MOD -------------------------------------------
@@ -692,6 +713,11 @@ input:focus{
 
 //------------------------------------------------TOOLTIP----------------------------------------
 
+#ttWrapper{
+    width: 0;
+    height: 0;
+    position: relative;
+}
 .tooltiptext {
     visibility: hidden;
     width: 60px;
@@ -706,73 +732,70 @@ input:focus{
   
     /* Position the tooltip */
     position: absolute;
+    bottom: 125%;
     z-index: 1;
-    transform: translate(45px, -80px);
 
     .paramSpan{
         color: white;
         text-decoration: underline;
     }
-  }
-
+  } 
+  //osc
     #oscFreqTip{
         transform: translate(55px, -80px);
     }
 
-    #oscLFOTip{
-        right: 45px;
-        top: 47px;
+    #oscModGainSpan{
+        transform: translate(50px, 5px);
     }
 
-    #oscModGainSpan{
-        transform: translate(46px, -66px);
+    #oscFreqlogSliderFreqTip{
+        left: 47px;
+        transform: translateY(5px);
     }
 
     #oscDetuneParamTip{
-        transform: translate(-28px, -48px);
+        transform: translate(-29px, -10px);
     }
+
+    //gain
 
     #gainGainParamTip{
-        transform: translate(-30px, -32px);
+        transform: translate(-30px, -3px);
     }
 
+    //filter
+
     #Qdialtip{
-        transform: translate(-11px, -32px);
+        transform: translate(-11px, -3px);
     }
 
     #filterGainSpan{
-        transform: translate(55px, -65px);
+        transform: translate(51px, 5px);
     }
+
+    #filterFreqlogSliderFreqTip{
+        transform: translate(51px, 5px);
+    }
+
+    //pan
 
     #panPanSpan{
-        transform: translate(55px, -67px);
+        transform: translate(51px, 5px);
     }
 
+    //ADSR
+
     #ADSRSliderlogSliderFreqTip{
-        transform: translate(55px, -65px);
+        transform: translate(55px, 5px);
     }
 
     #ADSRCheckTip{
-        transform: translate(-4px, -50px);
-    }
-
-    #ADSRAttackTip{
-        transform: translate(28px, -45px);
-    }
-
-    #ADSRDecayTip{
-        transform: translate(83px, -45px);
-    }
-
-    #ADSRSustainTip{
-        transform: translate(28px, -45px);
-    }
-
-    #ADSRReleaseTip{
-        transform: translate(83px, -45px);
+        transform: translate(-4px, -3px);
     }
 
 .tooltip{
+    position: relative;
     &:hover{
         .tooltiptext {
             display: block;

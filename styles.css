@@ -496,11 +496,25 @@ html, body {
         top: 82px;
     }
     */
+#ADSRDiv {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
 #ADSRSliderlogSliderWhole {
   margin-top: 13px;
 }
 
 #ADSRBox {
+  width: 100%;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -511,6 +525,18 @@ html, body {
       -ms-flex-pack: space-evenly;
           justify-content: space-evenly;
   margin: 5px 0px;
+}
+
+#ADSRControls {
+  width: 75%;
+  height: 30%;
+  display: -ms-grid;
+  display: grid;
+  grid: 50% 50% / 50% 50%;
+}
+
+#ADSRControls label input {
+  width: 75%;
 }
 
 #distortionCurveDiv {
@@ -721,6 +747,12 @@ input:focus {
   color: #ddd;
 }
 
+#ttWrapper {
+  width: 0;
+  height: 0;
+  position: relative;
+}
+
 .tooltiptext {
   visibility: hidden;
   width: 60px;
@@ -734,9 +766,8 @@ input:focus {
   z-index: 100;
   /* Position the tooltip */
   position: absolute;
+  bottom: 125%;
   z-index: 1;
-  -webkit-transform: translate(45px, -80px);
-          transform: translate(45px, -80px);
 }
 
 .tooltiptext .paramSpan {
@@ -749,69 +780,59 @@ input:focus {
           transform: translate(55px, -80px);
 }
 
-#oscLFOTip {
-  right: 45px;
-  top: 47px;
+#oscModGainSpan {
+  -webkit-transform: translate(50px, 5px);
+          transform: translate(50px, 5px);
 }
 
-#oscModGainSpan {
-  -webkit-transform: translate(46px, -66px);
-          transform: translate(46px, -66px);
+#oscFreqlogSliderFreqTip {
+  left: 47px;
+  -webkit-transform: translateY(5px);
+          transform: translateY(5px);
 }
 
 #oscDetuneParamTip {
-  -webkit-transform: translate(-28px, -48px);
-          transform: translate(-28px, -48px);
+  -webkit-transform: translate(-29px, -10px);
+          transform: translate(-29px, -10px);
 }
 
 #gainGainParamTip {
-  -webkit-transform: translate(-30px, -32px);
-          transform: translate(-30px, -32px);
+  -webkit-transform: translate(-30px, -3px);
+          transform: translate(-30px, -3px);
 }
 
 #Qdialtip {
-  -webkit-transform: translate(-11px, -32px);
-          transform: translate(-11px, -32px);
+  -webkit-transform: translate(-11px, -3px);
+          transform: translate(-11px, -3px);
 }
 
 #filterGainSpan {
-  -webkit-transform: translate(55px, -65px);
-          transform: translate(55px, -65px);
+  -webkit-transform: translate(51px, 5px);
+          transform: translate(51px, 5px);
+}
+
+#filterFreqlogSliderFreqTip {
+  -webkit-transform: translate(51px, 5px);
+          transform: translate(51px, 5px);
 }
 
 #panPanSpan {
-  -webkit-transform: translate(55px, -67px);
-          transform: translate(55px, -67px);
+  -webkit-transform: translate(51px, 5px);
+          transform: translate(51px, 5px);
 }
 
 #ADSRSliderlogSliderFreqTip {
-  -webkit-transform: translate(55px, -65px);
-          transform: translate(55px, -65px);
+  -webkit-transform: translate(55px, 5px);
+          transform: translate(55px, 5px);
 }
 
 #ADSRCheckTip {
-  -webkit-transform: translate(-4px, -50px);
-          transform: translate(-4px, -50px);
+  -webkit-transform: translate(-4px, -3px);
+          transform: translate(-4px, -3px);
 }
 
-#ADSRAttackTip {
-  -webkit-transform: translate(28px, -45px);
-          transform: translate(28px, -45px);
-}
-
-#ADSRDecayTip {
-  -webkit-transform: translate(83px, -45px);
-          transform: translate(83px, -45px);
-}
-
-#ADSRSustainTip {
-  -webkit-transform: translate(28px, -45px);
-          transform: translate(28px, -45px);
-}
-
-#ADSRReleaseTip {
-  -webkit-transform: translate(83px, -45px);
-          transform: translate(83px, -45px);
+.tooltip {
+  position: relative;
 }
 
 .tooltip:hover .tooltiptext {
